@@ -1,1 +1,15 @@
+server:
+  port: 38080
 
+spring:
+  application:
+    name: mmt-backend
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  profiles:
+    active: local
+
+mybatis-plus:
+  mapper-locations: classpath:/mapper/*.xml
+  configuration:
+    map-underscore-to-camel-case: true
