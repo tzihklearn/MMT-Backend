@@ -4,8 +4,6 @@ server:
 spring:
   application:
     name: mmt-backend
-  datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
   profiles:
     active: local
 

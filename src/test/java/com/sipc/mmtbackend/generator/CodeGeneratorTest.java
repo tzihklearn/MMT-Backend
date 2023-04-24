@@ -22,9 +22,9 @@ public class CodeGeneratorTest {
     @Test
     public void Test() {
 
-        String url = "jdbc:mysql://43.142.146.75/mmtbackend?useUnicode=true&characterEncoding=UTF-8&serverTimezone=GMT%2B8";
-        String username = "service";
-        String password = "service";
+        String url = "jdbc:mysql://ip/mmtbackend?useUnicode=true&characterEncoding=UTF-8&serverTimezone=GMT%2B8";
+        String username = "name";
+        String password = "passwd";
 
         FastAutoGenerator
                 //连接数据库

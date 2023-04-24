@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor(onConstructor = @_(@Autowired))
 public class OrganizationInfoController {
 
+
     private final OrganizationInfoService organizationInfoService;
 
     @PostMapping("/update")

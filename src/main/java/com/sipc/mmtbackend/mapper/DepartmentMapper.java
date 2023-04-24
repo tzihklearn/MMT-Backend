@@ -10,7 +10,7 @@ import org.apache.ibatis.annotations.Mapper;
  * </p>
  *
  * @author tzih
- * @since 2023-04-23
+ * @since 2023-04-24
  */
 @Mapper
 public interface DepartmentMapper extends BaseMapper<Department> {

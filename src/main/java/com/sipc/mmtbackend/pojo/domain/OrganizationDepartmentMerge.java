@@ -13,7 +13,7 @@ import lombok.Setter;
  * </p>
  *
  * @author tzih
- * @since 2023-04-23
+ * @since 2023-04-24
  */
 @Getter
 @Setter
@@ -22,9 +22,9 @@ public class OrganizationDepartmentMerge implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @TableId(value = "organization_id", type = IdType.AUTO)
+//    @TableId(value = "organization_id", type = IdType.AUTO)
     private Integer organizationId;
 
-    @TableId(value = "department_id", type = IdType.AUTO)
+//    @TableId(value = "department_id", type = IdType.AUTO)
     private Integer departmentId;
 }

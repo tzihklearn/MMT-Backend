@@ -31,9 +31,10 @@ import java.util.stream.Collectors;
  * @since 2023.04.23
  */
 @Service
-@RequiredArgsConstructor(onConstructor = @_(@Autowired))
+@RequiredArgsConstructor(onConstructor_ = {@Autowired})
 @Slf4j
 public class OrganizationInfoServiceImpl implements OrganizationInfoService {
+
 
     private final OrganizationMapper organizationMapper;
 
