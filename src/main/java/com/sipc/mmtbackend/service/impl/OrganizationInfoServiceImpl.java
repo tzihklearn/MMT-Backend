@@ -465,7 +465,6 @@ public class OrganizationInfoServiceImpl implements OrganizationInfoService {
 
         //拼装要返回的社团纳新宣传信息实体类对象
         OrganizationInfoResult organizationInfoResult = new OrganizationInfoResult();
-        organizationInfoResult.setOrganizationId(organizationId);
         organizationInfoResult.setName(organization.getName());
         organizationInfoResult.setAvatarUrl(organization.getAvatarUrl());
         organizationInfoResult.setBriefIntroduction(organization.getDescription());
