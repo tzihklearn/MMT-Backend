@@ -12,6 +12,7 @@ import java.util.Collections;
 
 
 /**
+ * mybatis-plus的代码生成工具，生成数据库的实体类代码和相应的mapper接口
  * @author tzih
  * @since 2023.03.20
  */
@@ -22,9 +23,9 @@ public class CodeGeneratorTest {
     @Test
     public void Test() {
 
-        String url = "jdbc:mysql://ip/mmtbackend?useUnicode=true&characterEncoding=UTF-8&serverTimezone=GMT%2B8";
-        String username = "name";
-        String password = "passwd";
+        String url = "jdbc:mysql://43.142.146.75/mmtbackend?useUnicode=true&characterEncoding=UTF-8&serverTimezone=GMT%2B8";
+        String username = "service";
+        String password = "service";
 
         FastAutoGenerator
                 //连接数据库
@@ -41,10 +42,13 @@ public class CodeGeneratorTest {
                         .pathInfo(Collections.singletonMap(OutputFile.xml, "src/main/resources/mapper")))
                 //策略配置,要生成的表的表名
                 .strategyConfig(builder -> builder.addInclude("organization", "organization_tag_merge",
-                                "organization_recruit", "organization_department_merge", "department", "tag")
+//                                "organization_recruit",
+                                "organization_department_merge",
+//                                "department",
+                                "tag")
                         //实体类策略配置，enableFileOverride覆盖原文件
-//                        .entityBuilder().enableLombok().enableTableFieldAnnotation().idType(IdType.AUTO).logicDeleteColumnName("is_deleted").enableFileOverride()
-                        .entityBuilder().enableLombok().enableTableFieldAnnotation().idType(IdType.AUTO).enableFileOverride()
+                        .entityBuilder().enableLombok().enableTableFieldAnnotation().idType(IdType.AUTO).logicDeleteColumnName("is_deleted").enableFileOverride()
+//                        .entityBuilder().enableLombok().enableTableFieldAnnotation().idType(IdType.AUTO).enableFileOverride()
                         //mapper类策略配置
                         .mapperBuilder().mapperAnnotation(Mapper.class).enableFileOverride())
                 //模板配置
