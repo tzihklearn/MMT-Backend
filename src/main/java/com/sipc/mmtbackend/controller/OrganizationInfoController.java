@@ -2,13 +2,11 @@ package com.sipc.mmtbackend.controller;
 
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
 import com.sipc.mmtbackend.pojo.dto.param.OrganizationInfoParam;
+import com.sipc.mmtbackend.pojo.dto.result.OrganizationInfoResult;
 import com.sipc.mmtbackend.service.OrganizationInfoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * @author tzih
@@ -32,6 +30,13 @@ public class OrganizationInfoController {
             e.printStackTrace();
             return CommonResult.fail("操作失败");
         }
+    }
+
+    @GetMapping("/get")
+    public CommonResult<OrganizationInfoResult> getOrganizationInfo(
+            @RequestParam("organizationId") Integer organizationId
+    ) {
+        return organizationInfoService.getOrganizationInfo(organizationId);
     }
 
 }

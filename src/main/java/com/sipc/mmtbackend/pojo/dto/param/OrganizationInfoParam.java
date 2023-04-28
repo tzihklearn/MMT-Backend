@@ -19,9 +19,9 @@ public class OrganizationInfoParam {
     @NotNull(message = "社团id不能为空")
     private Integer organizationId;
 
-    @NotBlank(message = "社团名称不能为null")
-    @Size(min = 2, max = 10, message = "社团名称长度错误，字数范围为[1,5]")
-    private String name;
+//    @NotBlank(message = "社团名称不能为null")
+//    @Size(min = 2, max = 10, message = "社团名称长度错误，字数范围为[1,5]")
+//    private String name;
 
 
     @NotNull(message = "简介不能为null")
