@@ -1,9 +1,7 @@
 package com.sipc.mmtbackend.pojo.domain;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
+
 import java.io.Serializable;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,7 +12,7 @@ import lombok.Setter;
  * </p>
  *
  * @author tzih
- * @since 2023-04-24
+ * @since 2023-04-28
  */
 @Getter
 @Setter
@@ -26,21 +24,25 @@ public class OrganizationRecruit implements Serializable {
     @TableId(value = "organization_id", type = IdType.AUTO)
     private Integer organizationId;
 
-    @TableField("description")
+    @TableField(value = "description", updateStrategy = FieldStrategy.IGNORED)
     private String description;
 
-    @TableField("feature")
+    @TableField(value = "feature", updateStrategy = FieldStrategy.IGNORED)
     private String feature;
 
-    @TableField("daily")
+    @TableField(value = "daily", updateStrategy = FieldStrategy.IGNORED)
     private String daily;
 
-    @TableField("slogan")
+    @TableField(value = "slogan", updateStrategy = FieldStrategy.IGNORED)
     private String slogan;
 
-    @TableField("contact_info")
+    @TableField(value = "contact_info", updateStrategy = FieldStrategy.IGNORED)
     private String contactInfo;
 
-    @TableField("more")
+    @TableField(value = "more", updateStrategy = FieldStrategy.IGNORED)
     private String more;
+
+    @TableField("is_deleted")
+    @TableLogic
+    private Byte isDeleted;
 }

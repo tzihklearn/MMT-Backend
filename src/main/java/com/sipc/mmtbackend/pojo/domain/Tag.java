@@ -3,6 +3,7 @@ package com.sipc.mmtbackend.pojo.domain;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 import lombok.Getter;
@@ -14,7 +15,7 @@ import lombok.Setter;
  * </p>
  *
  * @author tzih
- * @since 2023-04-24
+ * @since 2023-04-28
  */
 @Getter
 @Setter
@@ -34,4 +35,8 @@ public class Tag implements Serializable {
      */
     @TableField("type")
     private Byte type;
+
+    @TableField("is_deleted")
+    @TableLogic
+    private Byte isDeleted;
 }
