@@ -34,3 +34,5 @@ build/
 
 ## application yaml
 /src/main/resources/application-local.yml
+
+/src/test/java/com/sipc/mmtbackend/generator/CodeGeneratorTest.java

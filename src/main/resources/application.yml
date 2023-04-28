@@ -14,3 +14,6 @@ mybatis-plus:
   global-config:
     db-config:
       update-strategy: not_empty #配置更新时字段验证策略为：非空判断(只对字符串类型字段,其他类型字段依然为非 NULL 判断)
+      logic-delete-field: is_deleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
