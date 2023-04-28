@@ -1,8 +1,9 @@
-package com.sipc.mmtbackend.pojo.dto.param;
+package com.sipc.mmtbackend.pojo.dto.data;
 
 import lombok.Data;
 
 /**
+ * 社团宣传信息标签，分为系统标签和自定义标签
  * @author tzih
  * @version v1.0
  * @since 2023.04.23
@@ -10,6 +11,9 @@ import lombok.Data;
 @Data
 public class TagData {
 
+    /**
+     * 社团宣传信息标签
+     */
     private String tag;
 
     /**

@@ -7,9 +7,9 @@ import com.sipc.mmtbackend.iService.TagIService;
 import com.sipc.mmtbackend.mapper.*;
 import com.sipc.mmtbackend.pojo.domain.*;
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
-import com.sipc.mmtbackend.pojo.dto.param.DepartmentData;
+import com.sipc.mmtbackend.pojo.dto.data.DepartmentData;
 import com.sipc.mmtbackend.pojo.dto.param.OrganizationInfoParam;
-import com.sipc.mmtbackend.pojo.dto.param.TagData;
+import com.sipc.mmtbackend.pojo.dto.data.TagData;
 import com.sipc.mmtbackend.pojo.dto.result.OrganizationInfoResult;
 import com.sipc.mmtbackend.pojo.exceptions.DateBaseException;
 import com.sipc.mmtbackend.pojo.exceptions.RunException;
@@ -27,6 +27,7 @@ import java.util.stream.Collectors;
 
 
 /**
+ * 有关超级管理的社团宣传信息的功能的业务处理
  * @author tzih
  * @version v1.0
  * @since 2023.04.23
@@ -54,10 +55,13 @@ public class OrganizationInfoServiceImpl implements OrganizationInfoService {
     private final DepartmentMapper departmentMapper;
 
     /**
-     * Spring AOP代理造成的，因为只有当事务方法被当前类以外的代码调用时，才会由Spring生成的代理对象来管理
+     * 设置社团宣传信息的业务处理方法，处理设置社团宣传信息
      * @param organizationInfoParam 更新社团宣传信息接口的请求体参数类
+     * @see com.sipc.mmtbackend.pojo.dto.param.OrganizationInfoParam
      * @return 返回社团请求信息处理结果
      * @throws DateBaseException 自定义的数据库操作异常，抛出用于事务回滚
+     * @throws RunException 自定义的运行异常，抛出用于事务回滚
+     * Spring AOP代理造成的，因为只有当事务方法被当前类以外的代码调用时，才会由Spring生成的代理对象来管理
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -250,11 +254,11 @@ public class OrganizationInfoServiceImpl implements OrganizationInfoService {
                     if (deleteNum != 1) {
                         log.error("更新社团宣传信息接口异常，删除社团多余的自定义标签数出错，删除社团多余的自定义标签数：{}，删除社团和标签的对应id：{}",
                                 deleteNum, organizationTagMerges.get(typeJ).getId());
+                        throw new RunException("删除社团多余的自定义标签异常");
                     }
                 }
             }
         }
-
 
         /*
           设置宣传信息
@@ -367,6 +371,11 @@ public class OrganizationInfoServiceImpl implements OrganizationInfoService {
         return CommonResult.success("操作成功");
     }
 
+    /**
+     * 获取社团宣传信息的业务处理方法
+     * @param organizationId 社团组织id
+     * @return CommonResult<<OrganizationInfoResult>> 返回处理的结果，包括社团纳新宣传信息
+     */
     @Override
     public CommonResult<OrganizationInfoResult> getOrganizationInfo(Integer organizationId) {
 

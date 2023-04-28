@@ -1,7 +1,7 @@
 package com.sipc.mmtbackend.pojo.dto.result;
 
-import com.sipc.mmtbackend.pojo.dto.param.DepartmentData;
-import com.sipc.mmtbackend.pojo.dto.param.TagData;
+import com.sipc.mmtbackend.pojo.dto.data.DepartmentData;
+import com.sipc.mmtbackend.pojo.dto.data.TagData;
 import lombok.Data;
 import java.util.List;
 
