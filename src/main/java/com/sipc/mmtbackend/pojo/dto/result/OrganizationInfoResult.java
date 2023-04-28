@@ -15,11 +15,6 @@ import java.util.List;
 public class OrganizationInfoResult {
 
     /**
-     * 社团id
-     */
-    private Integer organizationId;
-
-    /**
      * 社团名称
      */
     private String name;

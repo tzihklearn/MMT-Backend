@@ -1,5 +1,6 @@
 package com.sipc.mmtbackend.pojo.dto.data;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 /**
@@ -9,6 +10,7 @@ import lombok.Data;
  * @since 2023.04.23
  */
 @Data
+@AllArgsConstructor
 public class TagData {
 
     /**
@@ -20,4 +22,8 @@ public class TagData {
      * 标签类型，1为系统标签，2为自定义标签
      */
     private Integer type;
+
+    public TagData() {
+
+    }
 }

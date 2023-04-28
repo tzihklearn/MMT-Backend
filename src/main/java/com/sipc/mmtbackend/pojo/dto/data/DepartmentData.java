@@ -1,5 +1,6 @@
 package com.sipc.mmtbackend.pojo.dto.data;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
@@ -12,6 +13,7 @@ import javax.validation.constraints.Size;
  * @since 2023.04.23
  */
 @Data
+@AllArgsConstructor
 public class DepartmentData {
 
     /**
@@ -43,4 +45,9 @@ public class DepartmentData {
      */
     @Size(min = 2, max = 2000, message = "部门纳新标准错误，字数范围为[1,1000]")
     private String standard;
+
+    public DepartmentData() {
+
+    }
+
 }

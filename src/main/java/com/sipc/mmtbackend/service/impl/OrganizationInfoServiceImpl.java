@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -99,6 +100,7 @@ public class OrganizationInfoServiceImpl implements OrganizationInfoService {
                     new QueryWrapper<OrganizationTagMerge>()
                             .eq("organization_id", organizationInfoParam.getOrganizationId())
                             .orderByAsc("tag_type")
+                            .orderByAsc("tag_id")
             );
 
             //获取当前社团标签数
@@ -379,8 +381,103 @@ public class OrganizationInfoServiceImpl implements OrganizationInfoService {
     @Override
     public CommonResult<OrganizationInfoResult> getOrganizationInfo(Integer organizationId) {
 
+        /*
+          获取社团基本信息表中对应的实体类对象
+         */
+        Organization organization = organizationMapper.selectById(organizationId);
+        if (organization == null) {
+            return CommonResult.fail("社团组织id不存在");
+        }
 
+        /*
+          获取社团宣传信息表中对应的实体类对象
+         */
+        OrganizationRecruit organizationRecruit = organizationRecruitMapper.selectById(organizationId);
+        if (organizationRecruit == null) {
+            return CommonResult.fail("社团组织id不存在");
+        }
 
-        return null;
+        /*
+          获取对应的社团标签
+         */
+        //获取对应的社团标签id列表
+        List<OrganizationTagMerge> organizationTagMergeList = organizationTagMergeMapper.selectList(
+                new QueryWrapper<OrganizationTagMerge>()
+                        .eq("organization_id", organizationId)
+                        .orderByAsc("tag_type")
+                        .orderByAsc("tag_id")
+        );
+        //社团标签数异常的话就打印日志
+        int size = 0;
+        if (organizationTagMergeList == null || organizationTagMergeList.size() < 2 || organizationTagMergeList.size() > 4) {
+            if (organizationTagMergeList != null) {
+                size = organizationTagMergeList.size();
+            }
+            log.warn("获取社团宣传信息异常，社团组织标签信息数出错，社团组织标签数：{}，社团组织id：{}", size, organizationId);
+        }
+
+        //社团标签信息列表
+        List<TagData> tagDataList = new ArrayList<>();
+        //循环处理设社团标签id,并获取相应的标签名称
+        if (organizationTagMergeList != null) {
+            for (OrganizationTagMerge organizationTagMerge : organizationTagMergeList) {
+                Tag tag = tagMapper.selectById(organizationTagMerge.getTagId());
+                if (tag == null) {
+                    log.error("获取社团宣传信息异常，社团组织标签表的标签id在标签表中不存在，相应的社团id：{}，不存在的标签id：{}",
+                            organizationId, organizationTagMerge.getTagId());
+                }
+
+                if (tag != null) {
+                    tagDataList.add(new TagData(tag.getName(), Integer.valueOf(tag.getType())));
+                }
+//                if (!isAdd) {
+//                    log.warn("获取社团宣传信息异常，社团标签信息列表添加信息失败，出错的社团id：{}，未添加的标签id：{}",
+//                            organizationId, organizationTagMerge.getTagId());
+//                }
+            }
+        }
+
+        /*
+          获取社团的纳新部门
+         */
+        //获取对应的社团纳新部门id列表
+        List<OrganizationDepartmentMerge> organizationDepartmentMergeList = organizationDepartmentMergeMapper.selectList(
+                new QueryWrapper<OrganizationDepartmentMerge>().eq("organization_id", organizationId)
+        );
+
+        //社团纳新部门纳新宣传信息列表
+        List<DepartmentData> departmentDataList = new ArrayList<>();
+        //循环处理对应的社团纳新部门id，并获取相应的纳新部门的纳新宣传信息
+        if (organizationDepartmentMergeList != null) {
+            for (OrganizationDepartmentMerge organizationDepartmentMerge : organizationDepartmentMergeList) {
+                Department department = departmentMapper.selectById(organizationDepartmentMerge.getDepartmentId());
+                if (department == null) {
+                    log.error("获取社团宣传信息异常，社团组织纳新部门表的纳新部门id在部门表中不存在，相应的社团id：{}，不存在的纳新部门id：{}",
+                            organizationId, organizationDepartmentMerge.getDepartmentId());
+                } else {
+                    departmentDataList.add(new DepartmentData(
+                            department.getId(), department.getName(), department.getBriefDescription(),
+                            department.getDescription(), department.getStandard()
+                    ));
+                }
+            }
+        }
+
+        //拼装要返回的社团纳新宣传信息实体类对象
+        OrganizationInfoResult organizationInfoResult = new OrganizationInfoResult();
+        organizationInfoResult.setOrganizationId(organizationId);
+        organizationInfoResult.setName(organization.getName());
+        organizationInfoResult.setAvatarUrl(organization.getAvatarUrl());
+        organizationInfoResult.setBriefIntroduction(organization.getDescription());
+        organizationInfoResult.setTagList(tagDataList);
+        organizationInfoResult.setIntroduction(organizationRecruit.getDescription());
+        organizationInfoResult.setFeature(organizationRecruit.getFeature());
+        organizationInfoResult.setDaily(organizationInfoResult.getDaily());
+        organizationInfoResult.setSlogan(organizationInfoResult.getSlogan());
+        organizationInfoResult.setContactInfo(organizationRecruit.getContactInfo());
+        organizationInfoResult.setMore(organizationInfoResult.getMore());
+        organizationInfoResult.setDepartmentList(departmentDataList);
+
+        return CommonResult.success(organizationInfoResult);
     }
 }
