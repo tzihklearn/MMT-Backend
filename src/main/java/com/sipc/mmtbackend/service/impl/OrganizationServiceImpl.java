@@ -13,7 +13,7 @@ import com.sipc.mmtbackend.pojo.dto.data.TagData;
 import com.sipc.mmtbackend.pojo.dto.result.OrganizationInfoResult;
 import com.sipc.mmtbackend.pojo.exceptions.DateBaseException;
 import com.sipc.mmtbackend.pojo.exceptions.RunException;
-import com.sipc.mmtbackend.service.OrganizationInfoService;
+import com.sipc.mmtbackend.service.OrganizationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 
 
 /**
- * 有关超级管理的社团宣传信息的功能的业务处理
+ * 有关超级管理的社团宣传与面试的功能的业务处理
  * @author tzih
  * @version v1.0
  * @since 2023.04.23
@@ -36,7 +36,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor(onConstructor_ = {@Autowired})
 @Slf4j
-public class OrganizationInfoServiceImpl implements OrganizationInfoService {
+public class OrganizationServiceImpl implements OrganizationService {
 
 
     private final OrganizationMapper organizationMapper;
