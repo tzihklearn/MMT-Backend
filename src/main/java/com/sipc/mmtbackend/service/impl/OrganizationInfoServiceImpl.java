@@ -416,6 +416,11 @@ public class OrganizationInfoServiceImpl implements OrganizationInfoService {
             log.warn("获取社团宣传信息异常，社团组织标签信息数出错，社团组织标签数：{}，社团组织id：{}", size, organizationId);
         }
 
+        //对社团标签进行排序
+        if (organizationTagMergeList != null) {
+            organizationTagMergeList = organizationTagMergeList.stream().sorted(Comparator.comparing(OrganizationTagMerge::getTagId)).collect(Collectors.toList());
+        }
+
         //社团标签信息列表
         List<TagData> tagDataList = new ArrayList<>();
         //循环处理设社团标签id,并获取相应的标签名称
