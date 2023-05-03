@@ -19,28 +19,25 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-@TableName("organization_tag_merge")
-public class OrganizationTagMerge implements Serializable {
+@TableName("admission_question_merge")
+public class AdmissionQuestionMerge implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     * 主键id
-     */
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
-    @TableField("organization_id")
-    private Integer organizationId;
+    @TableField("admission_id")
+    private Integer admissionId;
 
-    @TableField("tag_id")
-    private Integer tagId;
+    @TableField("quesstion_id")
+    private Integer quesstionId;
 
     /**
-     * 标签的类型，冗余字段，便于查询
+     * 1 系统问题，0 自定义问题，冗余字段
      */
-    @TableField("tag_type")
-    private Byte tagType;
+    @TableField("type")
+    private Byte type;
 
     @TableField("is_deleted")
     @TableLogic

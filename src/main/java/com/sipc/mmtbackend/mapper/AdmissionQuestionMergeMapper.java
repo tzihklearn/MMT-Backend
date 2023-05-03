@@ -1,6 +1,6 @@
 package com.sipc.mmtbackend.mapper;
 
-import com.sipc.mmtbackend.pojo.domain.OrganizationTagMerge;
+import com.sipc.mmtbackend.pojo.domain.AdmissionQuestionMerge;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -13,6 +13,6 @@ import org.apache.ibatis.annotations.Mapper;
  * @since 2023-05-03
  */
 @Mapper
-public interface OrganizationTagMergeMapper extends BaseMapper<OrganizationTagMerge> {
+public interface AdmissionQuestionMergeMapper extends BaseMapper<AdmissionQuestionMerge> {
 
 }

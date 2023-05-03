@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -19,28 +20,37 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-@TableName("organization_tag_merge")
-public class OrganizationTagMerge implements Serializable {
+@TableName("admission")
+public class Admission implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     * 主键id
-     */
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
+
+    @TableField("initiator")
+    private Integer initiator;
 
     @TableField("organization_id")
     private Integer organizationId;
 
-    @TableField("tag_id")
-    private Integer tagId;
+    @TableField("start_time")
+    private LocalDateTime startTime;
+
+    @TableField("end_time")
+    private LocalDateTime endTime;
 
     /**
-     * 标签的类型，冗余字段，便于查询
+     * 允许纳新部门数
      */
-    @TableField("tag_type")
-    private Byte tagType;
+    @TableField("allow_department_amount")
+    private Integer allowDepartmentAmount;
+
+    /**
+     * 面试轮次
+     */
+    @TableField("rounds")
+    private Integer rounds;
 
     @TableField("is_deleted")
     @TableLogic
