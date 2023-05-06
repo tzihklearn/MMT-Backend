@@ -1,6 +1,6 @@
 package com.sipc.mmtbackend.mapper;
 
-import com.sipc.mmtbackend.pojo.domain.UserInfoB;
+import com.sipc.mmtbackend.pojo.domain.Admission;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -10,9 +10,9 @@ import org.apache.ibatis.annotations.Mapper;
  * </p>
  *
  * @author DoudiNCer
- * @since 2023-04-27
+ * @since 2023-05-06
  */
 @Mapper
-public interface UserInfoBMapper extends BaseMapper<UserInfoB> {
+public interface AdmissionMapper extends BaseMapper<Admission> {
 
 }

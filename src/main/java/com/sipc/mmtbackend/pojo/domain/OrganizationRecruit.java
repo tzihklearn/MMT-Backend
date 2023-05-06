@@ -1,8 +1,8 @@
 package com.sipc.mmtbackend.pojo.domain;
 
-import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 import lombok.Getter;
@@ -13,8 +13,8 @@ import lombok.Setter;
  * 
  * </p>
  *
- * @author tzih
- * @since 2023-04-24
+ * @author DoudiNCer
+ * @since 2023-05-06
  */
 @Getter
 @Setter
@@ -23,7 +23,7 @@ public class OrganizationRecruit implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @TableId(value = "organization_id", type = IdType.AUTO)
+    @TableId("organization_id")
     private Integer organizationId;
 
     @TableField("description")
@@ -43,4 +43,8 @@ public class OrganizationRecruit implements Serializable {
 
     @TableField("more")
     private String more;
+
+    @TableField("is_deleted")
+    @TableLogic
+    private Byte isDeleted;
 }

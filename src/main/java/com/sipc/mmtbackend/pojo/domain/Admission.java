@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -19,22 +20,37 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-@TableName("organization")
-public class Organization implements Serializable {
+@TableName("admission")
+public class Admission implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
-    @TableField("name")
-    private String name;
+    @TableField("initiator")
+    private Integer initiator;
 
-    @TableField("description")
-    private String description;
+    @TableField("organization_id")
+    private Integer organizationId;
 
-    @TableField("avatar_id")
-    private String avatarId;
+    @TableField("start_time")
+    private LocalDateTime startTime;
+
+    @TableField("end_time")
+    private LocalDateTime endTime;
+
+    /**
+     * 允许纳新部门数
+     */
+    @TableField("allow_department_amount")
+    private Integer allowDepartmentAmount;
+
+    /**
+     * 面试轮次
+     */
+    @TableField("rounds")
+    private Integer rounds;
 
     @TableField("is_deleted")
     @TableLogic

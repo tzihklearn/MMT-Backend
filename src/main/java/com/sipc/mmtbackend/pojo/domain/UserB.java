@@ -3,9 +3,9 @@ package com.sipc.mmtbackend.pojo.domain;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
-import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -15,7 +15,7 @@ import lombok.Setter;
  * </p>
  *
  * @author DoudiNCer
- * @since 2023-04-27
+ * @since 2023-05-06
  */
 @Getter
 @Setter
@@ -49,20 +49,21 @@ public class UserB implements Serializable {
     private String studentId;
 
     /**
-     * 创建时间
+     * 用户名
      */
-    @TableField("create_time")
-    private LocalDateTime createTime;
+    @TableField("user_name")
+    private String userName;
 
     /**
-     * 修改时间
+     * 用户邮箱
      */
-    @TableField("update_time")
-    private LocalDateTime updateTime;
+    @TableField("email")
+    private String email;
 
     /**
      * 是否安全
      */
     @TableField("is_deleted")
+    @TableLogic
     private Boolean isDeleted;
 }

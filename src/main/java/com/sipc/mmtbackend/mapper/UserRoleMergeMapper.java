@@ -2,10 +2,7 @@ package com.sipc.mmtbackend.mapper;
 
 import com.sipc.mmtbackend.pojo.domain.UserRoleMerge;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.sipc.mmtbackend.pojo.domain.po.UserRolePermissionPo;
 import org.apache.ibatis.annotations.Mapper;
-
-import java.util.List;
 
 /**
  * <p>
@@ -13,9 +10,9 @@ import java.util.List;
  * </p>
  *
  * @author DoudiNCer
- * @since 2023-04-27
+ * @since 2023-05-06
  */
 @Mapper
 public interface UserRoleMergeMapper extends BaseMapper<UserRoleMerge> {
-    List<UserRolePermissionPo> selectAllRolePermissionByUserId(Integer userId);
+
 }
