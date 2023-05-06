@@ -3,7 +3,6 @@ package com.sipc.mmtbackend.pojo.domain;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 import lombok.Getter;
@@ -19,24 +18,20 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-@TableName("organization")
-public class Organization implements Serializable {
+@TableName("permission")
+public class Permission implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    /**
+     * 权限ID
+     */
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
+    /**
+     * 权限名称
+     */
     @TableField("name")
     private String name;
-
-    @TableField("description")
-    private String description;
-
-    @TableField("avatar_id")
-    private String avatarId;
-
-    @TableField("is_deleted")
-    @TableLogic
-    private Byte isDeleted;
 }

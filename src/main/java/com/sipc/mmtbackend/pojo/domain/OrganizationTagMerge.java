@@ -14,8 +14,8 @@ import lombok.Setter;
  * 
  * </p>
  *
- * @author tzih
- * @since 2023-04-28
+ * @author DoudiNCer
+ * @since 2023-05-06
  */
 @Getter
 @Setter

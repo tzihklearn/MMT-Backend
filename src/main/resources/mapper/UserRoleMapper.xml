@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sipc.mmtbackend.mapper.UserRoleMapper">
+
+    <select id="selectAllRolePermissionByUserId"
+            resultType="com.sipc.mmtbackend.pojo.domain.po.UserRolePermissionPo">
+        SELECT
+            organization_id AS 'organizationName',
+                permission_id AS 'permissionId',
+                `name` AS 'permissionName'
+        FROM
+            user_role_merge
+                LEFT JOIN role ON user_role_merge.role_id = role.id
+                LEFT JOIN permission ON role.permission_id = permission.id
+        WHERE
+            user_id = #{userId,jdbcType=INTEGER}
+    </select>
+</mapper>

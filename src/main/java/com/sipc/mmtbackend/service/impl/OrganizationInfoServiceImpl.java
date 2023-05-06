@@ -14,6 +14,7 @@ import com.sipc.mmtbackend.pojo.dto.result.OrganizationInfoResult;
 import com.sipc.mmtbackend.pojo.exceptions.DateBaseException;
 import com.sipc.mmtbackend.pojo.exceptions.RunException;
 import com.sipc.mmtbackend.service.OrganizationInfoService;
+import com.sipc.mmtbackend.utils.PictureUtil.PictureUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +39,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class OrganizationInfoServiceImpl implements OrganizationInfoService {
 
+    private final PictureUtil pictureUtil;
 
     private final OrganizationMapper organizationMapper;
 
@@ -471,7 +473,7 @@ public class OrganizationInfoServiceImpl implements OrganizationInfoService {
         //拼装要返回的社团纳新宣传信息实体类对象
         OrganizationInfoResult organizationInfoResult = new OrganizationInfoResult();
         organizationInfoResult.setName(organization.getName());
-        organizationInfoResult.setAvatarUrl(organization.getAvatarUrl());
+        organizationInfoResult.setAvatarUrl(pictureUtil.getPictureURL(organizationInfoResult.getAvatarUrl()));
         organizationInfoResult.setBriefIntroduction(organization.getDescription());
         organizationInfoResult.setTagList(tagDataList);
         organizationInfoResult.setIntroduction(organizationRecruit.getDescription());

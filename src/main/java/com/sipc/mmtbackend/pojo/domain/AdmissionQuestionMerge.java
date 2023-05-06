@@ -19,22 +19,25 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-@TableName("organization")
-public class Organization implements Serializable {
+@TableName("admission_question_merge")
+public class AdmissionQuestionMerge implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
-    @TableField("name")
-    private String name;
+    @TableField("admission_id")
+    private Integer admissionId;
 
-    @TableField("description")
-    private String description;
+    @TableField("quesstion_id")
+    private Integer quesstionId;
 
-    @TableField("avatar_id")
-    private String avatarId;
+    /**
+     * 1 系统问题，0 自定义问题，冗余字段
+     */
+    @TableField("type")
+    private Byte type;
 
     @TableField("is_deleted")
     @TableLogic
