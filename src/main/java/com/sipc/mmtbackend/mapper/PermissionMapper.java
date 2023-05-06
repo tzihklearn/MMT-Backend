@@ -1,6 +1,6 @@
 package com.sipc.mmtbackend.mapper;
 
-import com.sipc.mmtbackend.pojo.domain.Organization;
+import com.sipc.mmtbackend.pojo.domain.Permission;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -13,6 +13,6 @@ import org.apache.ibatis.annotations.Mapper;
  * @since 2023-04-27
  */
 @Mapper
-public interface OrganizationMapper extends BaseMapper<Organization> {
+public interface PermissionMapper extends BaseMapper<Permission> {
 
 }

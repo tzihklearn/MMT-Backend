@@ -19,34 +19,34 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-@TableName("organization")
-public class Organization implements Serializable {
+@TableName("user_b")
+public class UserB implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * 组织ID
+     * B端用户ID
      */
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
     /**
-     * 组织名称
+     * B端用户手机号（唯一）
      */
-    @TableField("name")
-    private String name;
+    @TableField("phone")
+    private String phone;
 
     /**
-     * 组织介绍
+     * B端密码
      */
-    @TableField("description")
-    private String description;
+    @TableField("password")
+    private String password;
 
     /**
-     * 组织头像ID（不含链接与扩展名）
+     * B端学号
      */
-    @TableField("avatar_id")
-    private String avatarId;
+    @TableField("student_id")
+    private String studentId;
 
     /**
      * 创建时间

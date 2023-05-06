@@ -19,34 +19,28 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-@TableName("organization")
-public class Organization implements Serializable {
+@TableName("user_role_merge")
+public class UserRoleMerge implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * 组织ID
+     * 用户角色对应ID
      */
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
     /**
-     * 组织名称
+     * 用户ID
      */
-    @TableField("name")
-    private String name;
+    @TableField("user_id")
+    private Integer userId;
 
     /**
-     * 组织介绍
+     * 角色ID
      */
-    @TableField("description")
-    private String description;
-
-    /**
-     * 组织头像ID（不含链接与扩展名）
-     */
-    @TableField("avatar_id")
-    private String avatarId;
+    @TableField("role_id")
+    private Integer roleId;
 
     /**
      * 创建时间
