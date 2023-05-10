@@ -9,8 +9,8 @@ import org.apache.ibatis.annotations.Mapper;
  *  Mapper 接口
  * </p>
  *
- * @author tzih
- * @since 2023-04-28
+ * @author DoudiNCer
+ * @since 2023-05-06
  */
 @Mapper
 public interface TagMapper extends BaseMapper<Tag> {

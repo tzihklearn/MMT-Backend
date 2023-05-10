@@ -19,21 +19,33 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-@TableName("organization_department_merge")
-public class OrganizationDepartmentMerge implements Serializable {
+@TableName("user_role_merge")
+public class UserRoleMerge implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    /**
+     * 用户角色对应ID
+     */
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
-    @TableField("organization_id")
-    private Integer organizationId;
+    /**
+     * 用户ID
+     */
+    @TableField("user_id")
+    private Integer userId;
 
-    @TableField("department_id")
-    private Integer departmentId;
+    /**
+     * 角色ID
+     */
+    @TableField("role_id")
+    private Integer roleId;
 
+    /**
+     * 是否安全
+     */
     @TableField("is_deleted")
     @TableLogic
-    private Byte isDeleted;
+    private Boolean isDeleted;
 }

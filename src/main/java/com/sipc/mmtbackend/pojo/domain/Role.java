@@ -1,5 +1,6 @@
 package com.sipc.mmtbackend.pojo.domain;
 
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableLogic;
@@ -18,33 +19,33 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-@TableName("organization_recruit")
-public class OrganizationRecruit implements Serializable {
+@TableName("role")
+public class Role implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @TableId("organization_id")
+    /**
+     * 角色ID
+     */
+    @TableId(value = "id", type = IdType.AUTO)
+    private Integer id;
+
+    /**
+     * 组织ID
+     */
+    @TableField("organization_id")
     private Integer organizationId;
 
-    @TableField("description")
-    private String description;
+    /**
+     * 权限ID
+     */
+    @TableField("permission_id")
+    private Integer permissionId;
 
-    @TableField("feature")
-    private String feature;
-
-    @TableField("daily")
-    private String daily;
-
-    @TableField("slogan")
-    private String slogan;
-
-    @TableField("contact_info")
-    private String contactInfo;
-
-    @TableField("more")
-    private String more;
-
+    /**
+     * 是否安全
+     */
     @TableField("is_deleted")
     @TableLogic
-    private Byte isDeleted;
+    private Boolean isDeleted;
 }

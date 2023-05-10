@@ -49,7 +49,7 @@ public class PictureUtil {
         try {
             md5 = MessageDigest.getInstance("MD5");
         } catch (NoSuchAlgorithmException e) {
-            log.warn("Get MD5 Algorithm Error: " + e.getMessage());
+            log.warn("Get MD5 Algorithm Error When Create Avatar ID: " + e.getMessage());
             return null;
         }
         return  Base64.encodeBase64String(md5.digest(v.getBytes()));

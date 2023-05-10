@@ -19,21 +19,51 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-@TableName("organization_department_merge")
-public class OrganizationDepartmentMerge implements Serializable {
+@TableName("user_b")
+public class UserB implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    /**
+     * B端用户ID
+     */
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
-    @TableField("organization_id")
-    private Integer organizationId;
+    /**
+     * B端用户手机号（唯一）
+     */
+    @TableField("phone")
+    private String phone;
 
-    @TableField("department_id")
-    private Integer departmentId;
+    /**
+     * B端密码
+     */
+    @TableField("password")
+    private String password;
 
+    /**
+     * B端学号
+     */
+    @TableField("student_id")
+    private String studentId;
+
+    /**
+     * 用户名
+     */
+    @TableField("user_name")
+    private String userName;
+
+    /**
+     * 用户邮箱
+     */
+    @TableField("email")
+    private String email;
+
+    /**
+     * 是否安全
+     */
     @TableField("is_deleted")
     @TableLogic
-    private Byte isDeleted;
+    private Boolean isDeleted;
 }
