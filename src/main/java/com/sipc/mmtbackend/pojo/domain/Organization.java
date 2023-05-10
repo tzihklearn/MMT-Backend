@@ -14,8 +14,8 @@ import lombok.Setter;
  * 
  * </p>
  *
- * @author DoudiNCer
- * @since 2023-05-06
+ * @author tzih
+ * @since 2023-05-03
  */
 @Getter
 @Setter
@@ -33,8 +33,8 @@ public class Organization implements Serializable {
     @TableField("description")
     private String description;
 
-    @TableField("avatar_id")
-    private String avatarId;
+    @TableField("avatar_url")
+    private String avatarUrl;
 
     @TableField("is_deleted")
     @TableLogic

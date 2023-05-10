@@ -1,26 +1,27 @@
 package com.sipc.mmtbackend.controller;
 
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
+import com.sipc.mmtbackend.pojo.dto.result.UploadAvatarResult;
 import com.sipc.mmtbackend.pojo.dto.param.OrganizationInfoParam;
 import com.sipc.mmtbackend.pojo.dto.result.OrganizationInfoResult;
-import com.sipc.mmtbackend.service.OrganizationInfoService;
+import com.sipc.mmtbackend.service.OrganizationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * 社团宣传信息相关接口的控制层
+ * 社团宣传与面试相关接口的控制层
  * @author tzih
  * @version v1.0
  * @since 2023.04.23
  */
 @RestController
-@RequestMapping("/organization/info")
+@RequestMapping("/organization")
 @RequiredArgsConstructor(onConstructor_ = {@Autowired})
-public class OrganizationInfoController {
+public class OrganizationController {
 
 
-    private final OrganizationInfoService organizationInfoService;
+    private final OrganizationService organizationService;
 
     /**
      * 设置社团宣传信息的接口的控制层处理，请求方法POST，请求路径/organization/info/update
@@ -28,10 +29,10 @@ public class OrganizationInfoController {
      * @see com.sipc.mmtbackend.pojo.dto.param.OrganizationInfoParam
      * @return CommonResult<<String>> 返回接口处理的结果
      */
-    @PostMapping("/update")
+    @PostMapping("/info/update")
     public CommonResult<String> updateOrganizationInfo(@RequestBody OrganizationInfoParam organizationInfoParam) {
         try {
-            return organizationInfoService.updateOrganizationInfo(organizationInfoParam);
+            return organizationService.updateOrganizationInfo(organizationInfoParam);
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -45,11 +46,33 @@ public class OrganizationInfoController {
      * @return CommonResult<<OrganizationInfoResult>> 返回接口处理的结果，含有社团的纳新宣传信息
      * @see com.sipc.mmtbackend.pojo.dto.result.OrganizationInfoResult
      */
-    @GetMapping("/get")
+    @GetMapping("/info/get")
     public CommonResult<OrganizationInfoResult> getOrganizationInfo(
             @RequestParam("organizationId") Integer organizationId
     ) {
-        return organizationInfoService.getOrganizationInfo(organizationId);
+        return organizationService.getOrganizationInfo(organizationId);
+    }
+
+    @PostMapping("/avatar/upload")
+    public CommonResult<UploadAvatarResult> uploadAvatar() {
+        try {
+            return organizationService.uploadAvatar();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            return CommonResult.fail("操作失败");
+        }
+    }
+
+    @PostMapping("/admission/publish")
+    public CommonResult<String> publishAdmission() {
+        return null;
+    }
+
+    @PostMapping("/test")
+    public CommonResult<String> test() {
+        throw new RuntimeException("test测试错误");
+//        return null;
     }
 
 }
