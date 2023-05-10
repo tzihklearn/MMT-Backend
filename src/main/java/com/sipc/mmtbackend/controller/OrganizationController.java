@@ -1,6 +1,7 @@
 package com.sipc.mmtbackend.controller;
 
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
+import com.sipc.mmtbackend.pojo.dto.result.UploadAvatarResult;
 import com.sipc.mmtbackend.pojo.dto.param.OrganizationInfoParam;
 import com.sipc.mmtbackend.pojo.dto.result.OrganizationInfoResult;
 import com.sipc.mmtbackend.service.OrganizationService;
@@ -50,6 +51,28 @@ public class OrganizationController {
             @RequestParam("organizationId") Integer organizationId
     ) {
         return organizationService.getOrganizationInfo(organizationId);
+    }
+
+    @PostMapping("/avatar/upload")
+    public CommonResult<UploadAvatarResult> uploadAvatar() {
+        try {
+            return organizationService.uploadAvatar();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            return CommonResult.fail("操作失败");
+        }
+    }
+
+    @PostMapping("/admission/publish")
+    public CommonResult<String> publishAdmission() {
+        return null;
+    }
+
+    @PostMapping("/test")
+    public CommonResult<String> test() {
+        throw new RuntimeException("test测试错误");
+//        return null;
     }
 
 }

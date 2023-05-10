@@ -25,8 +25,8 @@ public class Question implements Serializable {
     @TableField("id")
     private Integer id;
 
-    @TableField("name")
-    private String name;
+    @TableField("content")
+    private String content;
 
     /**
      * 1 系统问题，0 自定义问题

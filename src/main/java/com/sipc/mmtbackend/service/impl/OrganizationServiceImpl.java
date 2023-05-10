@@ -11,15 +11,21 @@ import com.sipc.mmtbackend.pojo.dto.data.DepartmentData;
 import com.sipc.mmtbackend.pojo.dto.param.OrganizationInfoParam;
 import com.sipc.mmtbackend.pojo.dto.data.TagData;
 import com.sipc.mmtbackend.pojo.dto.result.OrganizationInfoResult;
+import com.sipc.mmtbackend.pojo.dto.result.UploadAvatarResult;
 import com.sipc.mmtbackend.pojo.exceptions.DateBaseException;
 import com.sipc.mmtbackend.pojo.exceptions.RunException;
 import com.sipc.mmtbackend.service.OrganizationService;
+import com.sipc.mmtbackend.utils.PictureUtil.PictureUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
+import org.springframework.web.multipart.support.StandardServletMultipartResolver;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -54,6 +60,10 @@ public class OrganizationServiceImpl implements OrganizationService {
     private final OrganizationDepartmentMergeMapper organizationDepartmentMergeMapper;
 
     private final DepartmentMapper departmentMapper;
+
+    private final HttpServletRequest httpServletRequest;
+
+    private final PictureUtil pictureUtil;
 
     /**
      * 设置社团宣传信息的业务处理方法，处理设置社团宣传信息
@@ -471,7 +481,7 @@ public class OrganizationServiceImpl implements OrganizationService {
         //拼装要返回的社团纳新宣传信息实体类对象
         OrganizationInfoResult organizationInfoResult = new OrganizationInfoResult();
         organizationInfoResult.setName(organization.getName());
-        organizationInfoResult.setAvatarUrl(organization.getAvatarUrl());
+        organizationInfoResult.setAvatarUrl(pictureUtil.getPictureURL(organization.getAvatarUrl()));
         organizationInfoResult.setBriefIntroduction(organization.getDescription());
         organizationInfoResult.setTagList(tagDataList);
         organizationInfoResult.setIntroduction(organizationRecruit.getDescription());
@@ -483,5 +493,38 @@ public class OrganizationServiceImpl implements OrganizationService {
         organizationInfoResult.setDepartmentList(departmentDataList);
 
         return CommonResult.success(organizationInfoResult);
+    }
+
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public CommonResult<UploadAvatarResult> uploadAvatar() throws DateBaseException {
+
+        /*
+          获取相应的form-data参数
+         */
+        StandardServletMultipartResolver multipartResolver = new StandardServletMultipartResolver();
+        MultipartHttpServletRequest multipartHttpServletRequest = multipartResolver.resolveMultipart(httpServletRequest);
+        //获取organizationId
+        Integer organizationId = multipartHttpServletRequest.getIntHeader("organizationId");
+        //获取社团头像
+        MultipartFile avatar = multipartHttpServletRequest.getFile("avatar");
+
+        //上传图像
+        String pictureId = pictureUtil.uploadPicture(avatar);
+
+        Organization organization = new Organization();
+
+        organization.setId(organizationId);
+        organization.setAvatarUrl(pictureId);
+
+        int updateNum = organizationMapper.updateById(organization);
+        if (updateNum != 0) {
+            log.error("上传头像接口异常，更新社团信息数出错，更新数：{}，更新社团id：{}，更新头像id：{}",
+                    updateNum, organizationId, pictureId);
+            throw new DateBaseException("数据库更新更新操作异常");
+        }
+
+        return CommonResult.success("上传社团头像成功");
     }
 }
