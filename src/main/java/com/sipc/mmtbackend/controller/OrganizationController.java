@@ -53,6 +53,10 @@ public class OrganizationController {
         return organizationService.getOrganizationInfo(organizationId);
     }
 
+    /**
+     * 上传社团头像的接口，请求方法Post,请求路径/organization/avatar/upload，接受采用form-data接受图像文件
+     * @return CommonResult<UploadAvatarResult> 返回接口处理的结果，含有社团的头像url
+     */
     @PostMapping("/avatar/upload")
     public CommonResult<UploadAvatarResult> uploadAvatar() {
         try {
