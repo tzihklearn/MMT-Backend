@@ -9,8 +9,8 @@ import org.apache.ibatis.annotations.Mapper;
  *  Mapper 接口
  * </p>
  *
- * @author DoudiNCer
- * @since 2023-05-06
+ * @author tzih
+ * @since 2023-05-03
  */
 @Mapper
 public interface AdmissionQuestionMergeMapper extends BaseMapper<AdmissionQuestionMerge> {
