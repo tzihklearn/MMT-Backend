@@ -14,10 +14,16 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.annotation.Resource;
 
 @RestController
-@RequestMapping("/b/userb")
+@RequestMapping("/b/user")
 public class UserBController {
     @Resource
     UserBService userBService;
+
+    /**
+     * B端注册
+     * @param param 注册信息
+     * @return 状态信息
+     */
     @PostMapping("/reg")
     public CommonResult<String> registUser(@RequestBody RegParam param){
         try {
@@ -26,6 +32,12 @@ public class UserBController {
             return CommonResult.fail(e.getMessage());
         }
     }
+
+    /**
+     * 使用学号与密码登录
+     * @param param 学号与密码
+     * @return token、用户ID与
+     */
     @PostMapping("/loginp")
     public CommonResult<LoginResult> loginByPass(LoginPassParam param){
         return userBService.loginByPass(param);

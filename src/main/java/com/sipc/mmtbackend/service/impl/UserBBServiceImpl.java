@@ -59,6 +59,7 @@ public class UserBBServiceImpl implements UserBService {
         LoginResult result = new LoginResult();
         result.setUserId(userB.getId());
         result.setToken(token);
+        result.setUsername(userB.getUserName());
         List<UserPermissionPo> permissions = new LinkedList<>();
         for (UserRolePermissionPo permissionPo : userRoleMapper.selectAllRolePermissionByUserId(userB.getId())) {
             UserPermissionPo po = new UserPermissionPo();

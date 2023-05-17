@@ -7,6 +7,7 @@ import java.util.List;
 @Data
 public class LoginResult {
     private Integer userId;
+    private String username;
     private String token;
     private List<UserPermissionPo> permissions;
 }
