@@ -16,6 +16,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler({DateBaseException.class, RunException.class})
     public CommonResult<String> DateAndRunExceptionHandler(Exception e) {
+        e.printStackTrace();
 
         return CommonResult.fail("请求错误");
     }
