@@ -496,6 +496,11 @@ public class OrganizationServiceImpl implements OrganizationService {
     }
 
 
+    /**
+     * 上传社团头像接口
+     * @return CommonResult<UploadAvatarResult> 返回上传社团头像接口处理果，包含图像的url
+     * @throws DateBaseException 自定义的数据库操作异常，抛出用于事务回滚
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public CommonResult<UploadAvatarResult> uploadAvatar() throws DateBaseException {

@@ -25,7 +25,7 @@ public class LarkAop {
     private LarkRobot larkRobot;
 
     @Pointcut("execution(* *..controller.*.*(..))")
-    public void lark(){
+    public void lark() {
 
     }
     @AfterThrowing(pointcut = "lark()", throwing = "exception")
