@@ -22,7 +22,7 @@ public class ICodeUtil {
     /**
      * ICode的在redis的key的后缀
      */
-    private final String ICodeKeySuffix = ":ICode";
+    private final static String ICodeKeyPrefix = "ICode:";
 
     /**
      * 私有方法，生成对应社团的邀请码
@@ -67,7 +67,7 @@ public class ICodeUtil {
         while (!flag) {
             ICode = generateRandomString(length);
 
-            Integer value = redisUtil.getString(ICode + ICodeKeySuffix, Integer.class);
+            Integer value = redisUtil.getString(ICodeKeyPrefix + ICode, Integer.class);
 
             if (value == null) {
                 flag = true;
@@ -76,7 +76,7 @@ public class ICodeUtil {
         }
 
         //将生成的社团邀请码放入redis缓存
-        boolean isSet = redisUtil.setString(ICode + ICodeKeySuffix, organizationId, 10, TimeUnit.MINUTES);
+        boolean isSet = redisUtil.setString(ICode, organizationId, 10, TimeUnit.MINUTES);
 
         if (isSet) {
             return ICode;
@@ -92,7 +92,7 @@ public class ICodeUtil {
      * @return 返回验证成功后邀请码对应的社团组织id,若失败返回null
      */
     public Integer verifyICode(String ICode) {
-        return redisUtil.getString(ICode + ICodeKeySuffix, Integer.class);
+        return redisUtil.getString(ICodeKeyPrefix + ICode, Integer.class);
     }
 
 }
