@@ -1,13 +1,11 @@
-package com.sipc.mmtbackend.controller;
+package com.sipc.mmtbackend.controller.superAdmin;
 
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
-import com.sipc.mmtbackend.pojo.dto.result.ICodeResult;
+import com.sipc.mmtbackend.pojo.dto.result.superAdmin.ICodeResult;
 import com.sipc.mmtbackend.service.SuperAminService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * 超级管理相关操作接口的控制层类
@@ -16,9 +14,9 @@ import org.springframework.web.bind.annotation.RestController;
  * @since 2023.05.20
  */
 @RestController
-@RequestMapping("/b/admin")
+@RequestMapping("/b/admin/account")
 @RequiredArgsConstructor(onConstructor_ = {@Autowired})
-public class SuperAminController {
+public class AccountManageController {
 
     /**
      * 超级管理服务层接口
@@ -32,7 +30,7 @@ public class SuperAminController {
      * @see ICodeResult
      */
     @PostMapping("/icode/generated")
-    public CommonResult<ICodeResult> generatedICode(Integer organizationId) {
+    public CommonResult<ICodeResult> generatedICode(@RequestParam Integer organizationId) {
         return superAminService.generatedICode(organizationId);
     }
 

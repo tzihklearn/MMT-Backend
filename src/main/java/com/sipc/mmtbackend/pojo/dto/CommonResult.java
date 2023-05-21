@@ -31,7 +31,6 @@ public class CommonResult<T> {
 
     /**
      * 成功返回结果
-     * @param
      */
     public static <T> CommonResult<T> success() {
         return new CommonResult<>(ResultEnum.SUCCESS.getCode(), ResultEnum.SUCCESS.getMessage(), null);
@@ -53,14 +52,14 @@ public class CommonResult<T> {
      * @param data 获取的数据
      */
     public static <T> CommonResult<T> success(T data) {
-        return new CommonResult<T>(ResultEnum.SUCCESS.getCode(), ResultEnum.SUCCESS.getMessage(), data);
+        return new CommonResult<>(ResultEnum.SUCCESS.getCode(), ResultEnum.SUCCESS.getMessage(), data);
     }
 
     /**
      * 失败返回结果
      */
     public static <T> CommonResult<T> fail() {
-        return new CommonResult<T>(ResultEnum.FAILED.getCode(), ResultEnum.FAILED.getMessage(), null);
+        return new CommonResult<>(ResultEnum.FAILED.getCode(), ResultEnum.FAILED.getMessage(), null);
     }
 
     /**
@@ -69,14 +68,14 @@ public class CommonResult<T> {
      * @param message 错误信息
      */
     public static <T> CommonResult<T> fail(String message) {
-        return new CommonResult<T>(ResultEnum.FAILED.getCode(), message, null);
+        return new CommonResult<>(ResultEnum.FAILED.getCode(), message, null);
     }
 
     /**
      * 失败返回结果
      */
     public static <T> CommonResult<T> fail_login() {
-        return new CommonResult<T>(ResultEnum.USER_Logged_EXIST.getCode(), ResultEnum.USER_Logged_EXIST.getMessage(), null);
+        return new CommonResult<>(ResultEnum.USER_Logged_EXIST.getCode(), ResultEnum.USER_Logged_EXIST.getMessage(), null);
     }
 
     /**
@@ -88,14 +87,14 @@ public class CommonResult<T> {
      * @return 返回请求对象
      */
     public static <T> CommonResult<T> fail(String code, String message) {
-        return new CommonResult<T>(code, message, null);
+        return new CommonResult<>(code, message, null);
     }
 
     /**
      * 操作失败返回结果
      */
     public static <T> CommonResult<T> userResourceException() {
-        return new CommonResult<T>(ResultEnum.USER_RESOURCE_EXCEPTION.getCode(),
+        return new CommonResult<>(ResultEnum.USER_RESOURCE_EXCEPTION.getCode(),
                 ResultEnum.USER_RESOURCE_EXCEPTION.getMessage(), null);
     }
 
@@ -105,7 +104,7 @@ public class CommonResult<T> {
      * @param data 获取的数据
      */
     public static <T> CommonResult<T> userResourceException(T data) {
-        return new CommonResult<T>(ResultEnum.USER_RESOURCE_EXCEPTION.getCode(),
+        return new CommonResult<>(ResultEnum.USER_RESOURCE_EXCEPTION.getCode(),
                 ResultEnum.USER_RESOURCE_EXCEPTION.getMessage(), data);
     }
 
@@ -115,14 +114,14 @@ public class CommonResult<T> {
      * @param message 错误信息
      */
     public static <T> CommonResult<T> userResourceException(String message) {
-        return new CommonResult<T>(ResultEnum.USER_RESOURCE_EXCEPTION.getCode(), message, null);
+        return new CommonResult<>(ResultEnum.USER_RESOURCE_EXCEPTION.getCode(), message, null);
     }
 
     /**
      * 用户登录过期返回结果
      */
     public static <T> CommonResult<T> userLoginExpired() {
-        return new CommonResult<T>(ResultEnum.USER_LOGIN_EXPIRED.getCode(),
+        return new CommonResult<>(ResultEnum.USER_LOGIN_EXPIRED.getCode(),
                 ResultEnum.USER_LOGIN_EXPIRED.getMessage(), null);
     }
 
@@ -130,7 +129,7 @@ public class CommonResult<T> {
      * 用户登录过期返回结果
      */
     public static <T> CommonResult<T> userPasswordWrong() {
-        return new CommonResult<T>(ResultEnum.USER_PASSWORD_WRONG.getCode(),
+        return new CommonResult<>(ResultEnum.USER_PASSWORD_WRONG.getCode(),
                 ResultEnum.USER_PASSWORD_WRONG.getMessage(), null);
     }
 
@@ -138,7 +137,7 @@ public class CommonResult<T> {
      * 用户名已存在返回结果
      */
     public static <T> CommonResult<T> userUsernameExist() {
-        return new CommonResult<T>(ResultEnum.USER_USERNAME_EXIST.getCode(),
+        return new CommonResult<>(ResultEnum.USER_USERNAME_EXIST.getCode(),
                 ResultEnum.USER_USERNAME_EXIST.getMessage(), null);
     }
 
@@ -146,20 +145,20 @@ public class CommonResult<T> {
      * 用户权限错误
      */
     public static <T> CommonResult<T> userAuthError() {
-        return new CommonResult<T>(ResultEnum.AUTH_ERROR.getCode(), ResultEnum.AUTH_ERROR.getMessage(), null);
+        return new CommonResult<>(ResultEnum.AUTH_ERROR.getCode(), ResultEnum.AUTH_ERROR.getMessage(), null);
     }
 
     /**
      * 服务器执行错误
      */
     public static <T> CommonResult<T> serverError() {
-        return new CommonResult<T>(ResultEnum.SERVER_ERROR.getCode(), ResultEnum.SERVER_ERROR.getMessage(), null);
+        return new CommonResult<>(ResultEnum.SERVER_ERROR.getCode(), ResultEnum.SERVER_ERROR.getMessage(), null);
     }
 
     /**
      * 用户身份验证错误
      */
     public static <T> CommonResult<T> loginError() {
-        return new CommonResult<T>(ResultEnum.TOKEN_ERROR.getCode(), ResultEnum.TOKEN_ERROR.getMessage(), null);
+        return new CommonResult<>(ResultEnum.TOKEN_ERROR.getCode(), ResultEnum.TOKEN_ERROR.getMessage(), null);
     }
 }

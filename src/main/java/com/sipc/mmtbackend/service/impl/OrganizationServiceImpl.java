@@ -8,10 +8,10 @@ import com.sipc.mmtbackend.mapper.*;
 import com.sipc.mmtbackend.pojo.domain.*;
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
 import com.sipc.mmtbackend.pojo.dto.data.DepartmentData;
-import com.sipc.mmtbackend.pojo.dto.param.OrganizationInfoParam;
+import com.sipc.mmtbackend.pojo.dto.param.superAdmin.OrganizationInfoParam;
 import com.sipc.mmtbackend.pojo.dto.data.TagData;
-import com.sipc.mmtbackend.pojo.dto.result.OrganizationInfoResult;
-import com.sipc.mmtbackend.pojo.dto.result.UploadAvatarResult;
+import com.sipc.mmtbackend.pojo.dto.result.superAdmin.OrganizationInfoResult;
+import com.sipc.mmtbackend.pojo.dto.result.superAdmin.UploadAvatarResult;
 import com.sipc.mmtbackend.pojo.exceptions.DateBaseException;
 import com.sipc.mmtbackend.pojo.exceptions.RunException;
 import com.sipc.mmtbackend.service.OrganizationService;
@@ -68,7 +68,7 @@ public class OrganizationServiceImpl implements OrganizationService {
     /**
      * 设置社团宣传信息的业务处理方法，处理设置社团宣传信息
      * @param organizationInfoParam 更新社团宣传信息接口的请求体参数类
-     * @see com.sipc.mmtbackend.pojo.dto.param.OrganizationInfoParam
+     * @see OrganizationInfoParam
      * @return 返回社团请求信息处理结果
      * @throws DateBaseException 自定义的数据库操作异常，抛出用于事务回滚
      * @throws RunException 自定义的运行异常，抛出用于事务回滚
@@ -504,7 +504,6 @@ public class OrganizationServiceImpl implements OrganizationService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public CommonResult<UploadAvatarResult> uploadAvatar() throws DateBaseException {
-
         /*
           获取相应的form-data参数
          */

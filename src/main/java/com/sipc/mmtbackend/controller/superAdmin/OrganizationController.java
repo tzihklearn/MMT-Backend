@@ -1,9 +1,9 @@
-package com.sipc.mmtbackend.controller;
+package com.sipc.mmtbackend.controller.superAdmin;
 
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
-import com.sipc.mmtbackend.pojo.dto.result.UploadAvatarResult;
-import com.sipc.mmtbackend.pojo.dto.param.OrganizationInfoParam;
-import com.sipc.mmtbackend.pojo.dto.result.OrganizationInfoResult;
+import com.sipc.mmtbackend.pojo.dto.result.superAdmin.UploadAvatarResult;
+import com.sipc.mmtbackend.pojo.dto.param.superAdmin.OrganizationInfoParam;
+import com.sipc.mmtbackend.pojo.dto.result.superAdmin.OrganizationInfoResult;
 import com.sipc.mmtbackend.service.OrganizationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
  * @since 2023.04.23
  */
 @RestController
-@RequestMapping("/organization")
+@RequestMapping("/b/admin/organization")
 @RequiredArgsConstructor(onConstructor_ = {@Autowired})
 public class OrganizationController {
 
@@ -26,7 +26,7 @@ public class OrganizationController {
     /**
      * 设置社团宣传信息的接口的控制层处理，请求方法POST，请求路径/organization/info/update
      * @param organizationInfoParam 社团社团宣传信息的接口的请求体参数的实体类
-     * @see com.sipc.mmtbackend.pojo.dto.param.OrganizationInfoParam
+     * @see OrganizationInfoParam
      * @return CommonResult<<String>> 返回接口处理的结果
      */
     @PostMapping("/info/update")
@@ -44,7 +44,7 @@ public class OrganizationController {
      * 获取社团宣传信息的接口，请求方法GET,请求路径/organization/info/get
      * @param organizationId 社团组织id
      * @return CommonResult<<OrganizationInfoResult>> 返回接口处理的结果，含有社团的纳新宣传信息
-     * @see com.sipc.mmtbackend.pojo.dto.result.OrganizationInfoResult
+     * @see OrganizationInfoResult
      */
     @GetMapping("/info/get")
     public CommonResult<OrganizationInfoResult> getOrganizationInfo(
@@ -74,7 +74,7 @@ public class OrganizationController {
     }
 
     @PostMapping("/test")
-    public CommonResult<String> test() {
+    public CommonResult<String> test() throws RuntimeException {
         throw new RuntimeException("test测试错误");
 //        return null;
     }
