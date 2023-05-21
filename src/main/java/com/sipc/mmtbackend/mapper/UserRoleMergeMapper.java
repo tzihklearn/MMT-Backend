@@ -10,7 +10,7 @@ import org.apache.ibatis.annotations.Mapper;
  * </p>
  *
  * @author DoudiNCer
- * @since 2023-05-06
+ * @since 2023-05-21
  */
 @Mapper
 public interface UserRoleMergeMapper extends BaseMapper<UserRoleMerge> {

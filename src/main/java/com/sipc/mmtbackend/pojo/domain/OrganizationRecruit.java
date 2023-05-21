@@ -1,5 +1,6 @@
 package com.sipc.mmtbackend.pojo.domain;
 
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableLogic;
@@ -23,7 +24,7 @@ public class OrganizationRecruit implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @TableId("organization_id")
+    @TableId(value = "organization_id", type = IdType.AUTO)
     private Integer organizationId;
 
     @TableField("description")
