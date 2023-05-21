@@ -2,7 +2,8 @@ package com.sipc.mmtbackend.controller.superAdmin;
 
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
 import com.sipc.mmtbackend.pojo.dto.result.superAdmin.ICodeResult;
-import com.sipc.mmtbackend.service.SuperAminService;
+import com.sipc.mmtbackend.pojo.dto.result.superAdmin.MemberInfoResult;
+import com.sipc.mmtbackend.service.AccountManageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -21,7 +22,7 @@ public class AccountManageController {
     /**
      * 超级管理服务层接口
      */
-    private final SuperAminService superAminService;
+    private final AccountManageService accountManageService;
 
     /**
      * 生成社团邀请码，时限10min
@@ -31,7 +32,8 @@ public class AccountManageController {
      */
     @PostMapping("/icode/generated")
     public CommonResult<ICodeResult> generatedICode(@RequestParam Integer organizationId) {
-        return superAminService.generatedICode(organizationId);
+        return accountManageService.generatedICode(organizationId);
     }
+
 
 }
