@@ -1,4 +1,4 @@
-package com.sipc.mmtbackend.pojo.dto.result;
+package com.sipc.mmtbackend.pojo.dto.result.superAdmin;
 
 import com.sipc.mmtbackend.pojo.dto.data.DepartmentData;
 import com.sipc.mmtbackend.pojo.dto.data.TagData;

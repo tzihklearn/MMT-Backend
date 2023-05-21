@@ -1,7 +1,7 @@
 package com.sipc.mmtbackend.service.impl;
 
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
-import com.sipc.mmtbackend.pojo.dto.result.ICodeResult;
+import com.sipc.mmtbackend.pojo.dto.result.superAdmin.ICodeResult;
 import com.sipc.mmtbackend.service.SuperAminService;
 import com.sipc.mmtbackend.utils.ICodeUtil;
 import lombok.RequiredArgsConstructor;

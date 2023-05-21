@@ -18,10 +18,10 @@ public enum ResultEnum {
     AUTH_ERROR("A0300", "访问权限异常"),
     USER_Logged_EXIST("A0200", "用户已在另一台设备登录");
 
-    private String code;
-    private String message;
+    private final String code;
+    private final String message;
 
-    private ResultEnum(String code, String message) {
+    ResultEnum(String code, String message) {
         this.code = code;
         this.message = message;
     }
