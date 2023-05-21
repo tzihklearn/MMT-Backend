@@ -58,7 +58,7 @@ public class ICodeUtil {
     public String setICodeRedis(Integer organizationId, int length) {
         String ICode = generateRandomString(length);
 
-        boolean isSet = redisUtil.setString(organizationId + ICodeKeySuffix, ICode, 10, TimeUnit.MINUTES);
+        boolean isSet = redisUtil.setString(ICode, organizationId, 10, TimeUnit.MINUTES);
 
         if (isSet) {
             return ICode;
@@ -70,18 +70,11 @@ public class ICodeUtil {
 
     /**
      * 验证社团邀请码
-     * @param organizationId 社团组织id
      * @param ICode 待验证的社团邀请码
      * @return 返回是否正确，正确为true，不正确为false
      */
-    public boolean verifyICode(Integer organizationId, String ICode) {
-        String redisICode = redisUtil.getString(organizationId + ICodeKeySuffix, String.class);
-
-        if (redisICode == null) {
-            return false;
-        }
-
-        return redisICode.equals(ICode);
+    public Integer verifyICode(String ICode) {
+        return redisUtil.getString(ICode, Integer.class);
     }
 
 }

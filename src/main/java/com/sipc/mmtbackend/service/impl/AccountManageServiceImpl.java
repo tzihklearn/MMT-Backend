@@ -1,8 +1,8 @@
 package com.sipc.mmtbackend.service.impl;
 
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
-import com.sipc.mmtbackend.pojo.dto.result.ICodeResult;
-import com.sipc.mmtbackend.service.SuperAminService;
+import com.sipc.mmtbackend.pojo.dto.result.superAdmin.ICodeResult;
+import com.sipc.mmtbackend.service.AccountManageService;
 import com.sipc.mmtbackend.utils.ICodeUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
  */
 @Service
 @RequiredArgsConstructor(onConstructor_ = {@Autowired})
-public class SuperAminServiceImpl implements SuperAminService {
+public class AccountManageServiceImpl implements AccountManageService {
 
     /**
      * 社团邀请码工具类

@@ -1,4 +1,4 @@
-package com.sipc.mmtbackend.pojo.dto.param;
+package com.sipc.mmtbackend.pojo.dto.param.superAdmin;
 
 import lombok.Data;
 

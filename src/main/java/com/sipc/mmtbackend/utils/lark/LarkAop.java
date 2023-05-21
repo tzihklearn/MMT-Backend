@@ -1,11 +1,9 @@
 package com.sipc.mmtbackend.utils.lark;
 
-import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterThrowing;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -28,6 +26,7 @@ public class LarkAop {
     public void lark() {
 
     }
+
     @AfterThrowing(pointcut = "lark()", throwing = "exception")
     public void larkRobot(JoinPoint point, Exception exception){
         if (!larkRobot.getDev()) return;

@@ -1,6 +1,7 @@
 package com.sipc.mmtbackend.utils.lark;
 
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.Signature;
 import org.aspectj.lang.reflect.MethodSignature;
@@ -27,15 +28,13 @@ import java.util.*;
 @ConfigurationProperties("lark-robot")
 @Component
 @Data
+@Slf4j
 public class LarkRobot {
 
     private Boolean dev;
 
     private String url;
 
-//    private static Entry entry;
-
-//
     @Resource
     private RestTemplate restTemplate;
 
@@ -49,38 +48,34 @@ public class LarkRobot {
         assert attributes != null;
         HttpServletRequest request = attributes.getRequest();
 
+        //获取请求的url
         String urlStr = request.getRequestURL().toString();
 
-//        @Data
-//        class Request {
-//            private String uri;
-//            private String method;
-//            private Object parameter;
-//        }
-
+        /*
+          设置请求信息
+         */
         RequestData webRequestData = new RequestData();
         webRequestData.setMethod(request.getMethod());
 
-//        webRequest.setParameter(getParameter(method, joinPoint.getArgs()));
         webRequestData.setParameter(getParameter(joinPoint));
         webRequestData.setUri(request.getRequestURI());
 
+        /*
+          组装消息实体类
+         */
         Entry entry = new Entry("", urlStr, webRequestData.toString(), exception.getMessage() + "\\n" + Arrays.toString(exception.getStackTrace()));
 
-
+        //发送消息
         ResponseEntity<LarkResponse> responseResponseEntity = restTemplate.postForEntity(url, entry, LarkResponse.class);
 
         LarkResponse body = responseResponseEntity.getBody();
 
         if (body != null) {
             if (body.getCode() != 0) {
-                System.out.println("no");
-                System.out.println(body);
-            } else {
-                System.out.println("ok");
+                log.warn("消息发送失败，返回结果：{}，消息体：{}", body, entry);
             }
         } else {
-            System.out.println("no body为空");
+            log.warn("消息发送失败，返回结果为空，消息体：{}", entry);
         }
 
     }
