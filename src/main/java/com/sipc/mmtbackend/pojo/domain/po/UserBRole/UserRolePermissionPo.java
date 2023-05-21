@@ -1,4 +1,4 @@
-package com.sipc.mmtbackend.pojo.domain.po;
+package com.sipc.mmtbackend.pojo.domain.po.UserBRole;
 
 import lombok.Data;
 

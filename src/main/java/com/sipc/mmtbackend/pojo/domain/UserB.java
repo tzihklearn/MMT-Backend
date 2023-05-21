@@ -15,7 +15,7 @@ import lombok.Setter;
  * </p>
  *
  * @author DoudiNCer
- * @since 2023-05-06
+ * @since 2023-05-21
  */
 @Getter
 @Setter
@@ -37,13 +37,7 @@ public class UserB implements Serializable {
     private String phone;
 
     /**
-     * B端密码
-     */
-    @TableField("password")
-    private String password;
-
-    /**
-     * B端学号
+     * B端学号（唯一）
      */
     @TableField("student_id")
     private String studentId;

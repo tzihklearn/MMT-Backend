@@ -8,5 +8,6 @@ import lombok.Data;
 @Data
 public class LoginPassParam {
     private String studentId;
+    private Integer organizationId;
     private String password;
 }

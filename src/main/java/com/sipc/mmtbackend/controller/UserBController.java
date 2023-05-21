@@ -3,15 +3,14 @@ package com.sipc.mmtbackend.controller;
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
 import com.sipc.mmtbackend.pojo.dto.param.UserBParam.LoginPassParam;
 import com.sipc.mmtbackend.pojo.dto.param.UserBParam.RegParam;
+import com.sipc.mmtbackend.pojo.dto.result.UserBResult.JoinOrgsResult;
 import com.sipc.mmtbackend.pojo.dto.result.UserBResult.LoginResult;
 import com.sipc.mmtbackend.pojo.exceptions.DateBaseException;
 import com.sipc.mmtbackend.service.UserBService;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.time.format.SignStyle;
 
 @RestController
 @RequestMapping("/b/user")
@@ -31,6 +30,11 @@ public class UserBController {
         } catch (DateBaseException e) {
             return CommonResult.fail(e.getMessage());
         }
+    }
+
+    @GetMapping("/orgs")
+    public CommonResult<JoinOrgsResult> getJoinedOrgs(@RequestParam("studentIds") String studentId){
+        return userBService.getJoinedOrgs(studentId);
     }
 
     /**
