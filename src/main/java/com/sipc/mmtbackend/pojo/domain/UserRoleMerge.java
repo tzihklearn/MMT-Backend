@@ -15,7 +15,7 @@ import lombok.Setter;
  * </p>
  *
  * @author DoudiNCer
- * @since 2023-05-06
+ * @since 2023-05-21
  */
 @Getter
 @Setter
@@ -43,9 +43,15 @@ public class UserRoleMerge implements Serializable {
     private Integer roleId;
 
     /**
-     * 是否安全
+     * 是否删除
      */
     @TableField("is_deleted")
     @TableLogic
     private Boolean isDeleted;
+
+    /**
+     * 密码
+     */
+    @TableField("password")
+    private String password;
 }
