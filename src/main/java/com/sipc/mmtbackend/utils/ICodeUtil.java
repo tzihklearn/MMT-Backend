@@ -56,9 +56,27 @@ public class ICodeUtil {
      * @return 返回生成好的社团邀请码
      */
     public String setICodeRedis(Integer organizationId, int length) {
-        String ICode = generateRandomString(length);
 
-        boolean isSet = redisUtil.setString(ICode, organizationId, 10, TimeUnit.MINUTES);
+        boolean flag = false;
+
+        String ICode = null;
+
+        /*
+          生成社团邀请码，并确保其唯一
+         */
+        while (!flag) {
+            ICode = generateRandomString(length);
+
+            Integer value = redisUtil.getString(ICode + ICodeKeySuffix, Integer.class);
+
+            if (value == null) {
+                flag = true;
+            }
+
+        }
+
+        //将生成的社团邀请码放入redis缓存
+        boolean isSet = redisUtil.setString(ICode + ICodeKeySuffix, organizationId, 10, TimeUnit.MINUTES);
 
         if (isSet) {
             return ICode;
@@ -71,10 +89,10 @@ public class ICodeUtil {
     /**
      * 验证社团邀请码
      * @param ICode 待验证的社团邀请码
-     * @return 返回是否正确，正确为true，不正确为false
+     * @return 返回验证成功后邀请码对应的社团组织id,若失败返回null
      */
     public Integer verifyICode(String ICode) {
-        return redisUtil.getString(ICode, Integer.class);
+        return redisUtil.getString(ICode + ICodeKeySuffix, Integer.class);
     }
 
 }
