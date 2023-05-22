@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -98,18 +99,23 @@ public class CheckRoleUtil {
      * @return 检查结果，CommonResult&lt;CheckRoleResult&gt;，检查失败时可直接返回
      * @author DoudiNCer
      */
-    public CommonResult<CheckRoleResult> check(HttpServletRequest req) {
+    public CommonResult<CheckRoleResult> check(HttpServletRequest req, HttpServletResponse resp) {
         String token = req.getHeader("Authorization");
-        if (token == null)
+        if (token == null) {
+            resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
             return CommonResult.fail("无Token");
+        }
         CommonResult<CheckRoleResult> checkRoleResult = checkUsderInfoByToken(token);
-        if (!Objects.equals(checkRoleResult.getCode(), "00000"))
+        if (!Objects.equals(checkRoleResult.getCode(), "00000")) {
+            resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
             return checkRoleResult;
+        }
         String requestURI = req.getRequestURI();
         Integer apiPermission = apiPermissions.get(requestURI);
         CheckRoleResult userdata = checkRoleResult.getData();
         if (userdata.getPermissionId() > apiPermission) {
             log.info("用户 " + userdata + " 尝试越权访问 " + requestURI + "（权限为" + apiPermission +"）");
+            resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
             return CommonResult.fail("权限不足");
         }
         return checkRoleResult;
