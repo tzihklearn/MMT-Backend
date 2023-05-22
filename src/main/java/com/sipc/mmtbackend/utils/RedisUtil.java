@@ -83,6 +83,24 @@ public class RedisUtil {
 
     }
 
+    /**
+     * 删除redis的对应键的缓存
+     * @param key 要删除的键
+     * @return 返回是否成功删除redis缓存,成功为true,失败为false
+     */
+    public boolean delete(String key) {
+        boolean result = false;
+        try {
+            Boolean delete = redisTemplate.delete(key);
+            result = Boolean.TRUE.equals(delete);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return result;
+    }
+
 
 
 }
