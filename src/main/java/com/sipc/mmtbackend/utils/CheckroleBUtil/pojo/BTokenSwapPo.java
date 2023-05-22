@@ -1,4 +1,4 @@
-package com.sipc.mmtbackend.utils.CheckroleBUtil.po;
+package com.sipc.mmtbackend.utils.CheckroleBUtil.pojo;
 
 import com.sipc.mmtbackend.pojo.domain.po.UserBRole.UserLoginPermissionPo;
 import lombok.Data;

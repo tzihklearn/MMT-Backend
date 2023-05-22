@@ -13,13 +13,16 @@ import com.sipc.mmtbackend.pojo.domain.po.UserBRole.UserLoginPermissionPo;
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
 import com.sipc.mmtbackend.pojo.dto.param.UserBParam.LoginPassParam;
 import com.sipc.mmtbackend.pojo.dto.param.UserBParam.RegParam;
+import com.sipc.mmtbackend.pojo.dto.result.UserBResult.GetBUserInfoResult;
 import com.sipc.mmtbackend.pojo.dto.result.UserBResult.JoinOrgsResult;
 import com.sipc.mmtbackend.pojo.dto.result.UserBResult.LoginResult;
 import com.sipc.mmtbackend.pojo.dto.result.UserBResult.po.JoinedOrgResultPo;
 import com.sipc.mmtbackend.service.UserBService;
+import com.sipc.mmtbackend.utils.CheckroleBUtil.CheckRoleUtil;
 import com.sipc.mmtbackend.utils.CheckroleBUtil.JWTUtil;
 import com.sipc.mmtbackend.utils.CheckroleBUtil.PasswordUtil;
-import com.sipc.mmtbackend.utils.CheckroleBUtil.po.BTokenSwapPo;
+import com.sipc.mmtbackend.utils.CheckroleBUtil.pojo.BTokenSwapPo;
+import com.sipc.mmtbackend.utils.CheckroleBUtil.pojo.CheckRoleResult;
 import com.sipc.mmtbackend.utils.ICodeUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +31,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -42,19 +47,28 @@ public class UserBBServiceImpl implements UserBService {
     private final UserRoleMergeMapper userRoleMergeMapper;
     private final ICodeUtil iCodeUtil;
     private final JWTUtil jwtUtil;
+    private final CheckRoleUtil checkRoleUtil;
 
+    /**
+     * B 端用户注册
+     *
+     * @param param 用户信息、邀请码
+     * @return 注册结果
+     * @throws DatabaseException 数据库异常
+     * @author DoudiNCer
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public CommonResult<String> registUser(RegParam param) throws DatabaseException {
         Integer orgId = iCodeUtil.verifyICode(param.getKey());
         // 科协测试邀请码
         if (Objects.equals(param.getKey(), "qwertyuiop"))
-                orgId = 1;
+            orgId = 1;
         if (orgId == null)
             return CommonResult.fail("邀请码无效");
         // 初始化一个新组织的新角色
         Role role = roleMapper.selectOne(new QueryWrapper<Role>().eq("organization_id", orgId).eq("permission_id", 3));
-        if (role == null){
+        if (role == null) {
             role = new Role();
             role.setOrganizationId(orgId);
             role.setPermissionId(3);
@@ -71,7 +85,7 @@ public class UserBBServiceImpl implements UserBService {
         user.setUserName(param.getUsername());
         user.setEmail(param.getEmail());
         int uins = userBMapper.insert(user);
-        if (uins != 1){
+        if (uins != 1) {
             log.error("创建B端用户" + user + "失败, 受影响行数：" + uins);
             throw new DatabaseException("创建用户失败");
         }
@@ -86,6 +100,13 @@ public class UserBBServiceImpl implements UserBService {
         return CommonResult.success();
     }
 
+    /**
+     * B 端账号登陆
+     *
+     * @param param 用户帐号（学号）、登录组织ID、密码
+     * @return 登录结果、简单的用户信息、Token
+     * @author DoudiNCer
+     */
     @Override
     public CommonResult<LoginResult> loginByPass(LoginPassParam param) {
         UserLoginPermissionPo userLoginPermission = userBRoleMapper.selectBUserLoginInfoByStudentIdAndOrgId(param.getStudentId(), param.getOrganizationId());
@@ -104,8 +125,11 @@ public class UserBBServiceImpl implements UserBService {
     }
 
     /**
+     * 获取 B 端用户加入组织列表
+     *
      * @param studentId 用户账号（学号）
      * @return 加入的组织列表
+     * @author DoudiNCer
      */
     @Override
     public CommonResult<JoinOrgsResult> getJoinedOrgs(String studentId) {
@@ -122,6 +146,38 @@ public class UserBBServiceImpl implements UserBService {
         JoinOrgsResult result = new JoinOrgsResult();
         result.setNum(results.size());
         result.setOrganizations(results);
+        return CommonResult.success(result);
+    }
+
+    /**
+     * 获取 B 端用户信息
+     *
+     * @param request  HTTP请求报文
+     * @param response HTTP响应报文
+     * @return 用户信息
+     * @author DoudiNCer
+     */
+    @Override
+    public CommonResult<GetBUserInfoResult> getUserInfo(HttpServletRequest request, HttpServletResponse response) {
+        CommonResult<CheckRoleResult> check = checkRoleUtil.check(request, response);
+        if (!Objects.equals(check.getCode(), "00000"))
+            return CommonResult.fail(check.getCode(), check.getMessage());
+        CheckRoleResult data = check.getData();
+        GetBUserInfoResult result = new GetBUserInfoResult();
+        UserB userB = userBMapper.selectById(data.getUserId());
+        if (userB == null) {
+            log.warn("获取 B 端用户信息失败：用户不存在，Token解析结果：" + data);
+            return CommonResult.fail("数据库错误");
+        }
+        result.setUserId(data.getUserId());
+        result.setUsername(data.getUsername());
+        result.setStudentId(data.getStudentId());
+        result.setOrganizationId(data.getOrganizationId());
+        result.setOrganizationName(data.getOrganizationName());
+        result.setPermissionId(data.getPermissionId());
+        result.setPermissionName(data.getPermissionName());
+        result.setPhone(userB.getPhone());
+        result.setEmail(userB.getEmail());
         return CommonResult.success(result);
     }
 }
