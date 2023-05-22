@@ -19,7 +19,7 @@ import com.sipc.mmtbackend.pojo.dto.result.UserBResult.po.JoinedOrgResultPo;
 import com.sipc.mmtbackend.service.UserBService;
 import com.sipc.mmtbackend.utils.CheckroleBUtil.JWTUtil;
 import com.sipc.mmtbackend.utils.CheckroleBUtil.PasswordUtil;
-import com.sipc.mmtbackend.utils.CheckroleBUtil.po.BTokenSwapPo;
+import com.sipc.mmtbackend.utils.CheckroleBUtil.pojo.BTokenSwapPo;
 import com.sipc.mmtbackend.utils.ICodeUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
