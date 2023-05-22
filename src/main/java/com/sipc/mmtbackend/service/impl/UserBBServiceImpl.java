@@ -80,7 +80,7 @@ public class UserBBServiceImpl implements UserBService {
         roleMerge.setPassword(PasswordUtil.hashPassword(param.getPassword()));
         int urint = userRoleMergeMapper.insert(roleMerge);
         if (urint != 1) {
-            log.warn("创建 B 端用户 " + user + " 的角色失败，受影响行数：" + urint);
+            log.warn("创建 B 端用户 " + user + " 的角色" + roleMerge + "失败，受影响行数：" + urint);
             throw new DatabaseException("创建用户失败");
         }
         return CommonResult.success();
