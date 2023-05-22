@@ -176,7 +176,12 @@ public class UserBBServiceImpl implements UserBService {
         result.setOrganizationName(data.getOrganizationName());
         result.setPermissionId(data.getPermissionId());
         result.setPermissionName(data.getPermissionName());
-        result.setPhone(userB.getPhone());
+        StringBuilder sb = new StringBuilder();
+        String phone = userB.getPhone();
+        sb.append(phone, 0, 3);
+        sb.append(" **** ");
+        sb.append(phone.substring(7));
+        result.setPhone(sb.toString());
         return CommonResult.success(result);
     }
 }
