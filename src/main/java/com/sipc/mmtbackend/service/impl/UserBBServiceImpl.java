@@ -177,7 +177,6 @@ public class UserBBServiceImpl implements UserBService {
         result.setPermissionId(data.getPermissionId());
         result.setPermissionName(data.getPermissionName());
         result.setPhone(userB.getPhone());
-        result.setEmail(userB.getEmail());
         return CommonResult.success(result);
     }
 }
