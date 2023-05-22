@@ -1,8 +1,10 @@
 package com.sipc.mmtbackend.controller.superAdmin;
 
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
+import com.sipc.mmtbackend.pojo.dto.param.superAdmin.ReviseMemberInfoParam;
 import com.sipc.mmtbackend.pojo.dto.result.superAdmin.ICodeResult;
 import com.sipc.mmtbackend.pojo.dto.result.superAdmin.MemberInfoResult;
+import com.sipc.mmtbackend.pojo.exceptions.DateBaseException;
 import com.sipc.mmtbackend.service.AccountManageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,6 +66,19 @@ public class AccountManageController {
 
         return accountManageService.siftMemberInfo(organizationId, pageNum, sort, permission);
     }
+
+    /**
+     * 修改社团成员信息和权限接口
+     * @param reviseMemberInfoParam 修改社团成员信息和权限的参数实体类
+     * @return 返回处理的结果
+     * @throws DateBaseException 自定义的数据库操作异常，抛出用于统一异常处理
+     * @see ReviseMemberInfoParam
+     */
+    @PostMapping("/members/revise/info")
+    public CommonResult<String> reviseMemberInfo(@RequestBody ReviseMemberInfoParam reviseMemberInfoParam) throws DateBaseException {
+        return accountManageService.reviseMemberInfo(reviseMemberInfoParam);
+    }
+
 
 
 }

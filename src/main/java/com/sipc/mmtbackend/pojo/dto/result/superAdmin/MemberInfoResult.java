@@ -18,6 +18,6 @@ public class MemberInfoResult {
     /**
      * 社团成员信息列表
      */
-    private List<MemberInfoData> memberInfoData;
+    private List<MemberInfoData> memberInfoDataList;
 
 }

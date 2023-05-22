@@ -14,5 +14,5 @@ import org.apache.ibatis.annotations.Mapper;
  */
 @Mapper
 public interface UserRoleMergeMapper extends BaseMapper<UserRoleMerge> {
-
+    int updateRoleIdByUserIdAndOrganizationId(Integer userId, Integer organizationId, Integer roleId);
 }
