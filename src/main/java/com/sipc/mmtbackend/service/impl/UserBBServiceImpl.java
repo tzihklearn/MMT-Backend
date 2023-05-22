@@ -67,7 +67,17 @@ public class UserBBServiceImpl implements UserBService {
         if (Objects.equals(param.getKey(), "qwertyuiop"))
             orgId = 1;
         if (orgId == null)
-            return CommonResult.fail("邀请码无效");
+            return CommonResult.fail("注册失败：邀请码无效");
+        UserB userB = userBMapper.selectOne(new QueryWrapper<UserB>().eq("phone", param.getPhoneNum()));
+        if (userB != null){
+            log.info("用户" + param + "注册手机号重复：" + userB);
+            throw new DatabaseException("注册失败：手机号重复");
+        }
+        userB  = userBMapper.selectOne(new QueryWrapper<UserB>().eq("student_id", param.getStudentId()));
+        if (userB != null) {
+            log.info("用户" + param + "注册学号重复：" + userB);
+            throw new DatabaseException("注册失败：学号重复");
+        }
         // 初始化一个新组织的新角色
         Role role = roleMapper.selectOne(new QueryWrapper<Role>().eq("organization_id", orgId).eq("permission_id", 3));
         if (role == null) {
