@@ -22,7 +22,8 @@ public class LarkAop {
     @Resource
     private LarkRobot larkRobot;
 
-    @Pointcut("execution(* *..controller.*.*(..))")
+    //定义所有在controller包里及其子包里的任意类的任意方法
+    @Pointcut("execution(* *..controller..*.*(..))")
     public void lark() {
 
     }

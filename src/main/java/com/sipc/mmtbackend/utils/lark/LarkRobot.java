@@ -17,6 +17,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.lang.reflect.TypeVariable;
 import java.util.*;
 
@@ -57,13 +58,14 @@ public class LarkRobot {
         RequestData webRequestData = new RequestData();
         webRequestData.setMethod(request.getMethod());
 
-        webRequestData.setParameter(getParameter(joinPoint));
+        webRequestData.setParameter(getParameter(joinPoint, method));
         webRequestData.setUri(request.getRequestURI());
 
         /*
           组装消息实体类
          */
-        Entry entry = new Entry("", urlStr, webRequestData.toString(), exception.getMessage() + "\\n" + Arrays.toString(exception.getStackTrace()));
+        Entry entry = new Entry("", urlStr, webRequestData.toString(), exception.getMessage() +
+                ": **" + exception.getClass().getName() + "**", Arrays.toString(exception.getStackTrace()));
 
         //发送消息
         ResponseEntity<LarkResponse> responseResponseEntity = restTemplate.postForEntity(url, entry, LarkResponse.class);
@@ -80,35 +82,30 @@ public class LarkRobot {
 
     }
 
-    public static List<Object> getParameter(JoinPoint joinPoint) {
+    public static List<Object> getParameter(JoinPoint joinPoint, Method method) {
         //获取请求参数
         Object[] args = joinPoint.getArgs();
         //设置请求参数类
         List<Object> argList = new ArrayList<>();
         //获取请求参数
-        Class declaringType = joinPoint.getSignature().getDeclaringType();
         int i = 0;
-        for (TypeVariable typeParameter : declaringType.getTypeParameters()) {
+        for (Parameter parameter : method.getParameters()) {
             //获取@RequestBody注解的参数
-            RequestBody annotation = typeParameter.getAnnotation(RequestBody.class);
-            if (annotation != null) {
+            RequestBody requestBodyAnnotation = parameter.getAnnotation(RequestBody.class);
+            if (requestBodyAnnotation != null) {
                 argList.add(args[i]);
                 ++i;
                 continue;
             }
 
             //获取@RequestParam注解的参数
-            RequestParam annotation1 = typeParameter.getAnnotation(RequestParam.class);
+            RequestParam annotation1 = parameter.getAnnotation(RequestParam.class);
             if (annotation1 != null) {
                 Map<String, Object> map = new HashMap<>();
-                map.put(typeParameter.getName(), args[i]);
+                map.put(parameter.getName(), args[i]);
                 argList.add(map);
             }
             ++i;
-        }
-
-        if (args.length != 0) {
-            argList.add(args);
         }
 
         return argList;
