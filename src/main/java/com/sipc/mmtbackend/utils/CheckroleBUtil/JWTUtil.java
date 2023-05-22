@@ -139,7 +139,7 @@ public class JWTUtil {
             log.info("尝试吊销非法 Token：" + token);
             return false;
         }
-        boolean sel =  redisUtil.deleteString(tokenKey);
+        boolean sel =  redisUtil.delete(tokenKey);
         if (!sel){
             log.warn("Redis 删除 Token 失败，Token 为：" + token + "key 为：" + tokenKey);
         }
