@@ -33,7 +33,7 @@ public class UserBController {
     }
 
     @GetMapping("/orgs")
-    public CommonResult<JoinOrgsResult> getJoinedOrgs(@RequestParam("studentIds") String studentId){
+    public CommonResult<JoinOrgsResult> getJoinedOrgs(@RequestParam("studentId") String studentId){
         return userBService.getJoinedOrgs(studentId);
     }
 
