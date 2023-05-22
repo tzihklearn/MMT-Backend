@@ -16,7 +16,6 @@ import com.sipc.mmtbackend.pojo.dto.param.UserBParam.RegParam;
 import com.sipc.mmtbackend.pojo.dto.result.UserBResult.JoinOrgsResult;
 import com.sipc.mmtbackend.pojo.dto.result.UserBResult.LoginResult;
 import com.sipc.mmtbackend.pojo.dto.result.UserBResult.po.JoinedOrgResultPo;
-import com.sipc.mmtbackend.pojo.exceptions.DateBaseException;
 import com.sipc.mmtbackend.service.UserBService;
 import com.sipc.mmtbackend.utils.CheckroleBUtil.JWTUtil;
 import com.sipc.mmtbackend.utils.CheckroleBUtil.PasswordUtil;
@@ -31,25 +30,26 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.LinkedList;
 import java.util.List;
-
-import static net.sf.jsqlparser.util.validation.metadata.NamedObject.role;
-import static net.sf.jsqlparser.util.validation.metadata.NamedObject.user;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor(onConstructor_ = {@Autowired})
 @Slf4j
 public class UserBBServiceImpl implements UserBService {
-    private RoleMapper roleMapper;
-    private UserBMapper userBMapper;
-    private UserBRoleMapper userBRoleMapper;
-    private UserRoleMergeMapper userRoleMergeMapper;
-    private ICodeUtil iCodeUtil;
-    private JWTUtil jwtUtil;
+    private final RoleMapper roleMapper;
+    private final UserBMapper userBMapper;
+    private final UserBRoleMapper userBRoleMapper;
+    private final UserRoleMergeMapper userRoleMergeMapper;
+    private final ICodeUtil iCodeUtil;
+    private final JWTUtil jwtUtil;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public CommonResult<String> registUser(RegParam param) throws DatabaseException {
         Integer orgId = iCodeUtil.verifyICode(param.getKey());
+        // 科协测试邀请码
+        if (Objects.equals(param.getKey(), "qwertyuiop"))
+                orgId = 1;
         if (orgId == null)
             return CommonResult.fail("邀请码无效");
         // 初始化一个新组织的新角色
@@ -80,7 +80,7 @@ public class UserBBServiceImpl implements UserBService {
         roleMerge.setPassword(PasswordUtil.hashPassword(param.getPassword()));
         int urint = userRoleMergeMapper.insert(roleMerge);
         if (urint != 1) {
-            log.warn("创建 B 端用户 " + user + " 的角色失败，受影响行数：" + urint);
+            log.warn("创建 B 端用户 " + user + " 的角色" + roleMerge + "失败，受影响行数：" + urint);
             throw new DatabaseException("创建用户失败");
         }
         return CommonResult.success();

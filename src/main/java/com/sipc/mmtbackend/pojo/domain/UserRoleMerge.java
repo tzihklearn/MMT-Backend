@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 /**
  * <p>
@@ -19,6 +20,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
+@ToString
 @TableName("user_role_merge")
 public class UserRoleMerge implements Serializable {
 
