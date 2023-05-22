@@ -43,7 +43,7 @@ public class UserBController {
      * @return token、用户ID与
      */
     @PostMapping("/loginp")
-    public CommonResult<LoginResult> loginByPass(LoginPassParam param){
+    public CommonResult<LoginResult> loginByPass(@RequestBody LoginPassParam param){
         return userBService.loginByPass(param);
     }
 }
