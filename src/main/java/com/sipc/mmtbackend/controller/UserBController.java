@@ -3,6 +3,7 @@ package com.sipc.mmtbackend.controller;
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
 import com.sipc.mmtbackend.pojo.dto.param.UserBParam.LoginPassParam;
 import com.sipc.mmtbackend.pojo.dto.param.UserBParam.RegParam;
+import com.sipc.mmtbackend.pojo.dto.result.UserBResult.GetBUserInfoResult;
 import com.sipc.mmtbackend.pojo.dto.result.UserBResult.JoinOrgsResult;
 import com.sipc.mmtbackend.pojo.dto.result.UserBResult.LoginResult;
 import com.sipc.mmtbackend.pojo.exceptions.DateBaseException;
@@ -10,7 +11,8 @@ import com.sipc.mmtbackend.service.UserBService;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import java.time.format.SignStyle;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 @RestController
 @RequestMapping("/b/user")
@@ -20,11 +22,12 @@ public class UserBController {
 
     /**
      * B端注册
+     *
      * @param param 注册信息
      * @return 状态信息
      */
     @PostMapping("/reg")
-    public CommonResult<String> registUser(@RequestBody RegParam param){
+    public CommonResult<String> registUser(@RequestBody RegParam param) {
         try {
             return userBService.registUser(param);
         } catch (DateBaseException e) {
@@ -33,17 +36,23 @@ public class UserBController {
     }
 
     @GetMapping("/orgs")
-    public CommonResult<JoinOrgsResult> getJoinedOrgs(@RequestParam("studentId") String studentId){
+    public CommonResult<JoinOrgsResult> getJoinedOrgs(@RequestParam("studentId") String studentId) {
         return userBService.getJoinedOrgs(studentId);
     }
 
     /**
      * 使用学号与密码登录
+     *
      * @param param 学号与密码
      * @return token、用户ID与
      */
     @PostMapping("/loginp")
-    public CommonResult<LoginResult> loginByPass(@RequestBody LoginPassParam param){
+    public CommonResult<LoginResult> loginByPass(@RequestBody LoginPassParam param) {
         return userBService.loginByPass(param);
+    }
+
+    @GetMapping("/userinfo")
+    public CommonResult<GetBUserInfoResult> getUserInfo(HttpServletRequest request, HttpServletResponse Response){
+        return userBService.getUserInfo(request, Response);
     }
 }
