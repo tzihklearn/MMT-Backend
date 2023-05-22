@@ -1,6 +1,7 @@
 package com.sipc.mmtbackend.controller.superAdmin;
 
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
+import com.sipc.mmtbackend.pojo.dto.param.superAdmin.OrganizationPublishParam;
 import com.sipc.mmtbackend.pojo.dto.result.superAdmin.UploadAvatarResult;
 import com.sipc.mmtbackend.pojo.dto.param.superAdmin.OrganizationInfoParam;
 import com.sipc.mmtbackend.pojo.dto.result.superAdmin.OrganizationInfoResult;
@@ -74,7 +75,7 @@ public class OrganizationController {
     }
 
     @PostMapping("/test")
-    public CommonResult<String> test() throws RuntimeException {
+    public CommonResult<String> test(@RequestBody OrganizationPublishParam organizationPublishParam) throws RuntimeException {
         throw new RuntimeException("test测试错误");
 //        return null;
     }
