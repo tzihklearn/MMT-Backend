@@ -15,6 +15,9 @@ import java.util.List;
 @Data
 public class MemberInfoResult {
 
+    /**
+     * 社团成员信息列表
+     */
     private List<MemberInfoData> memberInfoData;
 
 }
