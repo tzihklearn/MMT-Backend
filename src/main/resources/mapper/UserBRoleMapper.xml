@@ -42,7 +42,6 @@
                 LEFT JOIN user_role_merge ON user_b.id = user_role_merge.user_id
                 LEFT JOIN role ON user_role_merge.role_id = role.id
                 LEFT JOIN permission ON role.permission_id = permission.id
-        WHERE LEFT JOIN role ON user_role_merge.role_id = role.id
         WHERE
             user_b.student_id = #{studentId,jdbcType=CHAR}
           AND role.organization_id = #{organizationId,jdbcType=INTEGER}
