@@ -9,8 +9,11 @@
                  JOIN user_role_merge AS urm ON user_b.id = urm.user_id
                  JOIN role ON urm.role_id = role.id
         WHERE organization_id = #{organizationId}
+            AND role.is_deleted = 0
+            AND urm.is_deleted = 0
+            AND user_b.is_deleted = 0
         <if test="permissionId != 0">
-            and role.permission_id = #{permissionId}
+            AND role.permission_id = #{permissionId}
         </if>
             LIMIT #{startNum}, #{endNum}
         <if test="sort != 0">
