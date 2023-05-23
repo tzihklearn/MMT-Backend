@@ -12,6 +12,7 @@ import com.sipc.mmtbackend.pojo.dto.CommonResult;
 import com.sipc.mmtbackend.pojo.dto.resultEnum.ResultEnum;
 import com.sipc.mmtbackend.utils.CheckroleBUtil.pojo.BTokenSwapPo;
 import com.sipc.mmtbackend.utils.CheckroleBUtil.pojo.CheckRoleResult;
+import com.sipc.mmtbackend.utils.CheckroleBUtil.pojo.PermissionEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -36,7 +37,7 @@ public class CheckRoleUtil {
     private final OrganizationMapper organizationMapper;
     private final PermissionMapper permissionMapper;
     private final UserBMapper userBMapper;
-    private final Map<String, Integer> apiPermissions;
+    private final Map<String, PermissionEnum> apiPermissions;
 
     @Autowired
     public CheckRoleUtil(JWTUtil jwtUtil, RoleMapper roleMapper, OrganizationMapper organizationMapper, PermissionMapper permissionMapper, UserBMapper userBMapper) {
@@ -45,10 +46,10 @@ public class CheckRoleUtil {
         this.organizationMapper = organizationMapper;
         this.permissionMapper = permissionMapper;
         this.userBMapper = userBMapper;
-        Map<String, Integer> apiPermissions = new HashMap<>();
-        apiPermissions.put("/b/user/userinfo", 3);
-        apiPermissions.put("/b/user/password", 3);
-        apiPermissions.put("/b/user/logout", 3);
+        Map<String, PermissionEnum> apiPermissions = new HashMap<>();
+        apiPermissions.put("/b/user/userinfo", PermissionEnum.NUMBER);
+        apiPermissions.put("/b/user/password", PermissionEnum.NUMBER);
+        apiPermissions.put("/b/user/logout", PermissionEnum.NUMBER);
         this.apiPermissions = apiPermissions;
     }
 
@@ -116,9 +117,9 @@ public class CheckRoleUtil {
             return checkRoleResult;
         }
         String requestURI = req.getRequestURI();
-        Integer apiPermission = apiPermissions.get(requestURI);
+        PermissionEnum apiPermission = apiPermissions.get(requestURI);
         CheckRoleResult userdata = checkRoleResult.getData();
-        if (userdata.getPermissionId() > apiPermission) {
+        if (userdata.getPermissionId() > apiPermission.getId()) {
             log.info("用户 " + userdata + " 尝试越权访问 " + requestURI + "（权限为" + apiPermission + "）");
             resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
             return CommonResult.fail("权限不足");
