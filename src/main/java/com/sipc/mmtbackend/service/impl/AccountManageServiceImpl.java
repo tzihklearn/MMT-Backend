@@ -11,11 +11,14 @@ import com.sipc.mmtbackend.pojo.domain.UserB;
 import com.sipc.mmtbackend.pojo.domain.po.UserBMemberPo;
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
 import com.sipc.mmtbackend.pojo.dto.data.MemberInfoData;
+import com.sipc.mmtbackend.pojo.dto.param.superAdmin.DeleteMemberParam;
 import com.sipc.mmtbackend.pojo.dto.param.superAdmin.ReviseMemberInfoParam;
+import com.sipc.mmtbackend.pojo.dto.param.superAdmin.ReviseMemberPasswdParam;
 import com.sipc.mmtbackend.pojo.dto.result.superAdmin.ICodeResult;
 import com.sipc.mmtbackend.pojo.dto.result.superAdmin.MemberInfoResult;
 import com.sipc.mmtbackend.pojo.exceptions.DateBaseException;
 import com.sipc.mmtbackend.service.AccountManageService;
+import com.sipc.mmtbackend.utils.CheckroleBUtil.PasswordUtil;
 import com.sipc.mmtbackend.utils.ICodeUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -143,6 +146,7 @@ public class AccountManageServiceImpl implements AccountManageService {
 
     /**
      * 修改社团成员信息和权限业务处理方法
+     *
      * @param reviseMemberInfoParam 修改社团成员信息和权限的参数实体类
      * @return 返回处理的结果
      * @throws DateBaseException 自定义的数据库操作异常，抛出用于事务处理回滚
@@ -151,7 +155,7 @@ public class AccountManageServiceImpl implements AccountManageService {
     @Transactional(rollbackFor = Exception.class)
     public CommonResult<String> reviseMemberInfo(ReviseMemberInfoParam reviseMemberInfoParam) throws DateBaseException {
 
-        Integer organizationId = 1;
+        Integer organizationId = 0;
 
         //获取权限列表，并将其存入map
         if (permissionMap.size() == 0) {
@@ -191,10 +195,12 @@ public class AccountManageServiceImpl implements AccountManageService {
          */
         int updateNum = userRoleMergeMapper.updateRoleIdByUserIdAndOrganizationId(
                 reviseMemberInfoParam.getId(), organizationId, role.getId());
-        if (updateNum != 1) {
+        if (updateNum != 1 && updateNum != 0) {
             log.error("修改社团成员信息接口异常，更新社团成员权限角色出错，更新数不正确，更新数：{}，用户id：{}，社团组织id：{}，修改权限角色id：{}",
                     updateNum, reviseMemberInfoParam.getId(), organizationId, role.getId());
             throw new DateBaseException("数据库更新数据异常");
+        } else if (updateNum == 0) {
+            return CommonResult.fail("请求失败，该成员不存在");
         }
 
         /*
@@ -206,13 +212,70 @@ public class AccountManageServiceImpl implements AccountManageService {
         userB.setUserName(reviseMemberInfoParam.getName());
 
         updateNum = userBMapper.updateById(userB);
-        if (updateNum != 0) {
+        if (updateNum != 1 && updateNum != 0) {
             log.error("修改社团成员信息接口异常，更新社团成员信息出错，更新数不正确，更新数：{}，社团组织id：{}，更新的成员信息：{}",
                     updateNum, organizationId, userB);
             throw new DateBaseException("数据库更新数据异常");
+        } else if (updateNum == 0) {
+            return CommonResult.fail("请求失败，该成员不存在");
         }
 
-        return CommonResult.success("请求成功，社团成员信息以修改");
+        return CommonResult.success("请求成功，社团成员信息已修改");
+    }
+
+    /**
+     * 修改社团成员密码业务处理方法
+     *
+     * @param reviseMemberPasswdParam 修改社团成员密码的参数实体类
+     * @return 返回处理的结果
+     * @throws DateBaseException 自定义的数据库操作异常，抛出用于事务处理回滚
+     * @see ReviseMemberPasswdParam
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public CommonResult<String> reviseMemberPasswd(ReviseMemberPasswdParam reviseMemberPasswdParam) throws DateBaseException {
+
+        Integer organizationId = 0;
+
+        String passwd = PasswordUtil.hashPassword(reviseMemberPasswdParam.getPasswd());
+
+        int updateNum = userRoleMergeMapper.updatePasswdByUserIdAndOrganizationId(reviseMemberPasswdParam.getUserId(), organizationId,
+                passwd);
+        if (updateNum != 1 && updateNum != 0) {
+            log.error("修改社团成员密码接口异常，更新社团成员密码出错，更新数不正确，更新数：{}，社团组织id：{}，被更新社团成员id：{}，更新密码信息为：{}",
+                    updateNum, organizationId, reviseMemberPasswdParam.getUserId(), passwd);
+            throw new DateBaseException("数据库更新数据异常");
+        } else if (updateNum == 0) {
+            return CommonResult.fail("请求失败，该成员不存在");
+        }
+
+        return CommonResult.success("请求成功，社团成员密码已更新");
+    }
+
+    /**
+     * 删除社团成员业务处理方法
+     *
+     * @param deleteMemberParam 删除社团成员的参数实体类
+     * @return 返回处理的结果
+     * @throws DateBaseException 自定义的数据库操作异常，抛出用于事务处理回滚
+     * @see DeleteMemberParam
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public CommonResult<String> deleteMember(DeleteMemberParam deleteMemberParam) throws DateBaseException {
+
+        Integer organizationId = 0;
+
+        int deleteNum = userRoleMergeMapper.logicDeleteByUserIdAndOrganizationId(deleteMemberParam.getUserId(), organizationId);
+        if (deleteNum != 1 && deleteNum != 0) {
+            log.error("删除社团成员接口异常，删除社团成员数出错，删除数不正确，删除数：{}，社团组织id：{}，被删除社团成员id：{}",
+                    deleteNum, organizationId, deleteMemberParam.getUserId());
+            throw new DateBaseException("数据库删除数据异常");
+        } else if (deleteNum == 0) {
+            return CommonResult.fail("请求失败，该成员不存在");
+        }
+
+        return CommonResult.success("请求成功，社团成员已删除");
     }
 
     /**
