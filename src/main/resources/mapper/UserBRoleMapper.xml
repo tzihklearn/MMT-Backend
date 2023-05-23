@@ -23,7 +23,7 @@
         FROM
             user_role_merge
                 LEFT JOIN role ON user_role_merge.role_id = role.id
-                FULL JOIN organization ON role.organization_id = organization.id
+                LEFT JOIN organization ON role.organization_id = organization.id
         WHERE
             user_role_merge.user_id = #{userId,jdbcType=INTEGER}
     </select>

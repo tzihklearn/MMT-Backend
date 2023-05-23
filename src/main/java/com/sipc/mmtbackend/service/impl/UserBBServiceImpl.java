@@ -14,9 +14,11 @@ import com.sipc.mmtbackend.pojo.dto.CommonResult;
 import com.sipc.mmtbackend.pojo.dto.param.UserBParam.LoginPassParam;
 import com.sipc.mmtbackend.pojo.dto.param.UserBParam.PutUserPasswordParam;
 import com.sipc.mmtbackend.pojo.dto.param.UserBParam.RegParam;
+import com.sipc.mmtbackend.pojo.dto.param.UserBParam.SwitchOrgParam;
 import com.sipc.mmtbackend.pojo.dto.result.UserBResult.GetBUserInfoResult;
 import com.sipc.mmtbackend.pojo.dto.result.UserBResult.JoinOrgsResult;
 import com.sipc.mmtbackend.pojo.dto.result.UserBResult.LoginResult;
+import com.sipc.mmtbackend.pojo.dto.result.UserBResult.SwitchOrgResult;
 import com.sipc.mmtbackend.pojo.dto.result.UserBResult.po.JoinedOrgResultPo;
 import com.sipc.mmtbackend.pojo.dto.resultEnum.ResultEnum;
 import com.sipc.mmtbackend.service.UserBService;
@@ -145,7 +147,7 @@ public class UserBBServiceImpl implements UserBService {
      */
     @Override
     public CommonResult<JoinOrgsResult> getJoinedOrgs(String studentId) {
-        UserB userB = userBMapper.selectOne(new QueryWrapper<UserB>().eq("studen_id", studentId));
+        UserB userB = userBMapper.selectOne(new QueryWrapper<UserB>().eq("student_id", studentId));
         if (userB == null)
             return CommonResult.fail("用户不存在");
         List<JoinedOrgResultPo> results = new LinkedList<>();
