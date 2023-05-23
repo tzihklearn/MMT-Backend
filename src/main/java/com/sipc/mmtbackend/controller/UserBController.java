@@ -77,4 +77,9 @@ public class UserBController {
     public CommonResult<String> changeUserNewPassword(HttpServletRequest request, HttpServletResponse response, PutUserPasswordParam param) {
         return userBService.putUserNewPassword(request, response, param);
     }
+
+    @PostMapping("/logout")
+    public CommonResult<String> logout(HttpServletRequest request, HttpServletResponse response){
+        return userBService.logout(request, response);
+    }
 }

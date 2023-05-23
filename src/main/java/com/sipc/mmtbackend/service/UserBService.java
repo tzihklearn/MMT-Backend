@@ -62,4 +62,13 @@ public interface UserBService {
      * @author DoudiNCer
      */
     CommonResult<String> putUserNewPassword(HttpServletRequest request, HttpServletResponse response, PutUserPasswordParam param);
+
+    /**
+     * B 段用户登出
+     *
+     * @param request  HTTP请求报文
+     * @param response HTTP响应报文
+     * @return 处理结果
+     */
+    CommonResult<String> logout(HttpServletRequest request, HttpServletResponse response);
 }

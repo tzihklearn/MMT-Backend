@@ -69,11 +69,11 @@ public class UserBBServiceImpl implements UserBService {
         if (orgId == null)
             return CommonResult.fail("注册失败：邀请码无效");
         UserB userB = userBMapper.selectOne(new QueryWrapper<UserB>().eq("phone", param.getPhoneNum()));
-        if (userB != null){
+        if (userB != null) {
             log.info("用户" + param + "注册手机号重复：" + userB);
             return CommonResult.fail("注册失败：手机号重复");
         }
-        userB  = userBMapper.selectOne(new QueryWrapper<UserB>().eq("student_id", param.getStudentId()));
+        userB = userBMapper.selectOne(new QueryWrapper<UserB>().eq("student_id", param.getStudentId()));
         if (userB != null) {
             log.info("用户" + param + "注册学号重复：" + userB);
             return CommonResult.fail("注册失败：学号重复");
@@ -232,5 +232,20 @@ public class UserBBServiceImpl implements UserBService {
             return CommonResult.fail("数据库错误");
         }
         return CommonResult.success();
+    }
+
+    /**
+     * B 段用户登出
+     *
+     * @param request  HTTP请求报文
+     * @param response HTTP响应报文
+     * @return 处理结果
+     */
+    @Override
+    public CommonResult<String> logout(HttpServletRequest request, HttpServletResponse response) {
+        CommonResult<CheckRoleResult> check = checkRoleUtil.check(request, response);
+        if (!Objects.equals(check.getCode(), ResultEnum.SUCCESS.getCode()))
+            return CommonResult.fail(check.getCode(), check.getMessage());
+        return checkRoleUtil.logout(request, response);
     }
 }
