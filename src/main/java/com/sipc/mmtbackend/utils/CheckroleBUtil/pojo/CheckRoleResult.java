@@ -11,4 +11,5 @@ public class CheckRoleResult {
     private String organizationName;
     private Integer permissionId;
     private String permissionName;
+    private Integer roleId;
 }

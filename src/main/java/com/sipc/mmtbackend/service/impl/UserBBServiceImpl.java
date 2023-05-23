@@ -12,11 +12,13 @@ import com.sipc.mmtbackend.pojo.domain.po.UserBRole.JoinedOrgPo;
 import com.sipc.mmtbackend.pojo.domain.po.UserBRole.UserLoginPermissionPo;
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
 import com.sipc.mmtbackend.pojo.dto.param.UserBParam.LoginPassParam;
+import com.sipc.mmtbackend.pojo.dto.param.UserBParam.PutUserPasswordParam;
 import com.sipc.mmtbackend.pojo.dto.param.UserBParam.RegParam;
 import com.sipc.mmtbackend.pojo.dto.result.UserBResult.GetBUserInfoResult;
 import com.sipc.mmtbackend.pojo.dto.result.UserBResult.JoinOrgsResult;
 import com.sipc.mmtbackend.pojo.dto.result.UserBResult.LoginResult;
 import com.sipc.mmtbackend.pojo.dto.result.UserBResult.po.JoinedOrgResultPo;
+import com.sipc.mmtbackend.pojo.dto.resultEnum.ResultEnum;
 import com.sipc.mmtbackend.service.UserBService;
 import com.sipc.mmtbackend.utils.CheckroleBUtil.CheckRoleUtil;
 import com.sipc.mmtbackend.utils.CheckroleBUtil.JWTUtil;
@@ -65,7 +67,17 @@ public class UserBBServiceImpl implements UserBService {
         if (Objects.equals(param.getKey(), "qwertyuiop"))
             orgId = 1;
         if (orgId == null)
-            return CommonResult.fail("邀请码无效");
+            return CommonResult.fail("注册失败：邀请码无效");
+        UserB userB = userBMapper.selectOne(new QueryWrapper<UserB>().eq("phone", param.getPhoneNum()));
+        if (userB != null){
+            log.info("用户" + param + "注册手机号重复：" + userB);
+            throw new DatabaseException("注册失败：手机号重复");
+        }
+        userB  = userBMapper.selectOne(new QueryWrapper<UserB>().eq("student_id", param.getStudentId()));
+        if (userB != null) {
+            log.info("用户" + param + "注册学号重复：" + userB);
+            throw new DatabaseException("注册失败：学号重复");
+        }
         // 初始化一个新组织的新角色
         Role role = roleMapper.selectOne(new QueryWrapper<Role>().eq("organization_id", orgId).eq("permission_id", 3));
         if (role == null) {
@@ -160,7 +172,7 @@ public class UserBBServiceImpl implements UserBService {
     @Override
     public CommonResult<GetBUserInfoResult> getUserInfo(HttpServletRequest request, HttpServletResponse response) {
         CommonResult<CheckRoleResult> check = checkRoleUtil.check(request, response);
-        if (!Objects.equals(check.getCode(), "00000"))
+        if (!Objects.equals(check.getCode(), ResultEnum.SUCCESS.getCode()))
             return CommonResult.fail(check.getCode(), check.getMessage());
         CheckRoleResult data = check.getData();
         GetBUserInfoResult result = new GetBUserInfoResult();
@@ -176,8 +188,49 @@ public class UserBBServiceImpl implements UserBService {
         result.setOrganizationName(data.getOrganizationName());
         result.setPermissionId(data.getPermissionId());
         result.setPermissionName(data.getPermissionName());
-        result.setPhone(userB.getPhone());
-        result.setEmail(userB.getEmail());
+        StringBuilder sb = new StringBuilder();
+        String phone = userB.getPhone();
+        sb.append(phone, 0, 3);
+        sb.append(" **** ");
+        sb.append(phone.substring(7));
+        result.setPhone(sb.toString());
         return CommonResult.success(result);
+    }
+
+    /**
+     * 更新 B 端用户密码
+     *
+     * @param request  HTTP 请求报文
+     * @param response HTTP 响应报文
+     * @param param    旧密码与新密码
+     * @return 处理结果
+     * @author DoudiNCer
+     */
+    @Override
+    public CommonResult<String> putUserNewPassword(HttpServletRequest request, HttpServletResponse response, PutUserPasswordParam param) {
+        CommonResult<CheckRoleResult> check = checkRoleUtil.check(request, response);
+        if (!Objects.equals(check.getCode(), ResultEnum.SUCCESS.getCode()))
+            return CommonResult.fail(check.getCode(), check.getMessage());
+        CheckRoleResult data = check.getData();
+        UserRoleMerge userRoleMerge = userRoleMergeMapper.selectOne(
+                new QueryWrapper<UserRoleMerge>()
+                        .eq("user_id", data.getUserId())
+                        .eq("role_id", data.getRoleId())
+        );
+        if (userRoleMerge == null) {
+            log.warn("获取 B 端用户信息失败：用户不存在，Token解析结果：" + data);
+            return CommonResult.fail("数据库错误");
+        }
+        boolean testPasswd = PasswordUtil.testPasswd(param.getOldPassword(), userRoleMerge.getPassword());
+        if (!testPasswd) {
+            return CommonResult.fail("旧密码错误");
+        }
+        userRoleMerge.setPassword(PasswordUtil.hashPassword(param.getNewPassword()));
+        int updateById = userRoleMergeMapper.updateById(userRoleMerge);
+        if (updateById != -1) {
+            log.warn("更新用户 " + userRoleMerge + " 密码错误，受影响行数：" + updateById);
+            return CommonResult.fail("数据库错误");
+        }
+        return CommonResult.success();
     }
 }

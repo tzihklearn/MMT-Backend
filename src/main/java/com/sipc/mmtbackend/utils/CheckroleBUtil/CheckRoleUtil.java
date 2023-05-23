@@ -9,6 +9,7 @@ import com.sipc.mmtbackend.pojo.domain.Permission;
 import com.sipc.mmtbackend.pojo.domain.Role;
 import com.sipc.mmtbackend.pojo.domain.UserB;
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
+import com.sipc.mmtbackend.pojo.dto.resultEnum.ResultEnum;
 import com.sipc.mmtbackend.utils.CheckroleBUtil.pojo.BTokenSwapPo;
 import com.sipc.mmtbackend.utils.CheckroleBUtil.pojo.CheckRoleResult;
 import lombok.extern.slf4j.Slf4j;
@@ -89,6 +90,7 @@ public class CheckRoleUtil {
         result.setUsername(organization.getName());
         result.setPermissionId(role.getPermissionId());
         result.setPermissionName(permission.getName());
+        result.setRoleId(bTokenSwapPo.getRoleId());
         return CommonResult.success(result);
     }
 
@@ -106,7 +108,7 @@ public class CheckRoleUtil {
             return CommonResult.fail("无Token");
         }
         CommonResult<CheckRoleResult> checkRoleResult = checkUsderInfoByToken(token);
-        if (!Objects.equals(checkRoleResult.getCode(), "00000")) {
+        if (!Objects.equals(checkRoleResult.getCode(), ResultEnum.SUCCESS.getCode())) {
             resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
             return checkRoleResult;
         }

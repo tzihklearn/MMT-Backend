@@ -2,6 +2,7 @@ package com.sipc.mmtbackend.service;
 
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
 import com.sipc.mmtbackend.pojo.dto.param.UserBParam.LoginPassParam;
+import com.sipc.mmtbackend.pojo.dto.param.UserBParam.PutUserPasswordParam;
 import com.sipc.mmtbackend.pojo.dto.param.UserBParam.RegParam;
 import com.sipc.mmtbackend.pojo.dto.result.UserBResult.GetBUserInfoResult;
 import com.sipc.mmtbackend.pojo.dto.result.UserBResult.JoinOrgsResult;
@@ -50,4 +51,15 @@ public interface UserBService {
      * @author DoudiNCer
      */
     CommonResult<GetBUserInfoResult> getUserInfo(HttpServletRequest request, HttpServletResponse response);
+
+    /**
+     * 更新 B 端用户密码
+     *
+     * @param request  HTTP 请求报文
+     * @param response HTTP 响应报文
+     * @param param    旧密码与新密码
+     * @return 处理结果
+     * @author DoudiNCer
+     */
+    CommonResult<String> putUserNewPassword(HttpServletRequest request, HttpServletResponse response, PutUserPasswordParam param);
 }
