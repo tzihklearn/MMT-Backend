@@ -78,8 +78,15 @@ public class UserBController {
         return userBService.putUserNewPassword(request, response, param);
     }
 
+    /**
+     * B 端用户登出
+     *
+     * @param request  HTTP请求报文
+     * @param response HTTP响应报文
+     * @return 处理结果
+     */
     @PostMapping("/logout")
-    public CommonResult<String> logout(HttpServletRequest request, HttpServletResponse response){
+    public CommonResult<String> logout(HttpServletRequest request, HttpServletResponse response) {
         return userBService.logout(request, response);
     }
 }

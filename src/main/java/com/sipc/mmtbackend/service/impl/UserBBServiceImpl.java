@@ -235,7 +235,7 @@ public class UserBBServiceImpl implements UserBService {
     }
 
     /**
-     * B 段用户登出
+     * B 端用户登出
      *
      * @param request  HTTP请求报文
      * @param response HTTP响应报文

@@ -46,6 +46,9 @@ public class CheckRoleUtil {
         this.permissionMapper = permissionMapper;
         this.userBMapper = userBMapper;
         Map<String, Integer> apiPermissions = new HashMap<>();
+        apiPermissions.put("/b/user/userinfo", 3);
+        apiPermissions.put("/b/user/password", 3);
+        apiPermissions.put("/b/user/logout", 3);
         this.apiPermissions = apiPermissions;
     }
 
