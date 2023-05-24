@@ -14,9 +14,11 @@ import com.sipc.mmtbackend.pojo.dto.CommonResult;
 import com.sipc.mmtbackend.pojo.dto.param.UserBParam.LoginPassParam;
 import com.sipc.mmtbackend.pojo.dto.param.UserBParam.PutUserPasswordParam;
 import com.sipc.mmtbackend.pojo.dto.param.UserBParam.RegParam;
+import com.sipc.mmtbackend.pojo.dto.param.UserBParam.SwitchOrgParam;
 import com.sipc.mmtbackend.pojo.dto.result.UserBResult.GetBUserInfoResult;
 import com.sipc.mmtbackend.pojo.dto.result.UserBResult.JoinOrgsResult;
 import com.sipc.mmtbackend.pojo.dto.result.UserBResult.LoginResult;
+import com.sipc.mmtbackend.pojo.dto.result.UserBResult.SwitchOrgResult;
 import com.sipc.mmtbackend.pojo.dto.result.UserBResult.po.JoinedOrgResultPo;
 import com.sipc.mmtbackend.pojo.dto.resultEnum.ResultEnum;
 import com.sipc.mmtbackend.service.UserBService;
@@ -69,14 +71,14 @@ public class UserBBServiceImpl implements UserBService {
         if (orgId == null)
             return CommonResult.fail("注册失败：邀请码无效");
         UserB userB = userBMapper.selectOne(new QueryWrapper<UserB>().eq("phone", param.getPhoneNum()));
-        if (userB != null){
+        if (userB != null) {
             log.info("用户" + param + "注册手机号重复：" + userB);
-            throw new DatabaseException("注册失败：手机号重复");
+            return CommonResult.fail("注册失败：手机号重复");
         }
-        userB  = userBMapper.selectOne(new QueryWrapper<UserB>().eq("student_id", param.getStudentId()));
+        userB = userBMapper.selectOne(new QueryWrapper<UserB>().eq("student_id", param.getStudentId()));
         if (userB != null) {
             log.info("用户" + param + "注册学号重复：" + userB);
-            throw new DatabaseException("注册失败：学号重复");
+            return CommonResult.fail("注册失败：学号重复");
         }
         // 初始化一个新组织的新角色
         Role role = roleMapper.selectOne(new QueryWrapper<Role>().eq("organization_id", orgId).eq("permission_id", 3));
@@ -145,7 +147,7 @@ public class UserBBServiceImpl implements UserBService {
      */
     @Override
     public CommonResult<JoinOrgsResult> getJoinedOrgs(String studentId) {
-        UserB userB = userBMapper.selectOne(new QueryWrapper<UserB>().eq("studen_id", studentId));
+        UserB userB = userBMapper.selectOne(new QueryWrapper<UserB>().eq("student_id", studentId));
         if (userB == null)
             return CommonResult.fail("用户不存在");
         List<JoinedOrgResultPo> results = new LinkedList<>();
@@ -232,5 +234,48 @@ public class UserBBServiceImpl implements UserBService {
             return CommonResult.fail("数据库错误");
         }
         return CommonResult.success();
+    }
+
+    /**
+     * B 端用户登出
+     *
+     * @param request  HTTP请求报文
+     * @param response HTTP响应报文
+     * @return 处理结果
+     */
+    @Override
+    public CommonResult<String> logout(HttpServletRequest request, HttpServletResponse response) {
+        CommonResult<CheckRoleResult> check = checkRoleUtil.check(request, response);
+        if (!Objects.equals(check.getCode(), ResultEnum.SUCCESS.getCode()))
+            return CommonResult.fail(check.getCode(), check.getMessage());
+        return checkRoleUtil.logout(request, response);
+    }
+
+    /**
+     * B 端用户切换组织
+     *
+     * @param request  HTTP请求报文
+     * @param response HTTP响应报文
+     * @param param    要切换的组织
+     * @return 权限信息、新 Token
+     */
+    @Override
+    public CommonResult<SwitchOrgResult> switchOrganization(HttpServletRequest request, HttpServletResponse response, SwitchOrgParam param) {
+        CommonResult<CheckRoleResult> check = checkRoleUtil.check(request, response);
+        if (!Objects.equals(check.getCode(), ResultEnum.SUCCESS.getCode()))
+            return CommonResult.fail(check.getCode(), check.getMessage());
+        CheckRoleResult data = check.getData();
+        UserLoginPermissionPo userLoginPermission = userBRoleMapper.selectBUserLoginInfoByStudentIdAndOrgId(data.getStudentId(), param.getOrganizationId());
+        if (userLoginPermission == null)
+            return CommonResult.fail("切换组织错误：组织不存在");
+        CommonResult<String> logout = checkRoleUtil.logout(request, response);
+        if (!Objects.equals(logout.getCode(), ResultEnum.SUCCESS.getCode()))
+            return CommonResult.fail(logout.getCode(), logout.getMessage());
+        String token = jwtUtil.createToken(new BTokenSwapPo(userLoginPermission));
+        SwitchOrgResult result = new SwitchOrgResult();
+        result.setPermissionId(userLoginPermission.getPermissionId());
+        result.setPermissionName(userLoginPermission.getPermissionName());
+        result.setToken(token);
+        return CommonResult.success(result);
     }
 }

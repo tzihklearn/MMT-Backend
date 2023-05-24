@@ -4,9 +4,11 @@ import com.sipc.mmtbackend.pojo.dto.CommonResult;
 import com.sipc.mmtbackend.pojo.dto.param.UserBParam.LoginPassParam;
 import com.sipc.mmtbackend.pojo.dto.param.UserBParam.PutUserPasswordParam;
 import com.sipc.mmtbackend.pojo.dto.param.UserBParam.RegParam;
+import com.sipc.mmtbackend.pojo.dto.param.UserBParam.SwitchOrgParam;
 import com.sipc.mmtbackend.pojo.dto.result.UserBResult.GetBUserInfoResult;
 import com.sipc.mmtbackend.pojo.dto.result.UserBResult.JoinOrgsResult;
 import com.sipc.mmtbackend.pojo.dto.result.UserBResult.LoginResult;
+import com.sipc.mmtbackend.pojo.dto.result.UserBResult.SwitchOrgResult;
 import com.sipc.mmtbackend.pojo.exceptions.DateBaseException;
 import com.sipc.mmtbackend.service.UserBService;
 import org.springframework.web.bind.annotation.*;
@@ -77,4 +79,30 @@ public class UserBController {
     public CommonResult<String> changeUserNewPassword(HttpServletRequest request, HttpServletResponse response, PutUserPasswordParam param) {
         return userBService.putUserNewPassword(request, response, param);
     }
+
+    /**
+     * B 端用户登出
+     *
+     * @param request  HTTP请求报文
+     * @param response HTTP响应报文
+     * @return 处理结果
+     */
+    @PostMapping("/logout")
+    public CommonResult<String> logout(HttpServletRequest request, HttpServletResponse response) {
+        return userBService.logout(request, response);
+    }
+
+    /**
+     * B 端用户切换组织
+     *
+     * @param request  HTTP请求报文
+     * @param response HTTP响应报文
+     * @param param    要切换的组织
+     * @return 权限信息、新 Token
+     */
+    @PutMapping("/switchOrg")
+    public CommonResult<SwitchOrgResult> switchOrganization(HttpServletRequest request, HttpServletResponse response, SwitchOrgParam param) {
+        return userBService.switchOrganization(request, response, param);
+    }
+
 }
