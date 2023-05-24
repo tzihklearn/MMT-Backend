@@ -1,10 +1,7 @@
 package com.sipc.mmtbackend.service;
 
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
-import com.sipc.mmtbackend.pojo.dto.param.UserBParam.LoginPassParam;
-import com.sipc.mmtbackend.pojo.dto.param.UserBParam.PutUserPasswordParam;
-import com.sipc.mmtbackend.pojo.dto.param.UserBParam.RegParam;
-import com.sipc.mmtbackend.pojo.dto.param.UserBParam.SwitchOrgParam;
+import com.sipc.mmtbackend.pojo.dto.param.UserBParam.*;
 import com.sipc.mmtbackend.pojo.dto.result.UserBResult.GetBUserInfoResult;
 import com.sipc.mmtbackend.pojo.dto.result.UserBResult.JoinOrgsResult;
 import com.sipc.mmtbackend.pojo.dto.result.UserBResult.LoginResult;
@@ -83,4 +80,14 @@ public interface UserBService {
      * @return 权限信息、新 Token
      */
     CommonResult<SwitchOrgResult> switchOrganization(HttpServletRequest request, HttpServletResponse response, SwitchOrgParam param);
+
+    /**
+     * B 端加入新组织
+     *
+     * @param request  HTTP 请求报文
+     * @param response HTTP 响应报文
+     * @param param    邀请码与密码
+     * @return 处理结果
+     */
+    CommonResult<String> addNewOrganization(HttpServletRequest request, HttpServletResponse response, AddNewOrgParam param) throws DatabaseException;
 }

@@ -1,16 +1,14 @@
 package com.sipc.mmtbackend.controller;
 
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
-import com.sipc.mmtbackend.pojo.dto.param.UserBParam.LoginPassParam;
-import com.sipc.mmtbackend.pojo.dto.param.UserBParam.PutUserPasswordParam;
-import com.sipc.mmtbackend.pojo.dto.param.UserBParam.RegParam;
-import com.sipc.mmtbackend.pojo.dto.param.UserBParam.SwitchOrgParam;
+import com.sipc.mmtbackend.pojo.dto.param.UserBParam.*;
 import com.sipc.mmtbackend.pojo.dto.result.UserBResult.GetBUserInfoResult;
 import com.sipc.mmtbackend.pojo.dto.result.UserBResult.JoinOrgsResult;
 import com.sipc.mmtbackend.pojo.dto.result.UserBResult.LoginResult;
 import com.sipc.mmtbackend.pojo.dto.result.UserBResult.SwitchOrgResult;
 import com.sipc.mmtbackend.pojo.exceptions.DateBaseException;
 import com.sipc.mmtbackend.service.UserBService;
+import net.sf.jsqlparser.util.validation.metadata.DatabaseException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -58,12 +56,12 @@ public class UserBController {
      * B 端获取用户信息
      *
      * @param request  HTTP请求报文
-     * @param Response HTTP 响应报文
+     * @param response HTTP 响应报文
      * @return 用户信息
      */
     @GetMapping("/userinfo")
-    public CommonResult<GetBUserInfoResult> getUserInfo(HttpServletRequest request, HttpServletResponse Response) {
-        return userBService.getUserInfo(request, Response);
+    public CommonResult<GetBUserInfoResult> getUserInfo(HttpServletRequest request, HttpServletResponse response) {
+        return userBService.getUserInfo(request, response);
     }
 
     /**
@@ -105,4 +103,20 @@ public class UserBController {
         return userBService.switchOrganization(request, response, param);
     }
 
+    /**
+     * B 端加入新组织
+     *
+     * @param request  HTTP 请求报文
+     * @param response HTTP 响应报文
+     * @param param    邀请码与密码
+     * @return 处理结果
+     */
+    @PostMapping("/addNewOrg")
+    public CommonResult<String> addNewOrganization(HttpServletRequest request, HttpServletResponse response, AddNewOrgParam param) {
+        try {
+            return userBService.addNewOrganization(request, response, param);
+        } catch (DatabaseException e) {
+            return CommonResult.fail(e.getMessage());
+        }
+    }
 }
