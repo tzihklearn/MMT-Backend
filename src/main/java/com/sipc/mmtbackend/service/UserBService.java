@@ -4,9 +4,11 @@ import com.sipc.mmtbackend.pojo.dto.CommonResult;
 import com.sipc.mmtbackend.pojo.dto.param.UserBParam.LoginPassParam;
 import com.sipc.mmtbackend.pojo.dto.param.UserBParam.PutUserPasswordParam;
 import com.sipc.mmtbackend.pojo.dto.param.UserBParam.RegParam;
+import com.sipc.mmtbackend.pojo.dto.param.UserBParam.SwitchOrgParam;
 import com.sipc.mmtbackend.pojo.dto.result.UserBResult.GetBUserInfoResult;
 import com.sipc.mmtbackend.pojo.dto.result.UserBResult.JoinOrgsResult;
 import com.sipc.mmtbackend.pojo.dto.result.UserBResult.LoginResult;
+import com.sipc.mmtbackend.pojo.dto.result.UserBResult.SwitchOrgResult;
 import com.sipc.mmtbackend.pojo.exceptions.DateBaseException;
 import net.sf.jsqlparser.util.validation.metadata.DatabaseException;
 
@@ -71,4 +73,14 @@ public interface UserBService {
      * @return 处理结果
      */
     CommonResult<String> logout(HttpServletRequest request, HttpServletResponse response);
+
+    /**
+     * B 端用户切换组织
+     *
+     * @param request  HTTP请求报文
+     * @param response HTTP响应报文
+     * @param param    要切换的组织
+     * @return 权限信息、新 Token
+     */
+    CommonResult<SwitchOrgResult> switchOrganization(HttpServletRequest request, HttpServletResponse response, SwitchOrgParam param);
 }

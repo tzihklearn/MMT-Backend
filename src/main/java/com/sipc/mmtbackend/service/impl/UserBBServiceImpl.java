@@ -250,4 +250,32 @@ public class UserBBServiceImpl implements UserBService {
             return CommonResult.fail(check.getCode(), check.getMessage());
         return checkRoleUtil.logout(request, response);
     }
+
+    /**
+     * B 端用户切换组织
+     *
+     * @param request  HTTP请求报文
+     * @param response HTTP响应报文
+     * @param param    要切换的组织
+     * @return 权限信息、新 Token
+     */
+    @Override
+    public CommonResult<SwitchOrgResult> switchOrganization(HttpServletRequest request, HttpServletResponse response, SwitchOrgParam param) {
+        CommonResult<CheckRoleResult> check = checkRoleUtil.check(request, response);
+        if (!Objects.equals(check.getCode(), ResultEnum.SUCCESS.getCode()))
+            return CommonResult.fail(check.getCode(), check.getMessage());
+        CheckRoleResult data = check.getData();
+        UserLoginPermissionPo userLoginPermission = userBRoleMapper.selectBUserLoginInfoByStudentIdAndOrgId(data.getStudentId(), param.getOrganizationId());
+        if (userLoginPermission == null)
+            return CommonResult.fail("切换组织错误：组织不存在");
+        CommonResult<String> logout = checkRoleUtil.logout(request, response);
+        if (!Objects.equals(logout.getCode(), ResultEnum.SUCCESS.getCode()))
+            return CommonResult.fail(logout.getCode(), logout.getMessage());
+        String token = jwtUtil.createToken(new BTokenSwapPo(userLoginPermission));
+        SwitchOrgResult result = new SwitchOrgResult();
+        result.setPermissionId(userLoginPermission.getPermissionId());
+        result.setPermissionName(userLoginPermission.getPermissionName());
+        result.setToken(token);
+        return CommonResult.success(result);
+    }
 }

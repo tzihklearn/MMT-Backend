@@ -50,6 +50,7 @@ public class CheckRoleUtil {
         apiPermissions.put("/b/user/userinfo", PermissionEnum.NUMBER);
         apiPermissions.put("/b/user/password", PermissionEnum.NUMBER);
         apiPermissions.put("/b/user/logout", PermissionEnum.NUMBER);
+        apiPermissions.put("/b/user/switchOrg", PermissionEnum.NUMBER);
         this.apiPermissions = apiPermissions;
     }
 
