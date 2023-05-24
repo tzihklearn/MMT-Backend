@@ -10,7 +10,8 @@ public class BTokenSwapPo {
     private Integer userId;
     private Integer roleId;
     private String studentId;
-    public BTokenSwapPo(UserLoginPermissionPo po){
+
+    public BTokenSwapPo(UserLoginPermissionPo po) {
         this.userId = po.getUserId();
         this.studentId = po.getStudentId();
         this.roleId = po.getRoleId();

@@ -2,48 +2,29 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.sipc.mmtbackend.mapper.UserBRoleMapper">
 
-    <select id="selectAllRolePermissionByBUserId"
-            resultType="com.sipc.mmtbackend.pojo.domain.po.UserBRole.UserRolePermissionPo">
-        SELECT
-            organization_id AS 'organizationName',
-                permission_id AS 'permissionId',
-                `name` AS 'permissionName'
-        FROM
-            user_role_merge
-                LEFT JOIN role ON user_role_merge.role_id = role.id
-                LEFT JOIN permission ON role.permission_id = permission.id
-        WHERE
-            user_id = #{userId,jdbcType=INTEGER}
-    </select>
     <select id="selectJoinedOrganizationsByBUserId"
             resultType="com.sipc.mmtbackend.pojo.domain.po.UserBRole.JoinedOrgPo">
-        SELECT
-            organization.id AS "organizationId",
-            organization.`name` AS "organizationName"
-        FROM
-            user_role_merge
-                LEFT JOIN role ON user_role_merge.role_id = role.id
-                LEFT JOIN organization ON role.organization_id = organization.id
-        WHERE
-            user_role_merge.user_id = #{userId,jdbcType=INTEGER}
+        SELECT organization.id     AS "organizationId",
+               organization.`name` AS "organizationName"
+        FROM user_role_merge
+                 LEFT JOIN role ON user_role_merge.role_id = role.id
+                 LEFT JOIN organization ON role.organization_id = organization.id
+        WHERE user_role_merge.user_id = #{userId,jdbcType=INTEGER}
     </select>
     <select id="selectBUserLoginInfoByStudentIdAndOrgId"
             resultType="com.sipc.mmtbackend.pojo.domain.po.UserBRole.UserLoginPermissionPo">
-        SELECT
-            user_b.id AS "userId",
-            user_role_merge.`password` AS "password",
-            user_b.user_name AS "username",
-            user_b.student_id AS "studentId",
-            role.id AS "roleId",
-            permission.id AS "permissionId",
-            permission.`name` AS "permissionName"
-        FROM
-            user_b
-                LEFT JOIN user_role_merge ON user_b.id = user_role_merge.user_id
-                LEFT JOIN role ON user_role_merge.role_id = role.id
-                LEFT JOIN permission ON role.permission_id = permission.id
-        WHERE
-            user_b.student_id = #{studentId,jdbcType=CHAR}
+        SELECT user_b.id                  AS "userId",
+               user_role_merge.`password` AS "password",
+               user_b.user_name           AS "username",
+               user_b.student_id          AS "studentId",
+               role.id                    AS "roleId",
+               permission.id              AS "permissionId",
+               permission.`name`          AS "permissionName"
+        FROM user_b
+                 LEFT JOIN user_role_merge ON user_b.id = user_role_merge.user_id
+                 LEFT JOIN role ON user_role_merge.role_id = role.id
+                 LEFT JOIN permission ON role.permission_id = permission.id
+        WHERE user_b.student_id = #{studentId,jdbcType=CHAR}
           AND role.organization_id = #{organizationId,jdbcType=INTEGER}
     </select>
 </mapper>

@@ -5,7 +5,6 @@ import com.sipc.mmtbackend.mapper.RoleMapper;
 import com.sipc.mmtbackend.mapper.UserBMapper;
 import com.sipc.mmtbackend.mapper.UserBRoleMapper;
 import com.sipc.mmtbackend.mapper.UserRoleMergeMapper;
-import com.sipc.mmtbackend.pojo.domain.Permission;
 import com.sipc.mmtbackend.pojo.domain.Role;
 import com.sipc.mmtbackend.pojo.domain.UserB;
 import com.sipc.mmtbackend.pojo.domain.UserRoleMerge;
