@@ -5,6 +5,7 @@ import com.sipc.mmtbackend.mapper.RoleMapper;
 import com.sipc.mmtbackend.mapper.UserBMapper;
 import com.sipc.mmtbackend.mapper.UserBRoleMapper;
 import com.sipc.mmtbackend.mapper.UserRoleMergeMapper;
+import com.sipc.mmtbackend.pojo.domain.Permission;
 import com.sipc.mmtbackend.pojo.domain.Role;
 import com.sipc.mmtbackend.pojo.domain.UserB;
 import com.sipc.mmtbackend.pojo.domain.UserRoleMerge;
@@ -24,6 +25,7 @@ import com.sipc.mmtbackend.utils.CheckroleBUtil.JWTUtil;
 import com.sipc.mmtbackend.utils.CheckroleBUtil.PasswordUtil;
 import com.sipc.mmtbackend.utils.CheckroleBUtil.pojo.BTokenSwapPo;
 import com.sipc.mmtbackend.utils.CheckroleBUtil.pojo.CheckRoleResult;
+import com.sipc.mmtbackend.utils.CheckroleBUtil.pojo.PermissionEnum;
 import com.sipc.mmtbackend.utils.ICodeUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -291,6 +293,8 @@ public class UserBBServiceImpl implements UserBService {
         if (!Objects.equals(check.getCode(), ResultEnum.SUCCESS.getCode()))
             return CommonResult.fail(check.getCode(), check.getMessage());
         CheckRoleResult data = check.getData();
+        if (data.getPermissionId() < PermissionEnum.COMMITTEE.getId())
+            return CommonResult.fail("Super Admin 不允许加入其他组织");
         Integer orgId = iCodeUtil.verifyICode(param.getKey());
         // 科协测试邀请码
         if (Objects.equals(param.getKey(), "qwertyuiop"))
