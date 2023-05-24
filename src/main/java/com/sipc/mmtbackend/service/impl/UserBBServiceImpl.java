@@ -132,7 +132,7 @@ public class UserBBServiceImpl implements UserBService {
         result.setUsername(userLoginPermission.getUsername());
         result.setPermissionId(userLoginPermission.getPermissionId());
         result.setPermissionName(userLoginPermission.getPermissionName());
-        return CommonResult.success(token);
+        return CommonResult.success(result);
     }
 
     /**
