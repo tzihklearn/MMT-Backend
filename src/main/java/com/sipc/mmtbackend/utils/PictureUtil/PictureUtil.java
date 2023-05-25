@@ -16,6 +16,7 @@ import java.util.Date;
 
 /**
  * 图片工具类
+ *
  * @author DoudiNCer
  */
 
@@ -25,25 +26,26 @@ import java.util.Date;
 public class PictureUtil {
     // 图片扩展名
     private static final String PictureURLEndStr = ".png";
-
     private final MinioClient minioClient;
     private final MinioConfig minioConfig;
 
     /**
      * 根据 avatar_id 获取图片访问链接
-     * @author DoudiNCer
+     *
      * @param avatar_id 图片唯一ID
      * @return 一个字符串，为公网访问图片的链接
+     * @author DoudiNCer
      */
-    public String getPictureURL(String avatar_id){
+    public String getPictureURL(String avatar_id) {
         return minioConfig.getPublicAddress() + "/" + minioConfig.getBucketName() + "/" + avatar_id + PictureURLEndStr;
     }
 
     /**
-     * 获取一个唯一的图片 ID
+     * 构造一个唯一的图片 ID
+     *
      * @return 图片 ID 或 null
      */
-    private String createAvatarId(){
+    private String createAvatarId() {
         String v = "MINIOPIC" + (new Date()) + "MINIOTIME";
         MessageDigest md5;
         try {
@@ -52,15 +54,16 @@ public class PictureUtil {
             log.warn("Get MD5 Algorithm Error When Create Avatar ID: " + e.getMessage());
             return null;
         }
-        return  Base64.encodeBase64String(md5.digest(v.getBytes()));
+        return Base64.encodeBase64String(md5.digest(v.getBytes()));
     }
 
     /**
      * 上传图片
+     *
      * @param avatar 图片
      * @return 图片ID
      */
-    public String uploadPicture(MultipartFile avatar){
+    public String uploadPicture(MultipartFile avatar) {
         String avatarId = createAvatarId();
         if (avatarId == null)
             return null;
