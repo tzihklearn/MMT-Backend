@@ -97,6 +97,7 @@ public class CheckRoleUtil {
         result.setPermissionId(role.getPermissionId());
         result.setPermissionName(permission.getName());
         result.setRoleId(bTokenSwapPo.getRoleId());
+        result.setToken(token);
         return CommonResult.success(result);
     }
 
