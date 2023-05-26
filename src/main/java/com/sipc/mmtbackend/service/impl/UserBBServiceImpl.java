@@ -11,10 +11,7 @@ import com.sipc.mmtbackend.pojo.domain.UserRoleMerge;
 import com.sipc.mmtbackend.pojo.domain.po.UserBRole.JoinedOrgPo;
 import com.sipc.mmtbackend.pojo.domain.po.UserBRole.UserLoginPermissionPo;
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
-import com.sipc.mmtbackend.pojo.dto.param.UserBParam.LoginPassParam;
-import com.sipc.mmtbackend.pojo.dto.param.UserBParam.PutUserPasswordParam;
-import com.sipc.mmtbackend.pojo.dto.param.UserBParam.RegParam;
-import com.sipc.mmtbackend.pojo.dto.param.UserBParam.SwitchOrgParam;
+import com.sipc.mmtbackend.pojo.dto.param.UserBParam.*;
 import com.sipc.mmtbackend.pojo.dto.result.UserBResult.GetBUserInfoResult;
 import com.sipc.mmtbackend.pojo.dto.result.UserBResult.JoinOrgsResult;
 import com.sipc.mmtbackend.pojo.dto.result.UserBResult.LoginResult;
@@ -27,7 +24,10 @@ import com.sipc.mmtbackend.utils.CheckroleBUtil.JWTUtil;
 import com.sipc.mmtbackend.utils.CheckroleBUtil.PasswordUtil;
 import com.sipc.mmtbackend.utils.CheckroleBUtil.pojo.BTokenSwapPo;
 import com.sipc.mmtbackend.utils.CheckroleBUtil.pojo.CheckRoleResult;
+import com.sipc.mmtbackend.utils.CheckroleBUtil.pojo.PermissionEnum;
 import com.sipc.mmtbackend.utils.ICodeUtil;
+import com.sipc.mmtbackend.utils.PictureUtil.PictureUtil;
+import com.sipc.mmtbackend.utils.PictureUtil.pojo.DefaultPictureIdEnum;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.jsqlparser.util.validation.metadata.DatabaseException;
@@ -52,6 +52,7 @@ public class UserBBServiceImpl implements UserBService {
     private final ICodeUtil iCodeUtil;
     private final JWTUtil jwtUtil;
     private final CheckRoleUtil checkRoleUtil;
+    private final PictureUtil pictureUtil;
 
     /**
      * B 端用户注册
@@ -101,7 +102,7 @@ public class UserBBServiceImpl implements UserBService {
         int uins = userBMapper.insert(user);
         if (uins != 1) {
             log.error("创建B端用户" + user + "失败, 受影响行数：" + uins);
-            throw new DatabaseException("创建用户失败");
+            throw new DatabaseException("创建用户失败：数据库错误");
         }
         roleMerge.setRoleId(role.getId());
         roleMerge.setUserId(user.getId());
@@ -109,7 +110,7 @@ public class UserBBServiceImpl implements UserBService {
         int urint = userRoleMergeMapper.insert(roleMerge);
         if (urint != 1) {
             log.warn("创建 B 端用户 " + user + " 的角色" + roleMerge + "失败，受影响行数：" + urint);
-            throw new DatabaseException("创建用户失败");
+            throw new DatabaseException("创建用户失败：数据库错误");
         }
         return CommonResult.success();
     }
@@ -135,7 +136,7 @@ public class UserBBServiceImpl implements UserBService {
         result.setUsername(userLoginPermission.getUsername());
         result.setPermissionId(userLoginPermission.getPermissionId());
         result.setPermissionName(userLoginPermission.getPermissionName());
-        return CommonResult.success(token);
+        return CommonResult.success(result);
     }
 
     /**
@@ -190,12 +191,20 @@ public class UserBBServiceImpl implements UserBService {
         result.setOrganizationName(data.getOrganizationName());
         result.setPermissionId(data.getPermissionId());
         result.setPermissionName(data.getPermissionName());
+        // 对手机号进行脱敏
         StringBuilder sb = new StringBuilder();
         String phone = userB.getPhone();
         sb.append(phone, 0, 3);
         sb.append(" **** ");
         sb.append(phone.substring(7));
         result.setPhone(sb.toString());
+        // 获取头像链接
+        String avatarUrl;
+        if (userB.getAvatarId() == null || userB.getAvatarId().length() == 0)
+            avatarUrl = pictureUtil.getPictureURL(DefaultPictureIdEnum.B_USER_AVATAR.getPictureId());
+        else
+            avatarUrl = pictureUtil.getPictureURL(userB.getAvatarId());
+        result.setAvatarUrl(avatarUrl);
         return CommonResult.success(result);
     }
 
@@ -277,5 +286,55 @@ public class UserBBServiceImpl implements UserBService {
         result.setPermissionName(userLoginPermission.getPermissionName());
         result.setToken(token);
         return CommonResult.success(result);
+    }
+
+    /**
+     * B 端加入新组织
+     *
+     * @param request  HTTP 请求报文
+     * @param response HTTP 响应报文
+     * @param param    邀请码与密码
+     * @return 处理结果
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public CommonResult<String> addNewOrganization(HttpServletRequest request, HttpServletResponse response, AddNewOrgParam param) throws DatabaseException {
+        CommonResult<CheckRoleResult> check = checkRoleUtil.check(request, response);
+        if (!Objects.equals(check.getCode(), ResultEnum.SUCCESS.getCode()))
+            return CommonResult.fail(check.getCode(), check.getMessage());
+        CheckRoleResult data = check.getData();
+        if (data.getPermissionId() < PermissionEnum.COMMITTEE.getId())
+            return CommonResult.fail("Super Admin 不允许加入其他组织");
+        Integer orgId = iCodeUtil.verifyICode(param.getKey());
+        // 科协测试邀请码
+        if (Objects.equals(param.getKey(), "qwertyuiop"))
+            orgId = 1;
+        if (orgId == null)
+            return CommonResult.fail("注册失败：邀请码无效");
+        UserLoginPermissionPo userLoginPermissionPo = userBRoleMapper.selectBUserLoginInfoByStudentIdAndOrgId(data.getStudentId(), orgId);
+        if (userLoginPermissionPo != null)
+            return CommonResult.fail("加入组织失败：请勿重复加入组织");
+        // 初始化一个新组织的新角色
+        Role role = roleMapper.selectOne(new QueryWrapper<Role>().eq("organization_id", orgId).eq("permission_id", 3));
+        if (role == null) {
+            role = new Role();
+            role.setOrganizationId(orgId);
+            role.setPermissionId(3);
+            int insert = roleMapper.insert(role);
+            if (insert != 1) {
+                log.warn("初始化组织 " + orgId + " 的角色时失败，受影响行数：" + insert);
+                throw new DatabaseException("数据库错误");
+            }
+        }
+        UserRoleMerge roleMerge = new UserRoleMerge();
+        roleMerge.setUserId(data.getUserId());
+        roleMerge.setRoleId(role.getId());
+        roleMerge.setPassword(PasswordUtil.hashPassword(param.getPassword()));
+        int insert = userRoleMergeMapper.insert(roleMerge);
+        if (insert != 1) {
+            log.warn("B 端用户 " + data + " 添加角色 " + roleMerge + "失败，受影响行数：" + insert);
+            throw new DatabaseException("加入组织失败：数据库错误");
+        }
+        return CommonResult.success();
     }
 }

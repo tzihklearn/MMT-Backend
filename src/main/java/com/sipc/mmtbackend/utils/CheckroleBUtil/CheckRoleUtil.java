@@ -51,6 +51,7 @@ public class CheckRoleUtil {
         apiPermissions.put("/b/user/password", PermissionEnum.NUMBER);
         apiPermissions.put("/b/user/logout", PermissionEnum.NUMBER);
         apiPermissions.put("/b/user/switchOrg", PermissionEnum.NUMBER);
+        apiPermissions.put("/b/user/addNewOrg", PermissionEnum.NUMBER);
         this.apiPermissions = apiPermissions;
     }
 
@@ -96,6 +97,7 @@ public class CheckRoleUtil {
         result.setPermissionId(role.getPermissionId());
         result.setPermissionName(permission.getName());
         result.setRoleId(bTokenSwapPo.getRoleId());
+        result.setToken(token);
         return CommonResult.success(result);
     }
 

@@ -4,6 +4,7 @@ import lombok.Data;
 
 @Data
 public class CheckRoleResult {
+    private String token;
     private Integer userId;
     private String username;
     private String studentId;

@@ -12,4 +12,5 @@ public class GetBUserInfoResult {
     private String organizationName;
     private Integer permissionId;
     private String permissionName;
+    private String avatarUrl;
 }

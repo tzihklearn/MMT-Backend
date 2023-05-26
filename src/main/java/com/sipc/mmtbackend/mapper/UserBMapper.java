@@ -13,7 +13,7 @@ import java.util.List;
  * </p>
  *
  * @author DoudiNCer
- * @since 2023-05-21
+ * @since 2023-05-25
  */
 @Mapper
 public interface UserBMapper extends BaseMapper<UserB> {
