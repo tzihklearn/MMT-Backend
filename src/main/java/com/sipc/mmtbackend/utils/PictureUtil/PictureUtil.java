@@ -112,4 +112,27 @@ public class PictureUtil {
         }
         return pictureId;
     }
+
+    /**
+     * 删除图片
+     *
+     * @param pictureId 图片ID
+     * @return true 表示一切正常，false 表示图片不存在，null 表示系统错误
+     */
+    public Boolean dropPicture(String pictureId) {
+        Picture picture = pictureMapper.selectOne(new QueryWrapper<Picture>().eq("pic_id", pictureId));
+        if (picture == null) {
+            log.warn("尝试删除不存在的图片：" + pictureId);
+            return false;
+        }
+        Boolean deletePicture = minioUtil.softDeletePicture(pictureId);
+        if (deletePicture == null || !deletePicture)
+            return deletePicture;
+        int i = pictureMapper.deleteById(picture.getId());
+        if (i != 0) {
+            log.warn("从数据库删除图片 " + pictureId + " 失败，受影响行数：" + i);
+            return null;
+        }
+        return true;
+    }
 }

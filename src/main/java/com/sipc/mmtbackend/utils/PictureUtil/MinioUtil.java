@@ -1,8 +1,6 @@
 package com.sipc.mmtbackend.utils.PictureUtil;
 
-import com.sipc.mmtbackend.mapper.PictureMapper;
-import io.minio.MinioClient;
-import io.minio.PutObjectArgs;
+import io.minio.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tomcat.util.codec.binary.Base64;
@@ -26,9 +24,9 @@ import java.util.Date;
 public class MinioUtil {
     // 图片扩展名
     private static final String PictureURLEndStr = ".png";
+    private static final String DropedPictureURLEndStr = ".png.d";
     private final MinioClient minioClient;
     private final MinioConfig minioConfig;
-    private PictureMapper pictureMapper;
 
     /**
      * 根据 avatar_id 获取图片访问链接
@@ -62,16 +60,60 @@ public class MinioUtil {
      * 上传图片
      *
      * @param picture 图片文件
-     * @return 图片ID
+     * @return 图片ID，null 表示系统错误
      */
     public String uploadPicture(MultipartFile picture) {
-        String avatarId = createPicId();
-        if (avatarId == null) return null;
+        String pictureId = createPicId();
+        if (pictureId == null) return null;
         try (InputStream is = picture.getInputStream()) {
-            minioClient.putObject(PutObjectArgs.builder().bucket(minioConfig.getBucketName()).object(avatarId + PictureURLEndStr).stream(is, picture.getSize(), -1).build());
+            minioClient.putObject(
+                    PutObjectArgs.builder()
+                            .bucket(minioConfig.getBucketName())
+                            .object(pictureId + PictureURLEndStr)
+                            .stream(is, picture.getSize(), -1)
+                            .build());
         } catch (Throwable e) {
             log.warn("Upload New Picture Error: " + e.getMessage());
+            return null;
         }
-        return avatarId;
+        return pictureId;
+    }
+
+    /**
+     * 软删除图片
+     *
+     * @param pictureId 图片在 Minio 的ID
+     * @return true 表示一切正常，false 表示操作失败。null 表示系统错误
+     */
+    public Boolean softDeletePicture(String pictureId) {
+        try {
+            minioClient.copyObject(
+                    CopyObjectArgs.builder()
+                            .bucket(minioConfig.getBucketName())
+                            .object(pictureId + DropedPictureURLEndStr)
+                            .source(
+                                    CopySource.builder()
+                                            .bucket(minioConfig.getBucketName())
+                                            .object(pictureId + PictureURLEndStr)
+                                            .build()
+                            )
+                            .build()
+            );
+        } catch (Throwable e) {
+            log.warn("软删除时复制图片 " + pictureId + " 失败：" + e.getMessage());
+            return null;
+        }
+        try {
+            minioClient.removeObject(
+                    RemoveObjectArgs.builder()
+                            .bucket(minioConfig.getBucketName())
+                            .object(pictureId + PictureURLEndStr)
+                            .build()
+            );
+        } catch (Throwable e) {
+            log.warn("软删除时删除图片 " + pictureId + " 失败：" + e.getMessage());
+            return null;
+        }
+        return true;
     }
 }
