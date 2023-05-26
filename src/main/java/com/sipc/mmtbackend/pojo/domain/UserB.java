@@ -16,7 +16,7 @@ import lombok.ToString;
  * </p>
  *
  * @author DoudiNCer
- * @since 2023-05-21
+ * @since 2023-05-25
  */
 @Getter
 @Setter
@@ -55,6 +55,12 @@ public class UserB implements Serializable {
      */
     @TableField("email")
     private String email;
+
+    /**
+     * 用户头像ID
+     */
+    @TableField("avatar_id")
+    private String avatarId;
 
     /**
      * 是否安全

@@ -38,16 +38,17 @@ public class PictureUtil {
     private final MinioUtil minioUtil;
 
     /**
-     * 根据 avatar_id 获取图片访问链接
+     * 根据 pictureId 获取图片访问链接
      *
-     * @param avatar_id 图片唯一ID
+     * @param pictureId 图片唯一ID
      * @return 一个字符串，为公网访问图片的链接，若图片不存在返回 null
      * @author DoudiNCer
      */
-    public String getPictureURL(String avatar_id) {
-        Picture picture = pictureMapper.selectOne(new QueryWrapper<Picture>().eq("pic_id", avatar_id));
+    @Deprecated
+    public String getPictureURL(String pictureId) {
+        Picture picture = pictureMapper.selectOne(new QueryWrapper<Picture>().eq("pic_id", pictureId));
         if (picture == null) return null;
-        return minioUtil.getPictureURL(avatar_id);
+        return minioUtil.getPictureURL(pictureId);
     }
 
     /**

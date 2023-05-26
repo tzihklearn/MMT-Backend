@@ -26,6 +26,8 @@ import com.sipc.mmtbackend.utils.CheckroleBUtil.pojo.BTokenSwapPo;
 import com.sipc.mmtbackend.utils.CheckroleBUtil.pojo.CheckRoleResult;
 import com.sipc.mmtbackend.utils.CheckroleBUtil.pojo.PermissionEnum;
 import com.sipc.mmtbackend.utils.ICodeUtil;
+import com.sipc.mmtbackend.utils.PictureUtil.PictureUtil;
+import com.sipc.mmtbackend.utils.PictureUtil.pojo.DefaultPictureIdEnum;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.jsqlparser.util.validation.metadata.DatabaseException;
@@ -50,6 +52,7 @@ public class UserBBServiceImpl implements UserBService {
     private final ICodeUtil iCodeUtil;
     private final JWTUtil jwtUtil;
     private final CheckRoleUtil checkRoleUtil;
+    private final PictureUtil pictureUtil;
 
     /**
      * B 端用户注册
@@ -188,12 +191,20 @@ public class UserBBServiceImpl implements UserBService {
         result.setOrganizationName(data.getOrganizationName());
         result.setPermissionId(data.getPermissionId());
         result.setPermissionName(data.getPermissionName());
+        // 对手机号进行脱敏
         StringBuilder sb = new StringBuilder();
         String phone = userB.getPhone();
         sb.append(phone, 0, 3);
         sb.append(" **** ");
         sb.append(phone.substring(7));
         result.setPhone(sb.toString());
+        // 获取头像链接
+        String avatarUrl;
+        if (userB.getAvatarId() == null || userB.getAvatarId().length() == 0)
+            avatarUrl = pictureUtil.getPictureURL(DefaultPictureIdEnum.B_USER_AVATAR.getPictureId());
+        else
+            avatarUrl = pictureUtil.getPictureURL(userB.getAvatarId());
+        result.setAvatarUrl(avatarUrl);
         return CommonResult.success(result);
     }
 

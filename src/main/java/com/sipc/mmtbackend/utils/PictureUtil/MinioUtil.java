@@ -24,12 +24,13 @@ import java.util.Date;
 public class MinioUtil {
     // 图片扩展名
     private static final String PictureURLEndStr = ".png";
+    // 被删除的图片的扩展名
     private static final String DropedPictureURLEndStr = ".png.d";
     private final MinioClient minioClient;
     private final MinioConfig minioConfig;
 
     /**
-     * 根据 avatar_id 获取图片访问链接
+     * 根据 pictureId 获取图片访问链接
      *
      * @param pictureId 图片唯一ID
      * @return 一个字符串，为公网访问图片的链接
