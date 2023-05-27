@@ -1,32 +1,25 @@
 package com.sipc.mmtbackend.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.sipc.mmtbackend.mapper.RoleMapper;
-import com.sipc.mmtbackend.mapper.UserBMapper;
-import com.sipc.mmtbackend.mapper.UserBRoleMapper;
-import com.sipc.mmtbackend.mapper.UserRoleMergeMapper;
-import com.sipc.mmtbackend.pojo.domain.Role;
-import com.sipc.mmtbackend.pojo.domain.UserB;
-import com.sipc.mmtbackend.pojo.domain.UserRoleMerge;
+import com.sipc.mmtbackend.mapper.*;
+import com.sipc.mmtbackend.pojo.domain.*;
 import com.sipc.mmtbackend.pojo.domain.po.UserBRole.JoinedOrgPo;
 import com.sipc.mmtbackend.pojo.domain.po.UserBRole.UserLoginPermissionPo;
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
 import com.sipc.mmtbackend.pojo.dto.param.UserBParam.*;
 import com.sipc.mmtbackend.pojo.dto.result.UserBResult.*;
 import com.sipc.mmtbackend.pojo.dto.result.UserBResult.po.JoinedOrgResultPo;
-import com.sipc.mmtbackend.pojo.dto.resultEnum.ResultEnum;
 import com.sipc.mmtbackend.service.UserBService;
-import com.sipc.mmtbackend.utils.CheckroleBUtil.CheckRoleUtil;
 import com.sipc.mmtbackend.utils.CheckroleBUtil.JWTUtil;
 import com.sipc.mmtbackend.utils.CheckroleBUtil.PasswordUtil;
 import com.sipc.mmtbackend.utils.CheckroleBUtil.pojo.BTokenSwapPo;
-import com.sipc.mmtbackend.utils.CheckroleBUtil.pojo.CheckRoleResult;
 import com.sipc.mmtbackend.utils.CheckroleBUtil.pojo.PermissionEnum;
 import com.sipc.mmtbackend.utils.ICodeUtil;
 import com.sipc.mmtbackend.utils.PictureUtil.PictureUtil;
 import com.sipc.mmtbackend.utils.PictureUtil.pojo.DefaultPictureIdEnum;
 import com.sipc.mmtbackend.utils.PictureUtil.pojo.PictureUsage;
 import com.sipc.mmtbackend.utils.PictureUtil.pojo.UsageEnum;
+import com.sipc.mmtbackend.utils.ThreadLocalContextUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.jsqlparser.util.validation.metadata.DatabaseException;
@@ -35,8 +28,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -49,9 +40,10 @@ public class UserBBServiceImpl implements UserBService {
     private final UserBMapper userBMapper;
     private final UserBRoleMapper userBRoleMapper;
     private final UserRoleMergeMapper userRoleMergeMapper;
+    private final OrganizationMapper organizationMapper;
+    private final PermissionMapper permissionMapper;
     private final ICodeUtil iCodeUtil;
     private final JWTUtil jwtUtil;
-    private final CheckRoleUtil checkRoleUtil;
     private final PictureUtil pictureUtil;
 
     /**
@@ -82,11 +74,11 @@ public class UserBBServiceImpl implements UserBService {
             return CommonResult.fail("注册失败：学号重复");
         }
         // 初始化一个新组织的新角色
-        Role role = roleMapper.selectOne(new QueryWrapper<Role>().eq("organization_id", orgId).eq("permission_id", 3));
+        Role role = roleMapper.selectOne(new QueryWrapper<Role>().eq("organization_id", orgId).eq("permission_id", PermissionEnum.COMMITTEE.getId()));
         if (role == null) {
             role = new Role();
             role.setOrganizationId(orgId);
-            role.setPermissionId(3);
+            role.setPermissionId(PermissionEnum.COMMITTEE.getId());
             int insert = roleMapper.insert(role);
             if (insert != 1) {
                 log.warn("初始化组织 " + orgId + " 的角色时失败，受影响行数：" + insert);
@@ -126,9 +118,9 @@ public class UserBBServiceImpl implements UserBService {
     public CommonResult<LoginResult> loginByPass(LoginPassParam param) {
         UserLoginPermissionPo userLoginPermission = userBRoleMapper.selectBUserLoginInfoByStudentIdAndOrgId(param.getStudentId(), param.getOrganizationId());
         if (userLoginPermission == null)
-            return CommonResult.fail("用户名或密码错误");
+            return CommonResult.fail("登录失败：用户名或密码错误");
         if (!PasswordUtil.testPasswd(param.getPassword(), userLoginPermission.getPassword()))
-            return CommonResult.fail("用户名或密码错误");
+            return CommonResult.fail("登录失败：用户名或密码错误");
         String token = jwtUtil.createToken(new BTokenSwapPo(userLoginPermission));
         LoginResult result = new LoginResult();
         result.setUserId(userLoginPermission.getUserId());
@@ -167,30 +159,35 @@ public class UserBBServiceImpl implements UserBService {
     /**
      * 获取 B 端用户信息
      *
-     * @param request  HTTP请求报文
-     * @param response HTTP响应报文
      * @return 用户信息
      * @author DoudiNCer
      */
     @Override
-    public CommonResult<GetBUserInfoResult> getUserInfo(HttpServletRequest request, HttpServletResponse response) {
-        CommonResult<CheckRoleResult> check = checkRoleUtil.check(request, response);
-        if (!Objects.equals(check.getCode(), ResultEnum.SUCCESS.getCode()))
-            return CommonResult.fail(check.getCode(), check.getMessage());
-        CheckRoleResult data = check.getData();
+    public CommonResult<GetBUserInfoResult> getUserInfo() {
+        BTokenSwapPo context = ThreadLocalContextUtil.getContext();
         GetBUserInfoResult result = new GetBUserInfoResult();
-        UserB userB = userBMapper.selectById(data.getUserId());
+        UserB userB = userBMapper.selectById(context.getUserId());
         if (userB == null) {
-            log.warn("获取 B 端用户信息失败：用户不存在，Token解析结果：" + data);
-            return CommonResult.fail("数据库错误");
+            log.warn("获取 B 端用户信息失败：用户不存在，Token解析结果：" + context);
+            return CommonResult.serverError();
         }
-        result.setUserId(data.getUserId());
-        result.setUsername(data.getUsername());
-        result.setStudentId(data.getStudentId());
-        result.setOrganizationId(data.getOrganizationId());
-        result.setOrganizationName(data.getOrganizationName());
-        result.setPermissionId(data.getPermissionId());
-        result.setPermissionName(data.getPermissionName());
+        Organization organization = organizationMapper.selectById(context.getOrganizationId());
+        if (organization == null) {
+            log.warn("获取 B 端用户信息失败：组织不存在，Token解析结果：" + context);
+            return CommonResult.serverError();
+        }
+        Permission permission = permissionMapper.selectById(context.getPermissionId());
+        if (permission == null) {
+            log.warn("获取 B 端用户信息失败：权限不存在，Token解析结果：" + context);
+            return CommonResult.serverError();
+        }
+        result.setUserId(userB.getId());
+        result.setUsername(userB.getUserName());
+        result.setStudentId(userB.getStudentId());
+        result.setOrganizationId(organization.getId());
+        result.setOrganizationName(organization.getName());
+        result.setPermissionId(context.getPermissionId());
+        result.setPermissionName(permission.getName());
         // 对手机号进行脱敏
         StringBuilder sb = new StringBuilder();
         String phone = userB.getPhone();
@@ -211,36 +208,28 @@ public class UserBBServiceImpl implements UserBService {
     /**
      * 更新 B 端用户密码
      *
-     * @param request  HTTP 请求报文
-     * @param response HTTP 响应报文
-     * @param param    旧密码与新密码
+     * @param param 旧密码与新密码
      * @return 处理结果
      * @author DoudiNCer
      */
     @Override
-    public CommonResult<String> putUserNewPassword(HttpServletRequest request, HttpServletResponse response, PutUserPasswordParam param) {
-        CommonResult<CheckRoleResult> check = checkRoleUtil.check(request, response);
-        if (!Objects.equals(check.getCode(), ResultEnum.SUCCESS.getCode()))
-            return CommonResult.fail(check.getCode(), check.getMessage());
-        CheckRoleResult data = check.getData();
-        UserRoleMerge userRoleMerge = userRoleMergeMapper.selectOne(
-                new QueryWrapper<UserRoleMerge>()
-                        .eq("user_id", data.getUserId())
-                        .eq("role_id", data.getRoleId())
-        );
+    public CommonResult<String> putUserNewPassword(PutUserPasswordParam param) {
+        BTokenSwapPo context = ThreadLocalContextUtil.getContext();
+        UserRoleMerge userRoleMerge = userBRoleMapper.selectUserRolleMergeByUserIdAndOrganizationIdAndPermissionId(
+                context.getUserId(), context.getOrganizationId());
         if (userRoleMerge == null) {
-            log.warn("获取 B 端用户信息失败：用户不存在，Token解析结果：" + data);
-            return CommonResult.fail("数据库错误");
+            log.warn("获取 B 端用户信息失败：用户不存在，Token解析结果：" + context);
+            return CommonResult.serverError();
         }
         boolean testPasswd = PasswordUtil.testPasswd(param.getOldPassword(), userRoleMerge.getPassword());
         if (!testPasswd) {
-            return CommonResult.fail("旧密码错误");
+            return CommonResult.fail("更新密码失败：旧密码错误");
         }
         userRoleMerge.setPassword(PasswordUtil.hashPassword(param.getNewPassword()));
         int updateById = userRoleMergeMapper.updateById(userRoleMerge);
         if (updateById != -1) {
             log.warn("更新用户 " + userRoleMerge + " 密码错误，受影响行数：" + updateById);
-            return CommonResult.fail("数据库错误");
+            return CommonResult.serverError();
         }
         return CommonResult.success();
     }
@@ -248,38 +237,42 @@ public class UserBBServiceImpl implements UserBService {
     /**
      * B 端用户登出
      *
-     * @param request  HTTP请求报文
-     * @param response HTTP响应报文
      * @return 处理结果
      */
     @Override
-    public CommonResult<String> logout(HttpServletRequest request, HttpServletResponse response) {
-        CommonResult<CheckRoleResult> check = checkRoleUtil.check(request, response);
-        if (!Objects.equals(check.getCode(), ResultEnum.SUCCESS.getCode()))
-            return CommonResult.fail(check.getCode(), check.getMessage());
-        return checkRoleUtil.logout(request, response);
+    public CommonResult<String> logout() {
+        BTokenSwapPo context = ThreadLocalContextUtil.getContext();
+        Boolean revokeToken = jwtUtil.revokeToken(context.getToken());
+        if (revokeToken == null) {
+            log.warn("用户 " + context + " 登出时出现异常");
+            return CommonResult.serverError();
+        }
+        return CommonResult.success();
     }
 
     /**
      * B 端用户切换组织
      *
-     * @param request  HTTP请求报文
-     * @param response HTTP响应报文
-     * @param param    要切换的组织
+     * @param param 要切换的组织
      * @return 权限信息、新 Token
      */
     @Override
-    public CommonResult<SwitchOrgResult> switchOrganization(HttpServletRequest request, HttpServletResponse response, SwitchOrgParam param) {
-        CommonResult<CheckRoleResult> check = checkRoleUtil.check(request, response);
-        if (!Objects.equals(check.getCode(), ResultEnum.SUCCESS.getCode()))
-            return CommonResult.fail(check.getCode(), check.getMessage());
-        CheckRoleResult data = check.getData();
-        UserLoginPermissionPo userLoginPermission = userBRoleMapper.selectBUserLoginInfoByStudentIdAndOrgId(data.getStudentId(), param.getOrganizationId());
-        if (userLoginPermission == null)
-            return CommonResult.fail("切换组织错误：组织不存在");
-        CommonResult<String> logout = checkRoleUtil.logout(request, response);
-        if (!Objects.equals(logout.getCode(), ResultEnum.SUCCESS.getCode()))
-            return CommonResult.fail(logout.getCode(), logout.getMessage());
+    public CommonResult<SwitchOrgResult> switchOrganization(SwitchOrgParam param) {
+        BTokenSwapPo context = ThreadLocalContextUtil.getContext();
+        UserLoginPermissionPo userLoginPermission = userBRoleMapper.selectBUserLoginInfoByUserIdAndOrgId(context.getUserId(), param.getOrganizationId());
+        if (userLoginPermission == null) {
+            log.info("用户 " + context + " 切换到组织 " + param + " 失败，组织不存在");
+            return CommonResult.fail("切换组织失败，组织不存在或密码错误");
+        }
+        if (!PasswordUtil.testPasswd(param.getPassword(), userLoginPermission.getPassword())) {
+            log.info("用户 " + context + " 切换到组织 " + param + " 失败，密码错误");
+            return CommonResult.fail("切换组织失败，组织不存在或密码错误");
+        }
+        Boolean revokeToken = jwtUtil.revokeToken(context.getToken());
+        if (revokeToken == null) {
+            log.warn("用户 " + context + " 切换账号注销 Token 时出现异常");
+            return CommonResult.serverError();
+        }
         String token = jwtUtil.createToken(new BTokenSwapPo(userLoginPermission));
         SwitchOrgResult result = new SwitchOrgResult();
         result.setPermissionId(userLoginPermission.getPermissionId());
@@ -291,19 +284,14 @@ public class UserBBServiceImpl implements UserBService {
     /**
      * B 端加入新组织
      *
-     * @param request  HTTP 请求报文
-     * @param response HTTP 响应报文
-     * @param param    邀请码与密码
+     * @param param 邀请码与密码
      * @return 处理结果
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public CommonResult<String> addNewOrganization(HttpServletRequest request, HttpServletResponse response, AddNewOrgParam param) throws DatabaseException {
-        CommonResult<CheckRoleResult> check = checkRoleUtil.check(request, response);
-        if (!Objects.equals(check.getCode(), ResultEnum.SUCCESS.getCode()))
-            return CommonResult.fail(check.getCode(), check.getMessage());
-        CheckRoleResult data = check.getData();
-        if (data.getPermissionId() < PermissionEnum.COMMITTEE.getId())
+    public CommonResult<String> addNewOrganization(AddNewOrgParam param) throws DatabaseException {
+        BTokenSwapPo context = ThreadLocalContextUtil.getContext();
+        if (context.getPermissionId() < PermissionEnum.COMMITTEE.getId())
             return CommonResult.fail("Super Admin 不允许加入其他组织");
         Integer orgId = iCodeUtil.verifyICode(param.getKey());
         // 科协测试邀请码
@@ -311,15 +299,20 @@ public class UserBBServiceImpl implements UserBService {
             orgId = 1;
         if (orgId == null)
             return CommonResult.fail("注册失败：邀请码无效");
-        UserLoginPermissionPo userLoginPermissionPo = userBRoleMapper.selectBUserLoginInfoByStudentIdAndOrgId(data.getStudentId(), orgId);
+        UserB userB = userBMapper.selectById(context.getUserId());
+        if (userB == null) {
+            log.warn("用户 " + context + " 进入组织 " + param + " 失败，用户不存在");
+            return CommonResult.serverError();
+        }
+        UserLoginPermissionPo userLoginPermissionPo = userBRoleMapper.selectBUserLoginInfoByUserIdAndOrgId(userB.getId(), orgId);
         if (userLoginPermissionPo != null)
             return CommonResult.fail("加入组织失败：请勿重复加入组织");
         // 初始化一个新组织的新角色
-        Role role = roleMapper.selectOne(new QueryWrapper<Role>().eq("organization_id", orgId).eq("permission_id", 3));
+        Role role = roleMapper.selectOne(new QueryWrapper<Role>().eq("organization_id", orgId).eq("permission_id", PermissionEnum.COMMITTEE.getId()));
         if (role == null) {
             role = new Role();
             role.setOrganizationId(orgId);
-            role.setPermissionId(3);
+            role.setPermissionId(PermissionEnum.COMMITTEE.getId());
             int insert = roleMapper.insert(role);
             if (insert != 1) {
                 log.warn("初始化组织 " + orgId + " 的角色时失败，受影响行数：" + insert);
@@ -327,12 +320,12 @@ public class UserBBServiceImpl implements UserBService {
             }
         }
         UserRoleMerge roleMerge = new UserRoleMerge();
-        roleMerge.setUserId(data.getUserId());
+        roleMerge.setUserId(context.getUserId());
         roleMerge.setRoleId(role.getId());
         roleMerge.setPassword(PasswordUtil.hashPassword(param.getPassword()));
         int insert = userRoleMergeMapper.insert(roleMerge);
         if (insert != 1) {
-            log.warn("B 端用户 " + data + " 添加角色 " + roleMerge + "失败，受影响行数：" + insert);
+            log.warn("B 端用户 " + context + " 添加角色 " + roleMerge + "失败，受影响行数：" + insert);
             throw new DatabaseException("加入组织失败：数据库错误");
         }
         return CommonResult.success();
@@ -341,40 +334,35 @@ public class UserBBServiceImpl implements UserBService {
     /**
      * B 端用户更新头像
      *
-     * @param request  HTTP 请求报文
-     * @param response HTTP 响应报文
-     * @param avatar   头像文件
+     * @param avatar 头像文件
      * @return 处理结果，包含新头像的 URL
      * @author DoudiNCer
      */
     @Override
-    public CommonResult<PutUserAvatarResult> putUserAvatar(HttpServletRequest request, HttpServletResponse response, MultipartFile avatar) {
-        CommonResult<CheckRoleResult> check = checkRoleUtil.check(request, response);
-        if (!Objects.equals(check.getCode(), ResultEnum.SUCCESS.getCode()))
-            return CommonResult.fail(check.getCode(), check.getMessage());
-        CheckRoleResult data = check.getData();
-        UserB userB = userBMapper.selectById(data.getUserId());
+    public CommonResult<PutUserAvatarResult> putUserAvatar(MultipartFile avatar) {
+        BTokenSwapPo context = ThreadLocalContextUtil.getContext();
+        UserB userB = userBMapper.selectById(context.getUserId());
         if (userB == null) {
-            log.warn("获取 B 端用户信息失败：用户不存在，Token解析结果：" + data);
-            return CommonResult.fail("数据库错误");
+            log.warn("获取 B 端用户信息失败：用户不存在，Token解析结果：" + context);
+            return CommonResult.serverError();
         }
         if (userB.getAvatarId() != null && userB.getAvatarId().length() != 0) {
             Boolean dropPicture = pictureUtil.dropPicture(userB.getAvatarId());
             if (dropPicture == null) {
-                log.warn("B 端用户 " + data + " 更新头像删除原头像失败");
+                log.warn("B 端用户 " + context + " 更新头像时删除原头像失败");
                 return CommonResult.serverError();
             }
         }
         String pictureId = pictureUtil.uploadPicture(avatar,
-                new PictureUsage(UsageEnum.B_USER_AVATAR, data.getToken()));
+                new PictureUsage(UsageEnum.B_USER_AVATAR, context.getToken()));
         if (pictureId == null) {
-            log.warn("B 端用户 " + data + " 更新头像上传失败");
+            log.warn("B 端用户 " + context + " 更新头像上传失败");
             return CommonResult.serverError();
         }
         userB.setAvatarId(pictureId);
         int updateById = userBMapper.updateById(userB);
         if (updateById != 1) {
-            log.warn("B 端用户 " + data + " 更新头像更新数据库出现异常，受影响行数：" + updateById);
+            log.warn("B 端用户 " + context + " 更新头像更新数据库出现异常，受影响行数：" + updateById);
             return CommonResult.serverError();
         }
         PutUserAvatarResult result = new PutUserAvatarResult();

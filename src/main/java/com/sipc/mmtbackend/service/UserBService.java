@@ -7,9 +7,6 @@ import com.sipc.mmtbackend.pojo.exceptions.DateBaseException;
 import net.sf.jsqlparser.util.validation.metadata.DatabaseException;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 public interface UserBService {
     /**
      * B 端用户注册
@@ -42,61 +39,49 @@ public interface UserBService {
     /**
      * 获取 B 端用户信息
      *
-     * @param request  HTTP请求报文
-     * @param response HTTP响应报文
      * @return 用户信息
      * @author DoudiNCer
      */
-    CommonResult<GetBUserInfoResult> getUserInfo(HttpServletRequest request, HttpServletResponse response);
+    CommonResult<GetBUserInfoResult> getUserInfo();
 
     /**
      * 更新 B 端用户密码
      *
-     * @param request  HTTP 请求报文
-     * @param response HTTP 响应报文
-     * @param param    旧密码与新密码
+     * @param param 旧密码与新密码
      * @return 处理结果
      * @author DoudiNCer
      */
-    CommonResult<String> putUserNewPassword(HttpServletRequest request, HttpServletResponse response, PutUserPasswordParam param);
+    CommonResult<String> putUserNewPassword(PutUserPasswordParam param);
 
     /**
      * B 端用户登出
      *
-     * @param request  HTTP请求报文
-     * @param response HTTP响应报文
      * @return 处理结果
      */
-    CommonResult<String> logout(HttpServletRequest request, HttpServletResponse response);
+    CommonResult<String> logout();
 
     /**
      * B 端用户切换组织
      *
-     * @param request  HTTP请求报文
-     * @param response HTTP响应报文
-     * @param param    要切换的组织
+     * @param param 要切换的组织
      * @return 权限信息、新 Token
      */
-    CommonResult<SwitchOrgResult> switchOrganization(HttpServletRequest request, HttpServletResponse response, SwitchOrgParam param);
+    CommonResult<SwitchOrgResult> switchOrganization(SwitchOrgParam param);
 
     /**
      * B 端加入新组织
      *
-     * @param request  HTTP 请求报文
-     * @param response HTTP 响应报文
-     * @param param    邀请码与密码
+     * @param param 邀请码与密码
      * @return 处理结果
      */
-    CommonResult<String> addNewOrganization(HttpServletRequest request, HttpServletResponse response, AddNewOrgParam param) throws DatabaseException;
+    CommonResult<String> addNewOrganization(AddNewOrgParam param) throws DatabaseException;
 
     /**
      * B 端用户更新头像
      *
-     * @param request  HTTP 请求报文
-     * @param response HTTP 响应报文
-     * @param avatar   头像文件
+     * @param avatar 头像文件
      * @return 处理结果，包含新头像的 URL
      * @author DoudiNCer
      */
-    CommonResult<PutUserAvatarResult> putUserAvatar(HttpServletRequest request, HttpServletResponse response, MultipartFile avatar);
+    CommonResult<PutUserAvatarResult> putUserAvatar(MultipartFile avatar);
 }

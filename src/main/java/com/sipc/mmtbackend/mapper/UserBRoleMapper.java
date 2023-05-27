@@ -1,5 +1,6 @@
 package com.sipc.mmtbackend.mapper;
 
+import com.sipc.mmtbackend.pojo.domain.UserRoleMerge;
 import com.sipc.mmtbackend.pojo.domain.po.UserBRole.JoinedOrgPo;
 import com.sipc.mmtbackend.pojo.domain.po.UserBRole.UserLoginPermissionPo;
 import org.apache.ibatis.annotations.Mapper;
@@ -29,5 +30,29 @@ public interface UserBRoleMapper {
      * @param organizationId 组织ID
      * @return UserLoginPermissionPo 登录信息，包括用户 ID、用户名、密码、角色 ID、 角色名
      */
-    UserLoginPermissionPo selectBUserLoginInfoByStudentIdAndOrgId(@Param("studentId") String studentId, @Param("organizationId") Integer organizationId);
+    UserLoginPermissionPo selectBUserLoginInfoByStudentIdAndOrgId(
+            @Param("studentId") String studentId,
+            @Param("organizationId") Integer organizationId);
+
+    /**
+     * 根据 B 端用户ID）与组织 ID 查询用户在该组织的登录信息
+     *
+     * @param userId         B 端用户ID）
+     * @param organizationId 组织ID
+     * @return UserLoginPermissionPo 登录信息，包括用户 ID、用户名、密码、角色 ID、角色名
+     */
+    UserLoginPermissionPo selectBUserLoginInfoByUserIdAndOrgId(
+            @Param("userId") Integer userId,
+            @Param("organizationId") Integer organizationId);
+
+    /**
+     * 根据 B 端用户ID、组织ID、查询用户在组织的登录信息
+     *
+     * @param userId         用户ID
+     * @param organizationId 组织ID
+     * @return 用户角色对应表
+     */
+    UserRoleMerge selectUserRolleMergeByUserIdAndOrganizationIdAndPermissionId(
+            @Param("userId") Integer userId,
+            @Param("organizationId") Integer organizationId);
 }
