@@ -8,17 +8,19 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class BTokenSwapPo {
     private Integer userId;
-    private Integer roleId;
-    private String studentId;
+//    @Deprecated
+//    private Integer roleId;
+    private String token;
+//    private String studentId;
     private Integer organizationId;
     private Integer permissionId;
 
-    @Deprecated
+//    @Deprecated
     public BTokenSwapPo(UserLoginPermissionPo po) {
         this.userId = po.getUserId();
-        this.studentId = po.getStudentId();
+//        this.studentId = po.getStudentId();
         this.organizationId = po.getOrganizationId();
         this.permissionId = po.getPermissionId();
-        this.roleId = po.getRoleId();
+//        this.roleId = po.getRoleId();
     }
 }
