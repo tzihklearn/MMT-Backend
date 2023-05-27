@@ -25,7 +25,7 @@ import java.util.Objects;
  */
 @Component
 @RequiredArgsConstructor(onConstructor_ = {@Autowired})
-public class MyHandlerInterceptor implements HandlerInterceptor {
+public class BCheckRoleHandlerInterceptor implements HandlerInterceptor {
 
     private final CheckRoleUtil checkRoleUtil;
 
@@ -35,12 +35,6 @@ public class MyHandlerInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler) throws Exception {
-
-//        CommonResult<CheckRoleResult> check = checkRoleUtil.check(request, response);
-//        if (!Objects.equals(check.getCode(), ResultEnum.SUCCESS.getCode())) {
-//            setResponse(response, check);
-//            return false;
-//        }
 
         /*
           获取token,并且解析token信息
@@ -88,6 +82,7 @@ public class MyHandlerInterceptor implements HandlerInterceptor {
             response.setContentType("application/json;charset=UTF-8");
             //获取HTTP响应的输出流，并将JSON字符串（json）写入输出流，最终将其作为响应发送给客户端
             response.getWriter().println(json);
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

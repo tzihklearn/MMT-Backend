@@ -29,8 +29,8 @@ public class JWTUtil {
     // 盐
     private static final String tokenPara = "p.iT|OnYm]:IRr1rW{E/~<5o_r+_ h@Eel/k kK?1n{|heX[Q4Tj_I#!*K8P=Y+Ru@";
     private static final String BUserIdTokenKey = "buidtkk";
-    private static final String BUserStuIdTokenKey = "busidtkk";
-    private static final String BUserRoleIdTokenKey = "busroleidtkk";
+//    private static final String BUserStuIdTokenKey = "busidtkk";
+//    private static final String BUserRoleIdTokenKey = "busroleidtkk";
 
     private static final String BUserOrganizationIdTokenKey = "busorganizationidtkk";
 
@@ -49,7 +49,7 @@ public class JWTUtil {
         instance.add(Calendar.DAY_OF_MONTH, 7);
         String token = JWT.create()
                 .withClaim(BUserIdTokenKey, po.getUserId())
-                .withClaim(BUserStuIdTokenKey, po.getStudentId())
+//                .withClaim(BUserStuIdTokenKey, po.getStudentId())
                 .withClaim(BUserOrganizationIdTokenKey, po.getOrganizationId())
                 .withClaim(BUserPermissionIdTokenKey, po.getPermissionId())
                 .withExpiresAt(instance.getTime())
@@ -81,8 +81,8 @@ public class JWTUtil {
         }
         BTokenSwapPo result = new BTokenSwapPo();
         result.setUserId(verify.getClaim(BUserIdTokenKey).asInt());
-        result.setStudentId(verify.getClaim(BUserStuIdTokenKey).asString());
-        result.setRoleId(verify.getClaim(BUserRoleIdTokenKey).asInt());
+//        result.setStudentId(verify.getClaim(BUserStuIdTokenKey).asString());
+//        result.setRoleId(verify.getClaim(BUserRoleIdTokenKey).asInt());
         result.setOrganizationId(verify.getClaim(BUserOrganizationIdTokenKey).asInt());
         result.setPermissionId(verify.getClaim(BUserPermissionIdTokenKey).asInt());
         return result;
@@ -108,6 +108,7 @@ public class JWTUtil {
             log.warn("发现解析成功但未登录的Token：" + po);
             return null;
         }
+        redisPo.setToken(token);
         return redisPo;
     }
 
@@ -135,18 +136,18 @@ public class JWTUtil {
      * 吊销 Token
      *
      * @param token Token字符串
-     * @return 吊销结果，true表示吊销正常，false表示Token非法；null表示系统错误
+     * @return 吊销结果，true表示吊销正常，null表示系统错误
      */
     public Boolean revokeToken(String token) {
         String tokenKey = getTokenKey(token);
         if (tokenKey == null) {
             return null;
         }
-        BTokenSwapPo po = verifyToken(token);
-        if (po == null){
-            log.info("尝试吊销非法 Token：" + token);
-            return false;
-        }
+//        BTokenSwapPo po = verifyToken(token);
+//        if (po == null){
+//            log.info("尝试吊销非法 Token：" + token);
+//            return false;
+//        }
         boolean sel =  redisUtil.delete(tokenKey);
         if (!sel){
             log.warn("Redis 删除 Token 失败，Token 为：" + token + "key 为：" + tokenKey);
