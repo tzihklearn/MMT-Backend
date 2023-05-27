@@ -66,6 +66,7 @@ public class CheckRoleUtil {
      * @return 用户数据与查询结果
      * @author DoudiNCer
      */
+    @Deprecated
     private CommonResult<CheckRoleResult> checkUsderInfoByToken(String token) {
         BTokenSwapPo bTokenSwapPo = jwtUtil.verifyToken(token);
         if (bTokenSwapPo == null) {
@@ -112,6 +113,7 @@ public class CheckRoleUtil {
      * @return 检查结果，CommonResult&lt;CheckRoleResult&gt;，检查失败时可直接返回
      * @author DoudiNCer
      */
+    @Deprecated
     public CommonResult<CheckRoleResult> check(HttpServletRequest req, HttpServletResponse resp) {
         String token = req.getHeader("Authorization");
         if (token == null) {
@@ -154,5 +156,21 @@ public class CheckRoleUtil {
             return CommonResult.fail("系统错误：注销失败");
         }
         return CommonResult.success();
+    }
+
+    /**
+     * 检验B段用户权限
+     * @param permissionId 待验证权限id
+     * @param url 请求的url
+     * @return 返回是否具有访问权限
+     */
+    public boolean bCheck(Integer permissionId, String url) {
+        PermissionEnum permissionEnum = apiPermissions.get(url);
+
+        if (permissionEnum == null) {
+            return false;
+        }
+
+        return Objects.equals(permissionEnum.getId(), permissionId);
     }
 }

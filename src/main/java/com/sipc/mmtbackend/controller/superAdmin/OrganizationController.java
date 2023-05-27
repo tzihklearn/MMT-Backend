@@ -67,13 +67,14 @@ public class OrganizationController {
     }
 
     @PostMapping("/admission/publish")
-    public CommonResult<String> publishAdmission() {
+    public CommonResult<String> publishAdmission(@RequestBody OrganizationPublishParam organizationPublishParam) {
         return null;
     }
 
     @PostMapping("/test")
-    public CommonResult<String> test(@RequestBody OrganizationPublishParam organizationPublishParam) throws RuntimeException {
+    public CommonResult<String> test() throws RuntimeException {
         throw new RuntimeException("test测试错误");
+//        return null;
 //        return null;
     }
 
