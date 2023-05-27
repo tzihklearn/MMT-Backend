@@ -44,7 +44,6 @@ public class PictureUtil {
      * @return 一个字符串，为公网访问图片的链接，若图片不存在返回 null
      * @author DoudiNCer
      */
-    @Deprecated
     public String getPictureURL(String pictureId) {
         Picture picture = pictureMapper.selectOne(new QueryWrapper<Picture>().eq("pic_id", pictureId));
         if (picture == null) return null;

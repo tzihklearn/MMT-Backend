@@ -8,12 +8,12 @@ spring:
     password: 123456
   redis:
     database: 3
-    url: redis://:123456@192.168.115.6:6379
+    url: redis://:@192.168.115.6:40027
 lark-robot:
   url: https://open.feishu.cn/open-apis/bot/v2/hook/
   dev: true
 minio:
-  endpoint: http://192.168.115.10:9000 #Minio服务所在地址
+  endpoint: http://192.168.115.10:9000 #Minio API 地址
   bucketName: mmt #存储桶名称
   accessKey: minio #访问的key
   secretKey: miniopass #访问的秘钥
