@@ -4,9 +4,6 @@ import com.sipc.mmtbackend.mapper.OrganizationMapper;
 import com.sipc.mmtbackend.mapper.PermissionMapper;
 import com.sipc.mmtbackend.mapper.RoleMapper;
 import com.sipc.mmtbackend.mapper.UserBMapper;
-import com.sipc.mmtbackend.pojo.domain.Organization;
-import com.sipc.mmtbackend.pojo.domain.Permission;
-import com.sipc.mmtbackend.pojo.domain.Role;
 import com.sipc.mmtbackend.pojo.domain.UserB;
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
 import com.sipc.mmtbackend.pojo.dto.resultEnum.ResultEnum;
@@ -73,21 +70,21 @@ public class CheckRoleUtil {
             log.info("鉴权验证Token失败：" + token);
             return CommonResult.loginError();
         }
-        Role role = roleMapper.selectById(bTokenSwapPo.getRoleId());
-        if (role == null) {
-            log.warn("鉴权查无角色代码，Token：" + token + "，载荷：" + bTokenSwapPo);
-            return CommonResult.fail("鉴权查无角色信息");
-        }
-        Organization organization = organizationMapper.selectById(role.getOrganizationId());
-        if (organization == null) {
-            log.warn("鉴权角色信息错误，查无组织：" + role);
-            return CommonResult.fail("鉴权角色信息错误");
-        }
-        Permission permission = permissionMapper.selectById(role.getPermissionId());
-        if (permission == null) {
-            log.warn("鉴权角色信息错误，查无权限：" + role);
-            return CommonResult.fail("鉴权角色信息错误");
-        }
+//        Role role = roleMapper.selectById(bTokenSwapPo.getRoleId());
+//        if (role == null) {
+//            log.warn("鉴权查无角色代码，Token：" + token + "，载荷：" + bTokenSwapPo);
+//            return CommonResult.fail("鉴权查无角色信息");
+//        }
+//        Organization organization = organizationMapper.selectById(role.getOrganizationId());
+//        if (organization == null) {
+//            log.warn("鉴权角色信息错误，查无组织：" + role);
+//            return CommonResult.fail("鉴权角色信息错误");
+//        }
+//        Permission permission = permissionMapper.selectById(role.getPermissionId());
+//        if (permission == null) {
+//            log.warn("鉴权角色信息错误，查无权限：" + role);
+//            return CommonResult.fail("鉴权角色信息错误");
+//        }
         UserB userB = userBMapper.selectById(bTokenSwapPo.getUserId());
         if (userB == null) {
             log.warn("鉴权查无用户信息：" + bTokenSwapPo);
@@ -95,13 +92,13 @@ public class CheckRoleUtil {
         }
         CheckRoleResult result = new CheckRoleResult();
         result.setUserId(bTokenSwapPo.getUserId());
-        result.setStudentId(bTokenSwapPo.getStudentId());
+//        result.setStudentId(bTokenSwapPo.getStudentId());
         result.setUsername(userB.getUserName());
-        result.setOrganizationId(role.getOrganizationId());
-        result.setUsername(organization.getName());
-        result.setPermissionId(role.getPermissionId());
-        result.setPermissionName(permission.getName());
-        result.setRoleId(bTokenSwapPo.getRoleId());
+//        result.setOrganizationId(role.getOrganizationId());
+//        result.setUsername(organization.getName());
+        result.setPermissionId(0);
+//        result.setPermissionName(permission.getName());
+//        result.setRoleId(bTokenSwapPo.getRoleId());
         result.setToken(token);
         return CommonResult.success(result);
     }
@@ -144,6 +141,7 @@ public class CheckRoleUtil {
      * @return 处理结果，可直接返回
      * @author DoudiNCer
      */
+    @Deprecated
     public CommonResult<String> logout(HttpServletRequest req, HttpServletResponse resp) {
         String token = req.getHeader("Authorization");
         if (token == null) {
@@ -159,9 +157,10 @@ public class CheckRoleUtil {
     }
 
     /**
-     * 检验B段用户权限
+     * 检验B端用户权限
+     *
      * @param permissionId 待验证权限id
-     * @param url 请求的url
+     * @param url          请求的url
      * @return 返回是否具有访问权限
      */
     public boolean bCheck(Integer permissionId, String url) {
@@ -171,6 +170,6 @@ public class CheckRoleUtil {
             return false;
         }
 
-        return Objects.equals(permissionEnum.getId(), permissionId);
+        return (permissionId <= permissionEnum.getId());
     }
 }
