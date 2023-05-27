@@ -10,11 +10,11 @@ import com.sipc.mmtbackend.pojo.exceptions.DateBaseException;
 
 public interface AccountManageService {
 
-    CommonResult<ICodeResult> generatedICode(Integer organizationId);
+    CommonResult<ICodeResult> generatedICode();
 
-    CommonResult<MemberInfoResult> allMemberInfo(Integer organizationId, Integer pageNum);
+    CommonResult<MemberInfoResult> allMemberInfo(Integer pageNum);
 
-    CommonResult<MemberInfoResult> siftMemberInfo(Integer organizationId, Integer pageNum, Integer sort, String permission);
+    CommonResult<MemberInfoResult> siftMemberInfo(Integer pageNum, Integer sort, String permission);
 
     CommonResult<String> reviseMemberInfo(ReviseMemberInfoParam reviseMemberInfoParam) throws DateBaseException;
 

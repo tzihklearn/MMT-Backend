@@ -19,7 +19,9 @@ import com.sipc.mmtbackend.pojo.dto.result.superAdmin.MemberInfoResult;
 import com.sipc.mmtbackend.pojo.exceptions.DateBaseException;
 import com.sipc.mmtbackend.service.AccountManageService;
 import com.sipc.mmtbackend.utils.CheckroleBUtil.PasswordUtil;
+import com.sipc.mmtbackend.utils.CheckroleBUtil.pojo.BTokenSwapPo;
 import com.sipc.mmtbackend.utils.ICodeUtil;
+import com.sipc.mmtbackend.utils.ThreadLocalContextUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,12 +64,17 @@ public class AccountManageServiceImpl implements AccountManageService {
     /**
      * 生成社团邀请码，并将其放入redis中，时限10min
      *
-     * @param organizationId 社团组织id
      * @return 生成社团邀请码的返回类，包含生成的社团邀请码
      * @see ICodeResult
      */
     @Override
-    public CommonResult<ICodeResult> generatedICode(Integer organizationId) {
+    public CommonResult<ICodeResult> generatedICode() {
+
+        /*
+          鉴权并且获取用户所属社团组织id
+         */
+        BTokenSwapPo context = ThreadLocalContextUtil.getContext();
+        Integer organizationId = context.getOrganizationId();
 
         /*
           生成社团邀请澳门，并将其放入redis中，时限10min
@@ -91,13 +98,18 @@ public class AccountManageServiceImpl implements AccountManageService {
     /**
      * 获取社团成员列表业务处理方法
      *
-     * @param organizationId 社团组织id
-     * @param pageNum        当前页数
+     * @param pageNum 当前页数
      * @return 返回处理的结果，包含社团成员列表
      * @see MemberInfoResult
      */
     @Override
-    public CommonResult<MemberInfoResult> allMemberInfo(Integer organizationId, Integer pageNum) {
+    public CommonResult<MemberInfoResult> allMemberInfo(Integer pageNum) {
+
+        /*
+          鉴权并且获取用户所属社团组织id
+         */
+        BTokenSwapPo context = ThreadLocalContextUtil.getContext();
+        Integer organizationId = context.getOrganizationId();
 
         //获取权限列表，并将其存入map
         if (permissionMap.size() == 0) {
@@ -113,15 +125,20 @@ public class AccountManageServiceImpl implements AccountManageService {
     /**
      * 筛选社团成员列表业务处理方法
      *
-     * @param organizationId 社团组织id
-     * @param pageNum        当前页数
-     * @param sort           学号排序， 0为正序， 1为倒序（默认为0）
-     * @param permission     成员权限筛选项
+     * @param pageNum    当前页数
+     * @param sort       学号排序， 0为正序， 1为倒序（默认为0）
+     * @param permission 成员权限筛选项
      * @return 返回处理的结果，包含社团成员列表
      * @see MemberInfoResult
      */
     @Override
-    public CommonResult<MemberInfoResult> siftMemberInfo(Integer organizationId, Integer pageNum, Integer sort, String permission) {
+    public CommonResult<MemberInfoResult> siftMemberInfo(Integer pageNum, Integer sort, String permission) {
+
+        /*
+          鉴权并且获取用户所属社团组织id
+         */
+        BTokenSwapPo context = ThreadLocalContextUtil.getContext();
+        Integer organizationId = context.getOrganizationId();
 
         //获取权限列表，并将其存入map
         if (permissionMap.size() == 0) {
@@ -155,7 +172,11 @@ public class AccountManageServiceImpl implements AccountManageService {
     @Transactional(rollbackFor = Exception.class)
     public CommonResult<String> reviseMemberInfo(ReviseMemberInfoParam reviseMemberInfoParam) throws DateBaseException {
 
-        Integer organizationId = 0;
+        /*
+          鉴权并且获取用户所属社团组织id
+         */
+        BTokenSwapPo context = ThreadLocalContextUtil.getContext();
+        Integer organizationId = context.getOrganizationId();
 
         //获取权限列表，并将其存入map
         if (permissionMap.size() == 0) {
@@ -235,7 +256,11 @@ public class AccountManageServiceImpl implements AccountManageService {
     @Transactional(rollbackFor = Exception.class)
     public CommonResult<String> reviseMemberPasswd(ReviseMemberPasswdParam reviseMemberPasswdParam) throws DateBaseException {
 
-        Integer organizationId = 0;
+        /*
+          鉴权并且获取用户所属社团组织id
+         */
+        BTokenSwapPo context = ThreadLocalContextUtil.getContext();
+        Integer organizationId = context.getOrganizationId();
 
         String passwd = PasswordUtil.hashPassword(reviseMemberPasswdParam.getPasswd());
 
@@ -264,7 +289,11 @@ public class AccountManageServiceImpl implements AccountManageService {
     @Transactional(rollbackFor = Exception.class)
     public CommonResult<String> deleteMember(DeleteMemberParam deleteMemberParam) throws DateBaseException {
 
-        Integer organizationId = 0;
+        /*
+          鉴权并且获取用户所属社团组织id
+         */
+        BTokenSwapPo context = ThreadLocalContextUtil.getContext();
+        Integer organizationId = context.getOrganizationId();
 
         int deleteNum = userRoleMergeMapper.logicDeleteByUserIdAndOrganizationId(deleteMemberParam.getUserId(), organizationId);
         if (deleteNum != 1 && deleteNum != 0) {

@@ -6,19 +6,18 @@ import com.sipc.mmtbackend.mapper.*;
 import com.sipc.mmtbackend.pojo.domain.*;
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
 import com.sipc.mmtbackend.pojo.dto.data.DepartmentData;
-import com.sipc.mmtbackend.pojo.dto.param.superAdmin.OrganizationInfoParam;
 import com.sipc.mmtbackend.pojo.dto.data.TagData;
+import com.sipc.mmtbackend.pojo.dto.param.superAdmin.OrganizationInfoParam;
 import com.sipc.mmtbackend.pojo.dto.result.superAdmin.OrganizationInfoResult;
 import com.sipc.mmtbackend.pojo.dto.result.superAdmin.UploadAvatarResult;
-import com.sipc.mmtbackend.pojo.dto.resultEnum.ResultEnum;
 import com.sipc.mmtbackend.pojo.exceptions.DateBaseException;
 import com.sipc.mmtbackend.pojo.exceptions.RunException;
 import com.sipc.mmtbackend.service.OrganizationService;
-import com.sipc.mmtbackend.utils.CheckroleBUtil.CheckRoleUtil;
-import com.sipc.mmtbackend.utils.CheckroleBUtil.pojo.CheckRoleResult;
+import com.sipc.mmtbackend.utils.CheckroleBUtil.pojo.BTokenSwapPo;
 import com.sipc.mmtbackend.utils.PictureUtil.PictureUtil;
 import com.sipc.mmtbackend.utils.PictureUtil.pojo.PictureUsage;
 import com.sipc.mmtbackend.utils.PictureUtil.pojo.UsageEnum;
+import com.sipc.mmtbackend.utils.ThreadLocalContextUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +28,6 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.multipart.support.StandardServletMultipartResolver;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -39,6 +37,7 @@ import java.util.stream.Collectors;
 
 /**
  * 有关超级管理的社团宣传与面试的功能的业务处理
+ *
  * @author tzih
  * @version v1.0
  * @since 2023.04.23
@@ -65,20 +64,18 @@ public class OrganizationServiceImpl implements OrganizationService {
 
     private final PictureUtil pictureUtil;
 
-    private final CheckRoleUtil checkRoleUtil;
-
     private final HttpServletRequest request;
 
-    private final HttpServletResponse response;
 
     /**
      * 设置社团宣传信息的业务处理方法，处理设置社团宣传信息
+     *
      * @param organizationInfoParam 更新社团宣传信息接口的请求体参数类
-     * @see OrganizationInfoParam
      * @return 返回社团请求信息处理结果
      * @throws DateBaseException 自定义的数据库操作异常，抛出用于事务回滚
-     * @throws RunException 自定义的运行异常，抛出用于事务回滚
-     * Spring AOP代理造成的，因为只有当事务方法被当前类以外的代码调用时，才会由Spring生成的代理对象来管理
+     * @throws RunException      自定义的运行异常，抛出用于事务回滚
+     *                           Spring AOP代理造成的，因为只有当事务方法被当前类以外的代码调用时，才会由Spring生成的代理对象来管理
+     * @see OrganizationInfoParam
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -87,13 +84,8 @@ public class OrganizationServiceImpl implements OrganizationService {
         /*
           鉴权并且获取用户所属社团组织id
          */
-        CommonResult<CheckRoleResult> check = checkRoleUtil.check(request, response);
-
-        if (!Objects.equals(check.getCode(), ResultEnum.SUCCESS.getCode())) {
-            return CommonResult.userAuthError();
-        }
-        CheckRoleResult data = check.getData();
-        Integer organizationId = data.getOrganizationId();
+        BTokenSwapPo context = ThreadLocalContextUtil.getContext();
+        Integer organizationId = context.getOrganizationId();
 
         /*
           更新社团基本信息表
@@ -208,7 +200,7 @@ public class OrganizationServiceImpl implements OrganizationService {
 
                 }
                 //处理自定义标签
-                else if (tagData.getType() == 2){
+                else if (tagData.getType() == 2) {
 //                    Tag tag = new Tag();
 //                    tag.setName(tagData.getTag());
 //                    tag.setType(tagData.getType());
@@ -247,7 +239,7 @@ public class OrganizationServiceImpl implements OrganizationService {
 
                     //如果当前社团自定义标签不同于更新自定义标签，进行更新
                     if (typeJ < size && organizationTagMerges != null) {
-                        if(!Objects.equals(tag.getId(), organizationTagMerges.get(typeJ).getTagId())) {
+                        if (!Objects.equals(tag.getId(), organizationTagMerges.get(typeJ).getTagId())) {
                             updateNum = organizationTagMergeMapper.update(organizationTagMerge,
                                     new UpdateWrapper<OrganizationTagMerge>()
                                             .eq("id", organizationTagMerges.get(typeJ).getId()));
@@ -402,7 +394,8 @@ public class OrganizationServiceImpl implements OrganizationService {
 
     /**
      * 获取社团宣传信息的业务处理方法
-     * @return CommonResult<<OrganizationInfoResult>> 返回处理的结果，包括社团纳新宣传信息
+     *
+     * @return CommonResult<< OrganizationInfoResult>> 返回处理的结果，包括社团纳新宣传信息
      */
     @Override
     public CommonResult<OrganizationInfoResult> getOrganizationInfo() {
@@ -410,13 +403,8 @@ public class OrganizationServiceImpl implements OrganizationService {
          /*
           鉴权并且获取用户所属社团组织id
          */
-        CommonResult<CheckRoleResult> check = checkRoleUtil.check(request, response);
-
-        if (!Objects.equals(check.getCode(), ResultEnum.SUCCESS.getCode())) {
-            return CommonResult.userAuthError();
-        }
-        CheckRoleResult data = check.getData();
-        Integer organizationId = data.getOrganizationId();
+        BTokenSwapPo context = ThreadLocalContextUtil.getContext();
+        Integer organizationId = context.getOrganizationId();
 
         /*
           获取社团基本信息表中对应的实体类对象
@@ -525,6 +513,7 @@ public class OrganizationServiceImpl implements OrganizationService {
 
     /**
      * 上传社团头像接口
+     *
      * @return CommonResult<UploadAvatarResult> 返回上传社团头像接口处理果，包含图像的url
      * @throws DateBaseException 自定义的数据库操作异常，抛出用于事务回滚
      */
@@ -535,13 +524,11 @@ public class OrganizationServiceImpl implements OrganizationService {
         /*
           鉴权并且获取用户所属社团组织id
          */
-        CommonResult<CheckRoleResult> check = checkRoleUtil.check(request, response);
+        BTokenSwapPo context = ThreadLocalContextUtil.getContext();
+        Integer organizationId = context.getOrganizationId();
 
-        if (!Objects.equals(check.getCode(), ResultEnum.SUCCESS.getCode())) {
-           return CommonResult.userAuthError();
-        }
-        CheckRoleResult data = check.getData();
-        Integer organizationId = data.getOrganizationId();
+        //获取token
+        String token = context.getToken();
 
         /*
           获取相应的form-data参数
@@ -553,7 +540,7 @@ public class OrganizationServiceImpl implements OrganizationService {
         MultipartFile avatar = multipartHttpServletRequest.getFile("avatar");
 
         //上传图像
-        String pictureId = pictureUtil.uploadPicture(avatar, new PictureUsage(UsageEnum.ORG_AVATAR, data.getToken()));
+        String pictureId = pictureUtil.uploadPicture(avatar, new PictureUsage(UsageEnum.ORG_AVATAR, token));
 
         Organization organization = new Organization();
 
