@@ -9,7 +9,10 @@
         FROM user_role_merge
                  LEFT JOIN role ON user_role_merge.role_id = role.id
                  LEFT JOIN organization ON role.organization_id = organization.id
-        WHERE user_role_merge.user_id = #{userId,jdbcType=INTEGER}
+        WHERE organization.is_deleted != 1
+		  AND user_role_merge.is_deleted != 1
+		  AND role.is_deleted != 1
+          AND user_role_merge.user_id = #{userId,jdbcType=INTEGER}
     </select>
     <select id="selectBUserLoginInfoByStudentIdAndOrgId"
             resultType="com.sipc.mmtbackend.pojo.domain.po.UserBRole.UserLoginPermissionPo">
@@ -20,12 +23,45 @@
                role.id                    AS "roleId",
                permission.id              AS "permissionId",
                permission.`name`          AS "permissionName",
-               role.organization_id       AS "organization_id"
+               role.organization_id       AS "organizationId"
         FROM user_b
                  LEFT JOIN user_role_merge ON user_b.id = user_role_merge.user_id
                  LEFT JOIN role ON user_role_merge.role_id = role.id
                  LEFT JOIN permission ON role.permission_id = permission.id
-        WHERE user_b.student_id = #{studentId,jdbcType=CHAR}
+        WHERE user_b.is_deleted != 1
+		  AND user_role_merge.is_deleted != 1
+		  AND role.is_deleted != 1
+          AND user_b.student_id = #{studentId,jdbcType=CHAR}
           AND role.organization_id = #{organizationId,jdbcType=INTEGER}
+    </select>
+    <select id="selectBUserLoginInfoByUserIdAndOrgId"
+            resultType="com.sipc.mmtbackend.pojo.domain.po.UserBRole.UserLoginPermissionPo">
+        SELECT user_b.id                  AS "userId",
+               user_role_merge.`password` AS "password",
+               user_b.user_name           AS "username",
+               user_b.student_id          AS "studentId",
+               role.id                    AS "roleId",
+               permission.id              AS "permissionId",
+               permission.`name`          AS "permissionName",
+               role.organization_id       AS "organizationId"
+        FROM user_b
+                 LEFT JOIN user_role_merge ON user_b.id = user_role_merge.user_id
+                 LEFT JOIN role ON user_role_merge.role_id = role.id
+                 LEFT JOIN permission ON role.permission_id = permission.id
+        WHERE user_b.is_deleted != 1
+		  AND user_role_merge.is_deleted != 1
+		  AND role.is_deleted != 1
+          AND user_b.id = #{userId,jdbcType=INTEGER}
+          AND role.organization_id = #{organizationId,jdbcType=INTEGER}
+    </select>
+    <select id="selectUserRolleMergeByUserIdAndOrganizationIdAndPermissionId"
+            resultType="com.sipc.mmtbackend.pojo.domain.UserRoleMerge">
+        SELECT user_role_merge.*
+        FROM user_role_merge
+                 LEFT JOIN role
+        WHERE user_role_merge.is_deleted != 1
+          AND role.is_deleted != 1
+          AND role.organization_id = #{organizationId,jdbcType=INTEGER}
+          AND user_role_merge.user_id = #{userId,jdbcType=INTEGER};
     </select>
 </mapper>
