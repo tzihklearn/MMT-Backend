@@ -9,13 +9,10 @@ import com.sipc.mmtbackend.pojo.dto.CommonResult;
 import com.sipc.mmtbackend.pojo.dto.param.UserBParam.*;
 import com.sipc.mmtbackend.pojo.dto.result.UserBResult.*;
 import com.sipc.mmtbackend.pojo.dto.result.UserBResult.po.JoinedOrgResultPo;
-import com.sipc.mmtbackend.pojo.dto.resultEnum.ResultEnum;
 import com.sipc.mmtbackend.service.UserBService;
-import com.sipc.mmtbackend.utils.CheckroleBUtil.CheckRoleUtil;
 import com.sipc.mmtbackend.utils.CheckroleBUtil.JWTUtil;
 import com.sipc.mmtbackend.utils.CheckroleBUtil.PasswordUtil;
 import com.sipc.mmtbackend.utils.CheckroleBUtil.pojo.BTokenSwapPo;
-import com.sipc.mmtbackend.utils.CheckroleBUtil.pojo.CheckRoleResult;
 import com.sipc.mmtbackend.utils.CheckroleBUtil.pojo.PermissionEnum;
 import com.sipc.mmtbackend.utils.ICodeUtil;
 import com.sipc.mmtbackend.utils.PictureUtil.PictureUtil;
@@ -49,7 +46,6 @@ public class UserBBServiceImpl implements UserBService {
     private final PermissionMapper permissionMapper;
     private final ICodeUtil iCodeUtil;
     private final JWTUtil jwtUtil;
-    private final CheckRoleUtil checkRoleUtil;
     private final PictureUtil pictureUtil;
 
     /**
@@ -180,12 +176,12 @@ public class UserBBServiceImpl implements UserBService {
             return CommonResult.serverError();
         }
         Organization organization = organizationMapper.selectById(context.getOrganizationId());
-        if (organization == null){
+        if (organization == null) {
             log.warn("获取 B 端用户信息失败：组织不存在，Token解析结果：" + context);
             return CommonResult.serverError();
         }
         Permission permission = permissionMapper.selectById(context.getPermissionId());
-        if (permission == null){
+        if (permission == null) {
             log.warn("获取 B 端用户信息失败：权限不存在，Token解析结果：" + context);
             return CommonResult.serverError();
         }
@@ -225,10 +221,6 @@ public class UserBBServiceImpl implements UserBService {
     @Override
     public CommonResult<String> putUserNewPassword(HttpServletRequest request, HttpServletResponse response, PutUserPasswordParam param) {
         BTokenSwapPo context = ThreadLocalContextUtil.getContext();
-//        CommonResult<CheckRoleResult> check = checkRoleUtil.check(request, response);
-//        if (!Objects.equals(check.getCode(), ResultEnum.SUCCESS.getCode()))
-//            return CommonResult.fail(check.getCode(), check.getMessage());
-//        CheckRoleResult data = check.getData();
         UserRoleMerge userRoleMerge = userBRoleMapper.selectUserRolleMergeByUserIdAndOrganizationIdAndPermissionId(
                 context.getUserId(), context.getOrganizationId());
         if (userRoleMerge == null) {
@@ -259,7 +251,7 @@ public class UserBBServiceImpl implements UserBService {
     public CommonResult<String> logout(HttpServletRequest request, HttpServletResponse response) {
         BTokenSwapPo context = ThreadLocalContextUtil.getContext();
         Boolean revokeToken = jwtUtil.revokeToken(context.getToken());
-        if (revokeToken == null){
+        if (revokeToken == null) {
             log.warn("用户 " + context + " 登出时出现异常");
             return CommonResult.serverError();
         }
@@ -277,24 +269,17 @@ public class UserBBServiceImpl implements UserBService {
     @Override
     public CommonResult<SwitchOrgResult> switchOrganization(HttpServletRequest request, HttpServletResponse response, SwitchOrgParam param) {
         BTokenSwapPo context = ThreadLocalContextUtil.getContext();
-//        CommonResult<CheckRoleResult> check = checkRoleUtil.check(request, response);
-//        if (!Objects.equals(check.getCode(), ResultEnum.SUCCESS.getCode()))
-//            return CommonResult.fail(check.getCode(), check.getMessage());
-//        CheckRoleResult data = check.getData();
         UserLoginPermissionPo userLoginPermission = userBRoleMapper.selectBUserLoginInfoByUserIdAndOrgId(context.getUserId(), param.getOrganizationId());
         if (userLoginPermission == null) {
             log.info("用户 " + context + " 切换到组织 " + param + " 失败，组织不存在");
             return CommonResult.fail("切换组织失败，组织不存在或密码错误");
         }
-        if (!PasswordUtil.testPasswd(param.getPassword(), userLoginPermission.getPassword())){
+        if (!PasswordUtil.testPasswd(param.getPassword(), userLoginPermission.getPassword())) {
             log.info("用户 " + context + " 切换到组织 " + param + " 失败，密码错误");
             return CommonResult.fail("切换组织失败，组织不存在或密码错误");
         }
-//        CommonResult<String> logout = checkRoleUtil.logout(request, response);
-//        if (!Objects.equals(logout.getCode(), ResultEnum.SUCCESS.getCode()))
-//            return CommonResult.fail(logout.getCode(), logout.getMessage());
         Boolean revokeToken = jwtUtil.revokeToken(context.getToken());
-        if (revokeToken == null){
+        if (revokeToken == null) {
             log.warn("用户 " + context + " 切换账号注销 Token 时出现异常");
             return CommonResult.serverError();
         }
@@ -318,10 +303,6 @@ public class UserBBServiceImpl implements UserBService {
     @Transactional(rollbackFor = Exception.class)
     public CommonResult<String> addNewOrganization(HttpServletRequest request, HttpServletResponse response, AddNewOrgParam param) throws DatabaseException {
         BTokenSwapPo context = ThreadLocalContextUtil.getContext();
-//        CommonResult<CheckRoleResult> check = checkRoleUtil.check(request, response);
-//        if (!Objects.equals(check.getCode(), ResultEnum.SUCCESS.getCode()))
-//            return CommonResult.fail(check.getCode(), check.getMessage());
-//        CheckRoleResult data = check.getData();
         if (context.getPermissionId() < PermissionEnum.COMMITTEE.getId())
             return CommonResult.fail("Super Admin 不允许加入其他组织");
         Integer orgId = iCodeUtil.verifyICode(param.getKey());
@@ -331,7 +312,7 @@ public class UserBBServiceImpl implements UserBService {
         if (orgId == null)
             return CommonResult.fail("注册失败：邀请码无效");
         UserB userB = userBMapper.selectById(context.getUserId());
-        if (userB == null){
+        if (userB == null) {
             log.warn("用户 " + context + " 进入组织 " + param + " 失败，用户不存在");
             return CommonResult.serverError();
         }
@@ -374,10 +355,6 @@ public class UserBBServiceImpl implements UserBService {
     @Override
     public CommonResult<PutUserAvatarResult> putUserAvatar(HttpServletRequest request, HttpServletResponse response, MultipartFile avatar) {
         BTokenSwapPo context = ThreadLocalContextUtil.getContext();
-//        CommonResult<CheckRoleResult> check = checkRoleUtil.check(request, response);
-//        if (!Objects.equals(check.getCode(), ResultEnum.SUCCESS.getCode()))
-//            return CommonResult.fail(check.getCode(), check.getMessage());
-//        CheckRoleResult data = check.getData();
         UserB userB = userBMapper.selectById(context.getUserId());
         if (userB == null) {
             log.warn("获取 B 端用户信息失败：用户不存在，Token解析结果：" + context);
