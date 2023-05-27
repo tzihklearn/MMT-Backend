@@ -28,8 +28,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -161,13 +159,11 @@ public class UserBBServiceImpl implements UserBService {
     /**
      * 获取 B 端用户信息
      *
-     * @param request  HTTP请求报文
-     * @param response HTTP响应报文
      * @return 用户信息
      * @author DoudiNCer
      */
     @Override
-    public CommonResult<GetBUserInfoResult> getUserInfo(HttpServletRequest request, HttpServletResponse response) {
+    public CommonResult<GetBUserInfoResult> getUserInfo() {
         BTokenSwapPo context = ThreadLocalContextUtil.getContext();
         GetBUserInfoResult result = new GetBUserInfoResult();
         UserB userB = userBMapper.selectById(context.getUserId());
@@ -212,14 +208,12 @@ public class UserBBServiceImpl implements UserBService {
     /**
      * 更新 B 端用户密码
      *
-     * @param request  HTTP 请求报文
-     * @param response HTTP 响应报文
-     * @param param    旧密码与新密码
+     * @param param 旧密码与新密码
      * @return 处理结果
      * @author DoudiNCer
      */
     @Override
-    public CommonResult<String> putUserNewPassword(HttpServletRequest request, HttpServletResponse response, PutUserPasswordParam param) {
+    public CommonResult<String> putUserNewPassword(PutUserPasswordParam param) {
         BTokenSwapPo context = ThreadLocalContextUtil.getContext();
         UserRoleMerge userRoleMerge = userBRoleMapper.selectUserRolleMergeByUserIdAndOrganizationIdAndPermissionId(
                 context.getUserId(), context.getOrganizationId());
@@ -243,12 +237,10 @@ public class UserBBServiceImpl implements UserBService {
     /**
      * B 端用户登出
      *
-     * @param request  HTTP请求报文
-     * @param response HTTP响应报文
      * @return 处理结果
      */
     @Override
-    public CommonResult<String> logout(HttpServletRequest request, HttpServletResponse response) {
+    public CommonResult<String> logout() {
         BTokenSwapPo context = ThreadLocalContextUtil.getContext();
         Boolean revokeToken = jwtUtil.revokeToken(context.getToken());
         if (revokeToken == null) {
@@ -261,13 +253,11 @@ public class UserBBServiceImpl implements UserBService {
     /**
      * B 端用户切换组织
      *
-     * @param request  HTTP请求报文
-     * @param response HTTP响应报文
-     * @param param    要切换的组织
+     * @param param 要切换的组织
      * @return 权限信息、新 Token
      */
     @Override
-    public CommonResult<SwitchOrgResult> switchOrganization(HttpServletRequest request, HttpServletResponse response, SwitchOrgParam param) {
+    public CommonResult<SwitchOrgResult> switchOrganization(SwitchOrgParam param) {
         BTokenSwapPo context = ThreadLocalContextUtil.getContext();
         UserLoginPermissionPo userLoginPermission = userBRoleMapper.selectBUserLoginInfoByUserIdAndOrgId(context.getUserId(), param.getOrganizationId());
         if (userLoginPermission == null) {
@@ -294,14 +284,12 @@ public class UserBBServiceImpl implements UserBService {
     /**
      * B 端加入新组织
      *
-     * @param request  HTTP 请求报文
-     * @param response HTTP 响应报文
-     * @param param    邀请码与密码
+     * @param param 邀请码与密码
      * @return 处理结果
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public CommonResult<String> addNewOrganization(HttpServletRequest request, HttpServletResponse response, AddNewOrgParam param) throws DatabaseException {
+    public CommonResult<String> addNewOrganization(AddNewOrgParam param) throws DatabaseException {
         BTokenSwapPo context = ThreadLocalContextUtil.getContext();
         if (context.getPermissionId() < PermissionEnum.COMMITTEE.getId())
             return CommonResult.fail("Super Admin 不允许加入其他组织");
@@ -346,14 +334,12 @@ public class UserBBServiceImpl implements UserBService {
     /**
      * B 端用户更新头像
      *
-     * @param request  HTTP 请求报文
-     * @param response HTTP 响应报文
-     * @param avatar   头像文件
+     * @param avatar 头像文件
      * @return 处理结果，包含新头像的 URL
      * @author DoudiNCer
      */
     @Override
-    public CommonResult<PutUserAvatarResult> putUserAvatar(HttpServletRequest request, HttpServletResponse response, MultipartFile avatar) {
+    public CommonResult<PutUserAvatarResult> putUserAvatar(MultipartFile avatar) {
         BTokenSwapPo context = ThreadLocalContextUtil.getContext();
         UserB userB = userBMapper.selectById(context.getUserId());
         if (userB == null) {
