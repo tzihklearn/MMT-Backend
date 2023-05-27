@@ -52,6 +52,7 @@ public class CheckRoleUtil {
         apiPermissions.put("/b/user/logout", PermissionEnum.NUMBER);
         apiPermissions.put("/b/user/switchOrg", PermissionEnum.NUMBER);
         apiPermissions.put("/b/user/addNewOrg", PermissionEnum.NUMBER);
+//        apiPermissions.put("/")
         this.apiPermissions = apiPermissions;
     }
 
