@@ -1,24 +1,12 @@
 package com.sipc.mmtbackend.utils.CheckroleBUtil;
 
-import com.sipc.mmtbackend.mapper.OrganizationMapper;
-import com.sipc.mmtbackend.mapper.PermissionMapper;
-import com.sipc.mmtbackend.mapper.RoleMapper;
-import com.sipc.mmtbackend.mapper.UserBMapper;
-import com.sipc.mmtbackend.pojo.domain.UserB;
-import com.sipc.mmtbackend.pojo.dto.CommonResult;
-import com.sipc.mmtbackend.pojo.dto.resultEnum.ResultEnum;
-import com.sipc.mmtbackend.utils.CheckroleBUtil.pojo.BTokenSwapPo;
-import com.sipc.mmtbackend.utils.CheckroleBUtil.pojo.CheckRoleResult;
 import com.sipc.mmtbackend.utils.CheckroleBUtil.pojo.PermissionEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * 鉴权相关工具
@@ -28,21 +16,10 @@ import java.util.Objects;
 @Component
 @Slf4j
 public class CheckRoleUtil {
-
-    private final JWTUtil jwtUtil;
-    private final RoleMapper roleMapper;
-    private final OrganizationMapper organizationMapper;
-    private final PermissionMapper permissionMapper;
-    private final UserBMapper userBMapper;
     private final Map<String, PermissionEnum> apiPermissions;
 
     @Autowired
-    public CheckRoleUtil(JWTUtil jwtUtil, RoleMapper roleMapper, OrganizationMapper organizationMapper, PermissionMapper permissionMapper, UserBMapper userBMapper) {
-        this.jwtUtil = jwtUtil;
-        this.roleMapper = roleMapper;
-        this.organizationMapper = organizationMapper;
-        this.permissionMapper = permissionMapper;
-        this.userBMapper = userBMapper;
+    public CheckRoleUtil() {
         Map<String, PermissionEnum> apiPermissions = new HashMap<>();
         apiPermissions.put("/b/user/userinfo", PermissionEnum.NUMBER);
         apiPermissions.put("/b/user/password", PermissionEnum.NUMBER);
@@ -54,106 +31,6 @@ public class CheckRoleUtil {
         apiPermissions.put("/b/admin/organization/info/get", PermissionEnum.SUPER_ADMIN);
         apiPermissions.put("/b/admin/organization/avatar/upload", PermissionEnum.SUPER_ADMIN);
         this.apiPermissions = apiPermissions;
-    }
-
-    /**
-     * Token 鉴权获取用户信息
-     *
-     * @param token JWT Token
-     * @return 用户数据与查询结果
-     * @author DoudiNCer
-     */
-    @Deprecated
-    private CommonResult<CheckRoleResult> checkUsderInfoByToken(String token) {
-        BTokenSwapPo bTokenSwapPo = jwtUtil.verifyToken(token);
-        if (bTokenSwapPo == null) {
-            log.info("鉴权验证Token失败：" + token);
-            return CommonResult.loginError();
-        }
-//        Role role = roleMapper.selectById(bTokenSwapPo.getRoleId());
-//        if (role == null) {
-//            log.warn("鉴权查无角色代码，Token：" + token + "，载荷：" + bTokenSwapPo);
-//            return CommonResult.fail("鉴权查无角色信息");
-//        }
-//        Organization organization = organizationMapper.selectById(role.getOrganizationId());
-//        if (organization == null) {
-//            log.warn("鉴权角色信息错误，查无组织：" + role);
-//            return CommonResult.fail("鉴权角色信息错误");
-//        }
-//        Permission permission = permissionMapper.selectById(role.getPermissionId());
-//        if (permission == null) {
-//            log.warn("鉴权角色信息错误，查无权限：" + role);
-//            return CommonResult.fail("鉴权角色信息错误");
-//        }
-        UserB userB = userBMapper.selectById(bTokenSwapPo.getUserId());
-        if (userB == null) {
-            log.warn("鉴权查无用户信息：" + bTokenSwapPo);
-            return CommonResult.fail("Token 数据错误");
-        }
-        CheckRoleResult result = new CheckRoleResult();
-        result.setUserId(bTokenSwapPo.getUserId());
-//        result.setStudentId(bTokenSwapPo.getStudentId());
-        result.setUsername(userB.getUserName());
-//        result.setOrganizationId(role.getOrganizationId());
-//        result.setUsername(organization.getName());
-        result.setPermissionId(0);
-//        result.setPermissionName(permission.getName());
-//        result.setRoleId(bTokenSwapPo.getRoleId());
-        result.setToken(token);
-        return CommonResult.success(result);
-    }
-
-    /**
-     * 校验 Token 并检查其权限
-     *
-     * @param req HttpServletRequest
-     * @return 检查结果，CommonResult&lt;CheckRoleResult&gt;，检查失败时可直接返回
-     * @author DoudiNCer
-     */
-    @Deprecated
-    public CommonResult<CheckRoleResult> check(HttpServletRequest req, HttpServletResponse resp) {
-        String token = req.getHeader("Authorization");
-        if (token == null) {
-            resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            return CommonResult.loginError();
-        }
-        CommonResult<CheckRoleResult> checkRoleResult = checkUsderInfoByToken(token);
-        if (!Objects.equals(checkRoleResult.getCode(), ResultEnum.SUCCESS.getCode())) {
-            resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            return checkRoleResult;
-        }
-        String requestURI = req.getRequestURI();
-        PermissionEnum apiPermission = apiPermissions.get(requestURI);
-        CheckRoleResult userdata = checkRoleResult.getData();
-        if (userdata.getPermissionId() > apiPermission.getId()) {
-            log.info("用户 " + userdata + " 尝试越权访问 " + requestURI + "（权限为" + apiPermission + "）");
-            resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            return CommonResult.userAuthError();
-        }
-        return checkRoleResult;
-    }
-
-    /**
-     * B 端用户登出
-     *
-     * @param req  HTTP 请求报文
-     * @param resp HTTP 响应报文
-     * @return 处理结果，可直接返回
-     * @author DoudiNCer
-     */
-    @Deprecated
-    public CommonResult<String> logout(HttpServletRequest req, HttpServletResponse resp) {
-        String token = req.getHeader("Authorization");
-        if (token == null) {
-            resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            return CommonResult.fail("无Token");
-        }
-        Boolean revokeToken = jwtUtil.revokeToken(token);
-        if (!revokeToken) {
-            log.warn("用户登出失败，Token（" + token + "）验证成功，Redis操作失败");
-            return CommonResult.fail("系统错误：注销失败");
-        }
-        return CommonResult.success();
     }
 
     /**
