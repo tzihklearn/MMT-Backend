@@ -11,7 +11,7 @@ public interface OrganizationService {
 
     CommonResult<String> updateOrganizationInfo(OrganizationInfoParam organizationInfoParam) throws DateBaseException, RunException;
 
-    CommonResult<OrganizationInfoResult> getOrganizationInfo(Integer organizationId);
+    CommonResult<OrganizationInfoResult> getOrganizationInfo();
 
     CommonResult<UploadAvatarResult> uploadAvatar() throws DateBaseException;
 

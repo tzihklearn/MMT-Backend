@@ -2,8 +2,6 @@ package com.sipc.mmtbackend.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
-import com.sipc.mmtbackend.iService.OrganizationTagMergeIService;
-import com.sipc.mmtbackend.iService.TagIService;
 import com.sipc.mmtbackend.mapper.*;
 import com.sipc.mmtbackend.pojo.domain.*;
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
@@ -12,10 +10,15 @@ import com.sipc.mmtbackend.pojo.dto.param.superAdmin.OrganizationInfoParam;
 import com.sipc.mmtbackend.pojo.dto.data.TagData;
 import com.sipc.mmtbackend.pojo.dto.result.superAdmin.OrganizationInfoResult;
 import com.sipc.mmtbackend.pojo.dto.result.superAdmin.UploadAvatarResult;
+import com.sipc.mmtbackend.pojo.dto.resultEnum.ResultEnum;
 import com.sipc.mmtbackend.pojo.exceptions.DateBaseException;
 import com.sipc.mmtbackend.pojo.exceptions.RunException;
 import com.sipc.mmtbackend.service.OrganizationService;
+import com.sipc.mmtbackend.utils.CheckroleBUtil.CheckRoleUtil;
+import com.sipc.mmtbackend.utils.CheckroleBUtil.pojo.CheckRoleResult;
 import com.sipc.mmtbackend.utils.PictureUtil.PictureUtil;
+import com.sipc.mmtbackend.utils.PictureUtil.pojo.PictureUsage;
+import com.sipc.mmtbackend.utils.PictureUtil.pojo.UsageEnum;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +29,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.multipart.support.StandardServletMultipartResolver;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -49,11 +53,7 @@ public class OrganizationServiceImpl implements OrganizationService {
 
     private final OrganizationTagMergeMapper organizationTagMergeMapper;
 
-    private final OrganizationTagMergeIService organizationTagMergeIService;
-
     private final TagMapper tagMapper;
-
-    private final TagIService tagIService;
 
     private final OrganizationRecruitMapper organizationRecruitMapper;
 
@@ -64,6 +64,12 @@ public class OrganizationServiceImpl implements OrganizationService {
     private final HttpServletRequest httpServletRequest;
 
     private final PictureUtil pictureUtil;
+
+    private final CheckRoleUtil checkRoleUtil;
+
+    private final HttpServletRequest request;
+
+    private final HttpServletResponse response;
 
     /**
      * 设置社团宣传信息的业务处理方法，处理设置社团宣传信息
@@ -79,16 +85,27 @@ public class OrganizationServiceImpl implements OrganizationService {
     public synchronized CommonResult<String> updateOrganizationInfo(OrganizationInfoParam organizationInfoParam) throws DateBaseException, RunException {
 
         /*
+          鉴权并且获取用户所属社团组织id
+         */
+        CommonResult<CheckRoleResult> check = checkRoleUtil.check(request, response);
+
+        if (!Objects.equals(check.getCode(), ResultEnum.SUCCESS.getCode())) {
+            return CommonResult.userAuthError();
+        }
+        CheckRoleResult data = check.getData();
+        Integer organizationId = data.getOrganizationId();
+
+        /*
           更新社团基本信息表
          */
         Organization organization = new Organization();
-        organization.setId(organizationInfoParam.getOrganizationId());
+        organization.setId(organizationId);
 //        organization.setName(organizationInfoParam.getName());
         organization.setDescription(organizationInfoParam.getBriefIntroduction());
         int updateNum = organizationMapper.updateById(organization);
         if (updateNum != 1) {
             log.error("更新社团宣传信息接口异常，更新社团信息数出错，更新社团信息数：{}，操作社团id：{}",
-                    updateNum, organizationInfoParam.getOrganizationId());
+                    updateNum, organizationId);
             throw new DateBaseException("数据库更新数据异常");
         }
 
@@ -98,7 +115,7 @@ public class OrganizationServiceImpl implements OrganizationService {
         if (organizationInfoParam.getTagList() != null) {
 //            //删除之前的社团标签数据。目前来说，只好删除之前的全部记录，因为不好修改具体的标签
 //            organizationTagMergeMapper.delete(new QueryWrapper<OrganizationTagMerge>()
-//                    .eq("organization_id", organizationInfoParam.getOrganizationId()));
+//                    .eq("organization_id", organizationId));
 
             //利用stream流对TagList作排序，使得其为从系统标签到自定义标签排序,Comparator.comparing(TagData::getType).reversed()从大到小输出
             organizationInfoParam.setTagList(
@@ -108,7 +125,7 @@ public class OrganizationServiceImpl implements OrganizationService {
             //获取当前社团标签
             List<OrganizationTagMerge> organizationTagMerges = organizationTagMergeMapper.selectList(
                     new QueryWrapper<OrganizationTagMerge>()
-                            .eq("organization_id", organizationInfoParam.getOrganizationId())
+                            .eq("organization_id", organizationId)
                             .orderByAsc("tag_type")
                             .orderByAsc("tag_id")
             );
@@ -136,7 +153,7 @@ public class OrganizationServiceImpl implements OrganizationService {
 //                            boolean remove = organizationTagMerges.remove(organizationTagMerge);
 //                            if (!remove) {
 //                                log.info("删除社团已有标签出错，出错社团id：{}，出错标签id：{}",
-//                                        organizationInfoParam.getOrganizationId(), organizationTagMerge.getTagId());
+//                                        organizationId, organizationTagMerge.getTagId());
 //                                throw new RunException("ada");
 //                            }
 //                            break;
@@ -155,7 +172,7 @@ public class OrganizationServiceImpl implements OrganizationService {
                             .last("limit 1"));
 
                     OrganizationTagMerge organizationTagMerge = new OrganizationTagMerge();
-                    organizationTagMerge.setOrganizationId(organizationInfoParam.getOrganizationId());
+                    organizationTagMerge.setOrganizationId(organizationId);
                     organizationTagMerge.setTagId(tag.getId());
                     organizationTagMerge.setTagType((byte) 1);
 
@@ -165,7 +182,7 @@ public class OrganizationServiceImpl implements OrganizationService {
                         int insertNum = organizationTagMergeMapper.insert(organizationTagMerge);
                         if (insertNum != 1) {
                             log.error("更新社团宣传信息接口异常，插入社团的系统标签数出错，插入社团的系统标签数：{}，操作社团id：{}，操作标签id：{}",
-                                    insertNum, organizationInfoParam.getOrganizationId(), tag.getId());
+                                    insertNum, organizationId, tag.getId());
                             throw new DateBaseException("数据库插入数据异常");
                         }
                     }
@@ -182,7 +199,7 @@ public class OrganizationServiceImpl implements OrganizationService {
                             );
                             if (updateNum != 1) {
                                 log.error("更新社团宣传信息接口异常，更新社团系统标签数出错，更新社团系统标签数：{}，操作社团id：{}，更新系统标签id：{}，被更换系统标签id：{}",
-                                        updateNum, organizationInfoParam.getOrganizationId(), tagData.getTag(), organizationTagMerge1.getTagId());
+                                        updateNum, organizationId, tagData.getTag(), organizationTagMerge1.getTagId());
                                 throw new DateBaseException("数据库更新数据异常");
                             }
                         }
@@ -224,7 +241,7 @@ public class OrganizationServiceImpl implements OrganizationService {
 
                     //拼装
                     OrganizationTagMerge organizationTagMerge = new OrganizationTagMerge();
-                    organizationTagMerge.setOrganizationId(organizationInfoParam.getOrganizationId());
+                    organizationTagMerge.setOrganizationId(organizationId);
                     organizationTagMerge.setTagId(tag.getId());
                     organizationTagMerge.setTagType((byte) 2);
 
@@ -236,7 +253,7 @@ public class OrganizationServiceImpl implements OrganizationService {
                                             .eq("id", organizationTagMerges.get(typeJ).getId()));
                             if (updateNum != 1) {
                                 log.error("更新社团宣传信息接口异常，更新社团的自定义标签数出错，更新社团的系统标签数：{}，操作社团id：{}，更新标签id：{}，被更新标签id：{}",
-                                        updateNum, organizationInfoParam.getOrganizationId(), tag.getId(),
+                                        updateNum, organizationId, tag.getId(),
                                         organizationTagMerges.get(typeJ).getTagId());
                                 throw new DateBaseException("数据库插入数据异常");
                             }
@@ -250,7 +267,7 @@ public class OrganizationServiceImpl implements OrganizationService {
                         int insertNum = organizationTagMergeMapper.insert(organizationTagMerge);
                         if (insertNum != 1) {
                             log.error("更新社团宣传信息接口异常，插入社团的自定义标签数出错，插入社团的系统标签数：{}，操作社团id：{}，操作标签id：{}",
-                                    insertNum, organizationInfoParam.getOrganizationId(), tag.getId());
+                                    insertNum, organizationId, tag.getId());
                             throw new DateBaseException("数据库插入数据异常");
                         }
 
@@ -277,7 +294,7 @@ public class OrganizationServiceImpl implements OrganizationService {
          */
         //拼接organizationRecruit（社团宣传信息实体类）
         OrganizationRecruit organizationRecruit = new OrganizationRecruit();
-        organizationRecruit.setOrganizationId(organizationInfoParam.getOrganizationId());
+        organizationRecruit.setOrganizationId(organizationId);
         organizationRecruit.setDescription(organizationInfoParam.getBriefIntroduction());
         organizationRecruit.setFeature(organizationInfoParam.getFeature());
         organizationRecruit.setDaily(organizationInfoParam.getDaily());
@@ -288,7 +305,7 @@ public class OrganizationServiceImpl implements OrganizationService {
         updateNum = organizationRecruitMapper.updateById(organizationRecruit);
         if (updateNum != 1) {
             log.error("更新社团宣传信息接口异常，更新社团宣传信息数出错，更新社团宣传信息数：{}，更新社团id：{}",
-                    updateNum, organizationInfoParam.getOrganizationId());
+                    updateNum, organizationId);
             throw new DateBaseException("数据库更新操作异常");
         }
 
@@ -302,7 +319,7 @@ public class OrganizationServiceImpl implements OrganizationService {
             //获取当前社团纳新部门的数据。
             List<OrganizationDepartmentMerge> organizationDepartmentMerges = organizationDepartmentMergeMapper.selectList(
                     new QueryWrapper<OrganizationDepartmentMerge>()
-                            .eq("organization_id", organizationInfoParam.getOrganizationId())
+                            .eq("organization_id", organizationId)
                             .orderByAsc("department_id")
             );
             //遍历请求来的社团数据
@@ -356,12 +373,12 @@ public class OrganizationServiceImpl implements OrganizationService {
                     //设置社团要纳新的部门
                     //拼装社团要参加纳新的部门的实体类
                     OrganizationDepartmentMerge organizationDepartmentMerge = new OrganizationDepartmentMerge();
-                    organizationDepartmentMerge.setOrganizationId(organizationInfoParam.getOrganizationId());
+                    organizationDepartmentMerge.setOrganizationId(organizationId);
                     organizationDepartmentMerge.setDepartmentId(department.getId());
                     insertNum = organizationDepartmentMergeMapper.insert(organizationDepartmentMerge);
                     if (insertNum != 1) {
                         log.error("更新社团宣传信息接口异常，新增社团要参加纳新的部门数出错，新增社团要参加纳新的部门数：{}，新增社团要参加纳新的部门数的社团id：{}，新增社团要参加纳新的部门id：{}",
-                                insertNum, organizationInfoParam.getOrganizationId(), department.getId());
+                                insertNum, organizationId, department.getId());
                         throw new DateBaseException("数据库插入操作异常");
                     }
                 }
@@ -385,11 +402,21 @@ public class OrganizationServiceImpl implements OrganizationService {
 
     /**
      * 获取社团宣传信息的业务处理方法
-     * @param organizationId 社团组织id
      * @return CommonResult<<OrganizationInfoResult>> 返回处理的结果，包括社团纳新宣传信息
      */
     @Override
-    public CommonResult<OrganizationInfoResult> getOrganizationInfo(Integer organizationId) {
+    public CommonResult<OrganizationInfoResult> getOrganizationInfo() {
+
+         /*
+          鉴权并且获取用户所属社团组织id
+         */
+        CommonResult<CheckRoleResult> check = checkRoleUtil.check(request, response);
+
+        if (!Objects.equals(check.getCode(), ResultEnum.SUCCESS.getCode())) {
+            return CommonResult.userAuthError();
+        }
+        CheckRoleResult data = check.getData();
+        Integer organizationId = data.getOrganizationId();
 
         /*
           获取社团基本信息表中对应的实体类对象
@@ -504,18 +531,29 @@ public class OrganizationServiceImpl implements OrganizationService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public CommonResult<UploadAvatarResult> uploadAvatar() throws DateBaseException {
+
+        /*
+          鉴权并且获取用户所属社团组织id
+         */
+        CommonResult<CheckRoleResult> check = checkRoleUtil.check(request, response);
+
+        if (!Objects.equals(check.getCode(), ResultEnum.SUCCESS.getCode())) {
+           return CommonResult.userAuthError();
+        }
+        CheckRoleResult data = check.getData();
+        Integer organizationId = data.getOrganizationId();
+
         /*
           获取相应的form-data参数
          */
         StandardServletMultipartResolver multipartResolver = new StandardServletMultipartResolver();
         MultipartHttpServletRequest multipartHttpServletRequest = multipartResolver.resolveMultipart(httpServletRequest);
-        //获取organizationId
-        Integer organizationId = multipartHttpServletRequest.getIntHeader("organizationId");
+
         //获取社团头像
         MultipartFile avatar = multipartHttpServletRequest.getFile("avatar");
 
         //上传图像
-        String pictureId = pictureUtil.uploadPicture(avatar);
+        String pictureId = pictureUtil.uploadPicture(avatar, new PictureUsage(UsageEnum.ORG_AVATAR, data.getToken()));
 
         Organization organization = new Organization();
 
