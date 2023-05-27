@@ -11,4 +11,5 @@ public class UserLoginPermissionPo {
     private Integer permissionId;
     private String permissionName;
     private String studentId;
+    private Integer organizationId;
 }

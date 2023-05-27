@@ -18,11 +18,11 @@ import java.util.List;
 @Data
 public class OrganizationInfoParam {
 
-    /**
-     * 社团id
-     */
-    @NotNull(message = "社团id不能为空")
-    private Integer organizationId;
+//    /**
+//     * 社团id
+//     */
+//    @NotNull(message = "社团id不能为空")
+//    private Integer organizationId;
 
 //    @NotBlank(message = "社团名称不能为null")
 //    @Size(min = 2, max = 10, message = "社团名称长度错误，字数范围为[1,5]")

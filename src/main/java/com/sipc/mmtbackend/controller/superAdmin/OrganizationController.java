@@ -43,15 +43,12 @@ public class OrganizationController {
 
     /**
      * 获取社团宣传信息的接口，请求方法GET,请求路径/organization/info/get
-     * @param organizationId 社团组织id
      * @return CommonResult<<OrganizationInfoResult>> 返回接口处理的结果，含有社团的纳新宣传信息
      * @see OrganizationInfoResult
      */
     @GetMapping("/info/get")
-    public CommonResult<OrganizationInfoResult> getOrganizationInfo(
-            @RequestParam("organizationId") Integer organizationId
-    ) {
-        return organizationService.getOrganizationInfo(organizationId);
+    public CommonResult<OrganizationInfoResult> getOrganizationInfo() {
+        return organizationService.getOrganizationInfo();
     }
 
     /**
@@ -70,13 +67,14 @@ public class OrganizationController {
     }
 
     @PostMapping("/admission/publish")
-    public CommonResult<String> publishAdmission() {
+    public CommonResult<String> publishAdmission(@RequestBody OrganizationPublishParam organizationPublishParam) {
         return null;
     }
 
     @PostMapping("/test")
-    public CommonResult<String> test(@RequestBody OrganizationPublishParam organizationPublishParam) throws RuntimeException {
+    public CommonResult<String> test() throws RuntimeException {
         throw new RuntimeException("test测试错误");
+//        return null;
 //        return null;
     }
 
