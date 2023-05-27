@@ -18,7 +18,7 @@ public class GlobalExceptionHandler {
     public CommonResult<String> DateAndRunExceptionHandler(Exception e) {
         e.printStackTrace();
 
-        return CommonResult.fail("请求失败，服务器繁忙");
+        return CommonResult.serverError();
     }
 
 }

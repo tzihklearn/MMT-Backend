@@ -5,6 +5,8 @@ import com.sipc.mmtbackend.pojo.dto.param.superAdmin.OrganizationPublishParam;
 import com.sipc.mmtbackend.pojo.dto.result.superAdmin.UploadAvatarResult;
 import com.sipc.mmtbackend.pojo.dto.param.superAdmin.OrganizationInfoParam;
 import com.sipc.mmtbackend.pojo.dto.result.superAdmin.OrganizationInfoResult;
+import com.sipc.mmtbackend.pojo.exceptions.DateBaseException;
+import com.sipc.mmtbackend.pojo.exceptions.RunException;
 import com.sipc.mmtbackend.service.OrganizationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,14 +33,9 @@ public class OrganizationController {
      * @return CommonResult<<String>> 返回接口处理的结果
      */
     @PostMapping("/info/update")
-    public CommonResult<String> updateOrganizationInfo(@RequestBody OrganizationInfoParam organizationInfoParam) {
-        try {
-            return organizationService.updateOrganizationInfo(organizationInfoParam);
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-            return CommonResult.fail("操作失败");
-        }
+    public CommonResult<String> updateOrganizationInfo(@RequestBody OrganizationInfoParam organizationInfoParam) throws RunException, DateBaseException {
+
+        return organizationService.updateOrganizationInfo(organizationInfoParam);
     }
 
     /**
@@ -56,14 +53,9 @@ public class OrganizationController {
      * @return CommonResult<UploadAvatarResult> 返回接口处理的结果，含有社团的头像url
      */
     @PostMapping("/avatar/upload")
-    public CommonResult<UploadAvatarResult> uploadAvatar() {
-        try {
-            return organizationService.uploadAvatar();
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-            return CommonResult.fail("操作失败");
-        }
+    public CommonResult<UploadAvatarResult> uploadAvatar() throws DateBaseException {
+
+        return organizationService.uploadAvatar();
     }
 
     @PostMapping("/admission/publish")
