@@ -12,10 +12,7 @@ import com.sipc.mmtbackend.pojo.domain.po.UserBRole.JoinedOrgPo;
 import com.sipc.mmtbackend.pojo.domain.po.UserBRole.UserLoginPermissionPo;
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
 import com.sipc.mmtbackend.pojo.dto.param.UserBParam.*;
-import com.sipc.mmtbackend.pojo.dto.result.UserBResult.GetBUserInfoResult;
-import com.sipc.mmtbackend.pojo.dto.result.UserBResult.JoinOrgsResult;
-import com.sipc.mmtbackend.pojo.dto.result.UserBResult.LoginResult;
-import com.sipc.mmtbackend.pojo.dto.result.UserBResult.SwitchOrgResult;
+import com.sipc.mmtbackend.pojo.dto.result.UserBResult.*;
 import com.sipc.mmtbackend.pojo.dto.result.UserBResult.po.JoinedOrgResultPo;
 import com.sipc.mmtbackend.pojo.dto.resultEnum.ResultEnum;
 import com.sipc.mmtbackend.service.UserBService;
@@ -28,12 +25,15 @@ import com.sipc.mmtbackend.utils.CheckroleBUtil.pojo.PermissionEnum;
 import com.sipc.mmtbackend.utils.ICodeUtil;
 import com.sipc.mmtbackend.utils.PictureUtil.PictureUtil;
 import com.sipc.mmtbackend.utils.PictureUtil.pojo.DefaultPictureIdEnum;
+import com.sipc.mmtbackend.utils.PictureUtil.pojo.PictureUsage;
+import com.sipc.mmtbackend.utils.PictureUtil.pojo.UsageEnum;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.jsqlparser.util.validation.metadata.DatabaseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -336,5 +336,49 @@ public class UserBBServiceImpl implements UserBService {
             throw new DatabaseException("加入组织失败：数据库错误");
         }
         return CommonResult.success();
+    }
+
+    /**
+     * B 端用户更新头像
+     *
+     * @param request  HTTP 请求报文
+     * @param response HTTP 响应报文
+     * @param avatar   头像文件
+     * @return 处理结果，包含新头像的 URL
+     * @author DoudiNCer
+     */
+    @Override
+    public CommonResult<PutUserAvatarResult> putUserAvatar(HttpServletRequest request, HttpServletResponse response, MultipartFile avatar) {
+        CommonResult<CheckRoleResult> check = checkRoleUtil.check(request, response);
+        if (!Objects.equals(check.getCode(), ResultEnum.SUCCESS.getCode()))
+            return CommonResult.fail(check.getCode(), check.getMessage());
+        CheckRoleResult data = check.getData();
+        UserB userB = userBMapper.selectById(data.getUserId());
+        if (userB == null) {
+            log.warn("获取 B 端用户信息失败：用户不存在，Token解析结果：" + data);
+            return CommonResult.fail("数据库错误");
+        }
+        if (userB.getAvatarId() != null && userB.getAvatarId().length() != 0) {
+            Boolean dropPicture = pictureUtil.dropPicture(userB.getAvatarId());
+            if (dropPicture == null) {
+                log.warn("B 端用户 " + data + " 更新头像删除原头像失败");
+                return CommonResult.serverError();
+            }
+        }
+        String pictureId = pictureUtil.uploadPicture(avatar,
+                new PictureUsage(UsageEnum.B_USER_AVATAR, data.getToken()));
+        if (pictureId == null) {
+            log.warn("B 端用户 " + data + " 更新头像上传失败");
+            return CommonResult.serverError();
+        }
+        userB.setAvatarId(pictureId);
+        int updateById = userBMapper.updateById(userB);
+        if (updateById != 1) {
+            log.warn("B 端用户 " + data + " 更新头像更新数据库出现异常，受影响行数：" + updateById);
+            return CommonResult.serverError();
+        }
+        PutUserAvatarResult result = new PutUserAvatarResult();
+        result.setAvatarUrl(pictureUtil.getPictureURL(pictureId));
+        return CommonResult.success(result);
     }
 }

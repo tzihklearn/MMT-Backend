@@ -2,14 +2,12 @@ package com.sipc.mmtbackend.controller;
 
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
 import com.sipc.mmtbackend.pojo.dto.param.UserBParam.*;
-import com.sipc.mmtbackend.pojo.dto.result.UserBResult.GetBUserInfoResult;
-import com.sipc.mmtbackend.pojo.dto.result.UserBResult.JoinOrgsResult;
-import com.sipc.mmtbackend.pojo.dto.result.UserBResult.LoginResult;
-import com.sipc.mmtbackend.pojo.dto.result.UserBResult.SwitchOrgResult;
+import com.sipc.mmtbackend.pojo.dto.result.UserBResult.*;
 import com.sipc.mmtbackend.pojo.exceptions.DateBaseException;
 import com.sipc.mmtbackend.service.UserBService;
 import net.sf.jsqlparser.util.validation.metadata.DatabaseException;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -62,6 +60,19 @@ public class UserBController {
     @GetMapping("/userinfo")
     public CommonResult<GetBUserInfoResult> getUserInfo(HttpServletRequest request, HttpServletResponse response) {
         return userBService.getUserInfo(request, response);
+    }
+    /**
+     * B 端用户更新头像
+     *
+     * @param request  HTTP 请求报文
+     * @param response HTTP 响应报文
+     * @param avatar   头像文件
+     * @return 处理结果，包含新头像的 URL
+     * @author DoudiNCer
+     */
+    @PutMapping("/avatar")
+    public CommonResult<PutUserAvatarResult> putUserAvatar(HttpServletRequest request, HttpServletResponse response, @RequestPart("avatar") MultipartFile avatar){
+        return userBService.putUserAvatar(request, response, avatar);
     }
 
     /**

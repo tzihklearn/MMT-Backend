@@ -2,12 +2,10 @@ package com.sipc.mmtbackend.service;
 
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
 import com.sipc.mmtbackend.pojo.dto.param.UserBParam.*;
-import com.sipc.mmtbackend.pojo.dto.result.UserBResult.GetBUserInfoResult;
-import com.sipc.mmtbackend.pojo.dto.result.UserBResult.JoinOrgsResult;
-import com.sipc.mmtbackend.pojo.dto.result.UserBResult.LoginResult;
-import com.sipc.mmtbackend.pojo.dto.result.UserBResult.SwitchOrgResult;
+import com.sipc.mmtbackend.pojo.dto.result.UserBResult.*;
 import com.sipc.mmtbackend.pojo.exceptions.DateBaseException;
 import net.sf.jsqlparser.util.validation.metadata.DatabaseException;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -90,4 +88,15 @@ public interface UserBService {
      * @return 处理结果
      */
     CommonResult<String> addNewOrganization(HttpServletRequest request, HttpServletResponse response, AddNewOrgParam param) throws DatabaseException;
+
+    /**
+     * B 端用户更新头像
+     *
+     * @param request  HTTP 请求报文
+     * @param response HTTP 响应报文
+     * @param avatar   头像文件
+     * @return 处理结果，包含新头像的 URL
+     * @author DoudiNCer
+     */
+    CommonResult<PutUserAvatarResult> putUserAvatar(HttpServletRequest request, HttpServletResponse response, MultipartFile avatar);
 }
