@@ -31,6 +31,11 @@ public class JWTUtil {
     private static final String BUserIdTokenKey = "buidtkk";
     private static final String BUserStuIdTokenKey = "busidtkk";
     private static final String BUserRoleIdTokenKey = "busroleidtkk";
+
+    private static final String BUserOrganizationIdTokenKey = "busorganizationidtkk";
+
+    private static final String BUserPermissionIdTokenKey = "buspermissionidtkk";
+
     private final RedisUtil redisUtil;
 
     /**
@@ -45,7 +50,8 @@ public class JWTUtil {
         String token = JWT.create()
                 .withClaim(BUserIdTokenKey, po.getUserId())
                 .withClaim(BUserStuIdTokenKey, po.getStudentId())
-                .withClaim(BUserRoleIdTokenKey, po.getRoleId())
+                .withClaim(BUserOrganizationIdTokenKey, po.getOrganizationId())
+                .withClaim(BUserPermissionIdTokenKey, po.getPermissionId())
                 .withExpiresAt(instance.getTime())
                 .sign(Algorithm.HMAC512(tokenPara));
         String tokenKey = getTokenKey(token);
@@ -77,6 +83,8 @@ public class JWTUtil {
         result.setUserId(verify.getClaim(BUserIdTokenKey).asInt());
         result.setStudentId(verify.getClaim(BUserStuIdTokenKey).asString());
         result.setRoleId(verify.getClaim(BUserRoleIdTokenKey).asInt());
+        result.setOrganizationId(verify.getClaim(BUserOrganizationIdTokenKey).asInt());
+        result.setPermissionId(verify.getClaim(BUserPermissionIdTokenKey).asInt());
         return result;
     }
 
