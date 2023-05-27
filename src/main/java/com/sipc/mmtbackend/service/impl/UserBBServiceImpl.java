@@ -74,11 +74,11 @@ public class UserBBServiceImpl implements UserBService {
             return CommonResult.fail("注册失败：学号重复");
         }
         // 初始化一个新组织的新角色
-        Role role = roleMapper.selectOne(new QueryWrapper<Role>().eq("organization_id", orgId).eq("permission_id", 3));
+        Role role = roleMapper.selectOne(new QueryWrapper<Role>().eq("organization_id", orgId).eq("permission_id", PermissionEnum.COMMITTEE.getId()));
         if (role == null) {
             role = new Role();
             role.setOrganizationId(orgId);
-            role.setPermissionId(3);
+            role.setPermissionId(PermissionEnum.COMMITTEE.getId());
             int insert = roleMapper.insert(role);
             if (insert != 1) {
                 log.warn("初始化组织 " + orgId + " 的角色时失败，受影响行数：" + insert);
@@ -308,11 +308,11 @@ public class UserBBServiceImpl implements UserBService {
         if (userLoginPermissionPo != null)
             return CommonResult.fail("加入组织失败：请勿重复加入组织");
         // 初始化一个新组织的新角色
-        Role role = roleMapper.selectOne(new QueryWrapper<Role>().eq("organization_id", orgId).eq("permission_id", 3));
+        Role role = roleMapper.selectOne(new QueryWrapper<Role>().eq("organization_id", orgId).eq("permission_id", PermissionEnum.COMMITTEE.getId()));
         if (role == null) {
             role = new Role();
             role.setOrganizationId(orgId);
-            role.setPermissionId(3);
+            role.setPermissionId(PermissionEnum.COMMITTEE.getId());
             int insert = roleMapper.insert(role);
             if (insert != 1) {
                 log.warn("初始化组织 " + orgId + " 的角色时失败，受影响行数：" + insert);
