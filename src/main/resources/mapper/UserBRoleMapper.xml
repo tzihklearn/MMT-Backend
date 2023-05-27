@@ -19,8 +19,6 @@
         SELECT user_b.id                  AS "userId",
                user_role_merge.`password` AS "password",
                user_b.user_name           AS "username",
-               user_b.student_id          AS "studentId",
-               role.id                    AS "roleId",
                permission.id              AS "permissionId",
                permission.`name`          AS "permissionName",
                role.organization_id       AS "organizationId"
@@ -39,8 +37,6 @@
         SELECT user_b.id                  AS "userId",
                user_role_merge.`password` AS "password",
                user_b.user_name           AS "username",
-               user_b.student_id          AS "studentId",
-               role.id                    AS "roleId",
                permission.id              AS "permissionId",
                permission.`name`          AS "permissionName",
                role.organization_id       AS "organizationId"
