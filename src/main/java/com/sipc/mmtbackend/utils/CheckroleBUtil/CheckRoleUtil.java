@@ -67,7 +67,7 @@ public class CheckRoleUtil {
         BTokenSwapPo bTokenSwapPo = jwtUtil.verifyToken(token);
         if (bTokenSwapPo == null) {
             log.info("鉴权验证Token失败：" + token);
-            return CommonResult.fail("Token 验证失败");
+            return CommonResult.loginError();
         }
         Role role = roleMapper.selectById(bTokenSwapPo.getRoleId());
         if (role == null) {
@@ -113,7 +113,7 @@ public class CheckRoleUtil {
         String token = req.getHeader("Authorization");
         if (token == null) {
             resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            return CommonResult.fail("无Token");
+            return CommonResult.loginError();
         }
         CommonResult<CheckRoleResult> checkRoleResult = checkUsderInfoByToken(token);
         if (!Objects.equals(checkRoleResult.getCode(), ResultEnum.SUCCESS.getCode())) {
@@ -126,7 +126,7 @@ public class CheckRoleUtil {
         if (userdata.getPermissionId() > apiPermission.getId()) {
             log.info("用户 " + userdata + " 尝试越权访问 " + requestURI + "（权限为" + apiPermission + "）");
             resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            return CommonResult.fail("权限不足");
+            return CommonResult.userAuthError();
         }
         return checkRoleResult;
     }
