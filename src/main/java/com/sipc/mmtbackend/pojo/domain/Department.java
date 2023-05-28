@@ -39,7 +39,7 @@ public class Department implements Serializable {
     @TableField("description")
     private String description;
 
-    @TableField("standard")
+    @TableField(value = "standard", updateStrategy = FieldStrategy.IGNORED)
     private String standard;
 
     @TableField("is_deleted")
