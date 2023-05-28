@@ -11,6 +11,7 @@ import java.util.List;
 
 /**
  * 社团社团宣传信息的接口的请求体参数的实体类，包含了设置社团宣传信息所需要的相应的参数
+ *
  * @author tzih
  * @version v1.0
  * @since 2023.04.23

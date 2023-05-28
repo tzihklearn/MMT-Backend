@@ -1,10 +1,10 @@
 package com.sipc.mmtbackend.controller.superAdmin;
 
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
-import com.sipc.mmtbackend.pojo.dto.param.superAdmin.OrganizationPublishParam;
-import com.sipc.mmtbackend.pojo.dto.result.superAdmin.UploadAvatarResult;
 import com.sipc.mmtbackend.pojo.dto.param.superAdmin.OrganizationInfoParam;
+import com.sipc.mmtbackend.pojo.dto.param.superAdmin.OrganizationPublishParam;
 import com.sipc.mmtbackend.pojo.dto.result.superAdmin.OrganizationInfoResult;
+import com.sipc.mmtbackend.pojo.dto.result.superAdmin.UploadAvatarResult;
 import com.sipc.mmtbackend.pojo.exceptions.DateBaseException;
 import com.sipc.mmtbackend.pojo.exceptions.RunException;
 import com.sipc.mmtbackend.service.OrganizationService;
@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 /**
  * 社团宣传与面试相关接口的控制层
+ *
  * @author tzih
  * @version v1.0
  * @since 2023.04.23
@@ -28,9 +29,10 @@ public class OrganizationController {
 
     /**
      * 设置社团宣传信息的接口的控制层处理，请求方法POST，请求路径/organization/info/update
+     *
      * @param organizationInfoParam 社团社团宣传信息的接口的请求体参数的实体类
+     * @return CommonResult<< String>> 返回接口处理的结果
      * @see OrganizationInfoParam
-     * @return CommonResult<<String>> 返回接口处理的结果
      */
     @PostMapping("/info/update")
     public CommonResult<String> updateOrganizationInfo(@RequestBody OrganizationInfoParam organizationInfoParam) throws RunException, DateBaseException {
@@ -40,7 +42,8 @@ public class OrganizationController {
 
     /**
      * 获取社团宣传信息的接口，请求方法GET,请求路径/organization/info/get
-     * @return CommonResult<<OrganizationInfoResult>> 返回接口处理的结果，含有社团的纳新宣传信息
+     *
+     * @return CommonResult<< OrganizationInfoResult>> 返回接口处理的结果，含有社团的纳新宣传信息
      * @see OrganizationInfoResult
      */
     @GetMapping("/info/get")
@@ -50,6 +53,7 @@ public class OrganizationController {
 
     /**
      * 上传社团头像的接口，请求方法Post,请求路径/organization/avatar/upload，接受采用form-data接受图像文件
+     *
      * @return CommonResult<UploadAvatarResult> 返回接口处理的结果，含有社团的头像url
      */
     @PostMapping("/avatar/upload")

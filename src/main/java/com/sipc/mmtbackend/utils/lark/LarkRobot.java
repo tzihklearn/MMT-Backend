@@ -38,6 +38,35 @@ public class LarkRobot {
     @Resource
     private RestTemplate restTemplate;
 
+    public static List<Object> getParameter(JoinPoint joinPoint, Method method) {
+        //获取请求参数
+        Object[] args = joinPoint.getArgs();
+        //设置请求参数类
+        List<Object> argList = new ArrayList<>();
+        //获取请求参数
+        int i = 0;
+        for (Parameter parameter : method.getParameters()) {
+            //获取@RequestBody注解的参数
+            RequestBody requestBodyAnnotation = parameter.getAnnotation(RequestBody.class);
+            if (requestBodyAnnotation != null) {
+                argList.add(args[i]);
+                ++i;
+                continue;
+            }
+
+            //获取@RequestParam注解的参数
+            RequestParam annotation1 = parameter.getAnnotation(RequestParam.class);
+            if (annotation1 != null) {
+                Map<String, Object> map = new HashMap<>();
+                map.put(parameter.getName(), args[i]);
+                argList.add(map);
+            }
+            ++i;
+        }
+
+        return argList;
+    }
+
     public void send(JoinPoint joinPoint, Exception exception) {
         Signature signature = joinPoint.getSignature();
         MethodSignature methodSignature = (MethodSignature) signature;
@@ -79,35 +108,6 @@ public class LarkRobot {
             log.warn("消息发送失败，返回结果为空，消息体：{}", entry);
         }
 
-    }
-
-    public static List<Object> getParameter(JoinPoint joinPoint, Method method) {
-        //获取请求参数
-        Object[] args = joinPoint.getArgs();
-        //设置请求参数类
-        List<Object> argList = new ArrayList<>();
-        //获取请求参数
-        int i = 0;
-        for (Parameter parameter : method.getParameters()) {
-            //获取@RequestBody注解的参数
-            RequestBody requestBodyAnnotation = parameter.getAnnotation(RequestBody.class);
-            if (requestBodyAnnotation != null) {
-                argList.add(args[i]);
-                ++i;
-                continue;
-            }
-
-            //获取@RequestParam注解的参数
-            RequestParam annotation1 = parameter.getAnnotation(RequestParam.class);
-            if (annotation1 != null) {
-                Map<String, Object> map = new HashMap<>();
-                map.put(parameter.getName(), args[i]);
-                argList.add(map);
-            }
-            ++i;
-        }
-
-        return argList;
     }
 
 }

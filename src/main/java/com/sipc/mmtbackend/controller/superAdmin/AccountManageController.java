@@ -43,7 +43,7 @@ public class AccountManageController {
     /**
      * 获取社团成员列表接口
      *
-     * @param pageNum        当前页数
+     * @param pageNum 当前页数
      * @return 返回处理的结果，包含社团成员列表
      * @see MemberInfoResult
      */
@@ -55,9 +55,9 @@ public class AccountManageController {
     /**
      * 筛选社团成员列表接口
      *
-     * @param pageNum        当前页数
-     * @param sort           学号排序， 0为正序， 1为倒序（默认为0）
-     * @param permission     成员权限筛选项
+     * @param pageNum    当前页数
+     * @param sort       学号排序， 0为正序， 1为倒序（默认为0）
+     * @param permission 成员权限筛选项
      * @return 返回处理的结果，包含社团成员列表
      * @see MemberInfoResult
      */

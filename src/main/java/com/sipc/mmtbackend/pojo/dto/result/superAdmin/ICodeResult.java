@@ -4,6 +4,7 @@ import lombok.Data;
 
 /**
  * 生成社团邀请码接口的返回结果类
+ *
  * @author tzih
  * @version v1.0
  * @since 2023.05.20

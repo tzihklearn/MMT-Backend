@@ -16,7 +16,7 @@ public enum UsageEnum {
     // 组织默认头像
     ORG_AVATAR(1, "OrganizationAvatar"),
     // C 端用户默认头像
-    C_USER_AVATAR(2,"CUserAvatar");
+    C_USER_AVATAR(2, "CUserAvatar");
     private final Integer id;
     private final String usage;
 

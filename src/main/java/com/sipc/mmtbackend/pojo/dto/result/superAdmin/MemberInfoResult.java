@@ -7,10 +7,11 @@ import java.util.List;
 
 /**
  * 社团成员列表相关接口的返回类
+ *
  * @author tzih
  * @version v1.0
- * @since 2023.05.21
  * @see MemberInfoData
+ * @since 2023.05.21
  */
 @Data
 public class MemberInfoResult {

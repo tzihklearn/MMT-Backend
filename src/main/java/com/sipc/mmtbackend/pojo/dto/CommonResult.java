@@ -21,7 +21,8 @@ public class CommonResult<T> {
      */
     private T data;
 
-    public CommonResult(){}
+    public CommonResult() {
+    }
 
     public CommonResult(String code, String message, T data) {
         this.code = code;

@@ -10,8 +10,8 @@
                  LEFT JOIN role ON user_role_merge.role_id = role.id
                  LEFT JOIN organization ON role.organization_id = organization.id
         WHERE organization.is_deleted != 1
-		  AND user_role_merge.is_deleted != 1
-		  AND role.is_deleted != 1
+          AND user_role_merge.is_deleted != 1
+          AND role.is_deleted != 1
           AND user_role_merge.user_id = #{userId,jdbcType=INTEGER}
     </select>
     <select id="selectBUserLoginInfoByStudentIdAndOrgId"
@@ -27,8 +27,8 @@
                  LEFT JOIN role ON user_role_merge.role_id = role.id
                  LEFT JOIN permission ON role.permission_id = permission.id
         WHERE user_b.is_deleted != 1
-		  AND user_role_merge.is_deleted != 1
-		  AND role.is_deleted != 1
+          AND user_role_merge.is_deleted != 1
+          AND role.is_deleted != 1
           AND user_b.student_id = #{studentId,jdbcType=CHAR}
           AND role.organization_id = #{organizationId,jdbcType=INTEGER}
     </select>
@@ -45,8 +45,8 @@
                  LEFT JOIN role ON user_role_merge.role_id = role.id
                  LEFT JOIN permission ON role.permission_id = permission.id
         WHERE user_b.is_deleted != 1
-		  AND user_role_merge.is_deleted != 1
-		  AND role.is_deleted != 1
+          AND user_role_merge.is_deleted != 1
+          AND role.is_deleted != 1
           AND user_b.id = #{userId,jdbcType=INTEGER}
           AND role.organization_id = #{organizationId,jdbcType=INTEGER}
     </select>

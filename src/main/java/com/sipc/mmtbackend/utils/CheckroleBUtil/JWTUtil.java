@@ -95,16 +95,16 @@ public class JWTUtil {
      * @return 解析到的 Token 载荷
      * @author doudiNCer
      */
-    public BTokenSwapPo verifyToken(String token){
+    public BTokenSwapPo verifyToken(String token) {
         BTokenSwapPo po = unMarshellToken(token);
         if (po == null)
             return null;
         String tokenKey = getTokenKey(token);
-        if (tokenKey == null){
+        if (tokenKey == null) {
             return null;
         }
         BTokenSwapPo redisPo = redisUtil.getString(tokenKey, BTokenSwapPo.class);
-        if (redisPo == null){
+        if (redisPo == null) {
             log.warn("发现解析成功但未登录的Token：" + po);
             return null;
         }
@@ -148,8 +148,8 @@ public class JWTUtil {
 //            log.info("尝试吊销非法 Token：" + token);
 //            return false;
 //        }
-        boolean sel =  redisUtil.delete(tokenKey);
-        if (!sel){
+        boolean sel = redisUtil.delete(tokenKey);
+        if (!sel) {
             log.warn("Redis 删除 Token 失败，Token 为：" + token + "key 为：" + tokenKey);
         }
         return true;
