@@ -162,7 +162,7 @@ public class JWTUtil {
         String tokenKey = getTokenKey(po);
         BTokenSwapPo poRedis = redisUtil.getString(tokenKey, BTokenSwapPo.class);
         if (poRedis == null) {
-            log.info("使用组织 ID " + organizationId + " 吊销用户 " + poRedis + " 失败：用户未登录");
+            log.info("使用组织 ID " + organizationId + " 吊销用户 " + po + " 失败：用户未登录");
             return false;
         }
         if (!Objects.equals(poRedis.getOrganizationId(), organizationId)) {
