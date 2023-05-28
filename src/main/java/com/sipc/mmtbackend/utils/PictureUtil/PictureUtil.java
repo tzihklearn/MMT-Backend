@@ -7,18 +7,11 @@ import com.sipc.mmtbackend.mapper.PictureMapper;
 import com.sipc.mmtbackend.pojo.domain.Picture;
 import com.sipc.mmtbackend.utils.PictureUtil.pojo.PictureUsage;
 import io.minio.MinioClient;
-import io.minio.PutObjectArgs;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.io.InputStream;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.Date;
 
 /**
  * 图片工具类
@@ -48,41 +41,6 @@ public class PictureUtil {
         Picture picture = pictureMapper.selectOne(new QueryWrapper<Picture>().eq("pic_id", pictureId));
         if (picture == null) return null;
         return minioUtil.getPictureURL(pictureId);
-    }
-
-    /**
-     * 构造一个唯一的图片 ID
-     *
-     * @return 图片 ID 或 null
-     */
-    private String createAvatarId() {
-        String v = "MINIOPIC" + (new Date()) + "MINIOTIME";
-        MessageDigest md5;
-        try {
-            md5 = MessageDigest.getInstance("MD5");
-        } catch (NoSuchAlgorithmException e) {
-            log.warn("Get MD5 Algorithm Error When Create Avatar ID: " + e.getMessage());
-            return null;
-        }
-        return Base64.encodeBase64String(md5.digest(v.getBytes()));
-    }
-
-    /**
-     * 上传图片
-     *
-     * @param picture 图片
-     * @return 图片ID
-     */
-    @Deprecated
-    public String uploadPicture(MultipartFile picture) {
-        String pictureId = createAvatarId();
-        if (pictureId == null) return null;
-        try (InputStream is = picture.getInputStream()) {
-            minioClient.putObject(PutObjectArgs.builder().bucket(minioConfig.getBucketName()).object(pictureId + PictureURLEndStr).stream(is, picture.getSize(), -1).build());
-        } catch (Throwable e) {
-            log.warn("Upload New Picture Error: " + e.getMessage());
-        }
-        return pictureId;
     }
 
     /**
