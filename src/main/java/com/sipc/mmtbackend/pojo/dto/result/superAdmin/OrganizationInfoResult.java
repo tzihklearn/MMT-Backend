@@ -3,10 +3,12 @@ package com.sipc.mmtbackend.pojo.dto.result.superAdmin;
 import com.sipc.mmtbackend.pojo.dto.data.DepartmentData;
 import com.sipc.mmtbackend.pojo.dto.data.TagData;
 import lombok.Data;
+
 import java.util.List;
 
 /**
  * 获取社团宣传信息接口的返回类，封装了相应的社团信息
+ *
  * @author tzih
  * @version v1.0
  * @since 2023.04.27

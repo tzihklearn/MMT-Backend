@@ -142,8 +142,8 @@ public class JWTUtil {
         if (tokenKey == null) {
             return null;
         }
-        boolean sel = redisUtil.delete(tokenKey);
-        if (!sel) {
+        boolean del = redisUtil.delete(tokenKey);
+        if (!del) {
             log.warn("Redis 删除 Token 失败，Token 为：" + token + "key 为：" + tokenKey);
         }
         return true;

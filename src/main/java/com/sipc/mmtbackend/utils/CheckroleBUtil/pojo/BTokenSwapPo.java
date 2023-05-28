@@ -12,7 +12,7 @@ public class BTokenSwapPo {
     private Integer organizationId;
     private Integer permissionId;
 
-//    @Deprecated
+    //    @Deprecated
     public BTokenSwapPo(UserLoginPermissionPo po) {
         this.userId = po.getUserId();
         this.organizationId = po.getOrganizationId();

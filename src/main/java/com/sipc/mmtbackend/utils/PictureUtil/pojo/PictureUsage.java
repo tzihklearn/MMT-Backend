@@ -2,7 +2,6 @@ package com.sipc.mmtbackend.utils.PictureUtil.pojo;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
 
 /**
  * 用于溯源的图片信息

@@ -4,6 +4,7 @@ import lombok.Data;
 
 /**
  * 社团成员信息实体类
+ *
  * @author tzih
  * @version v1.0
  * @since 2023.05.21
