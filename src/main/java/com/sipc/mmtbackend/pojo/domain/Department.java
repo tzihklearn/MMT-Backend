@@ -24,6 +24,12 @@ public class Department implements Serializable {
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
+    /**
+     * 组织ID
+     */
+    @TableField("organization_id")
+    private Integer organizationId;
+
     @TableField("name")
     private String name;
 
