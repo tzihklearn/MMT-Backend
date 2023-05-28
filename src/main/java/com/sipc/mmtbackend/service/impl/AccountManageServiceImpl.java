@@ -18,6 +18,7 @@ import com.sipc.mmtbackend.pojo.dto.result.superAdmin.ICodeResult;
 import com.sipc.mmtbackend.pojo.dto.result.superAdmin.MemberInfoResult;
 import com.sipc.mmtbackend.pojo.exceptions.DateBaseException;
 import com.sipc.mmtbackend.service.AccountManageService;
+import com.sipc.mmtbackend.utils.CheckroleBUtil.JWTUtil;
 import com.sipc.mmtbackend.utils.CheckroleBUtil.PasswordUtil;
 import com.sipc.mmtbackend.utils.CheckroleBUtil.pojo.BTokenSwapPo;
 import com.sipc.mmtbackend.utils.ICodeUtil;
@@ -57,6 +58,8 @@ public class AccountManageServiceImpl implements AccountManageService {
     private final RoleMapper roleMapper;
 
     private final UserRoleMergeMapper userRoleMergeMapper;
+
+    private final JWTUtil jwtUtil;
 
     //TODO:初步处理，以后使用Guava Cache缓存
     private final Map<Integer, String> permissionMap = new HashMap<>();
@@ -241,6 +244,12 @@ public class AccountManageServiceImpl implements AccountManageService {
             return CommonResult.fail("请求失败，该成员不存在");
         }
 
+        //清楚被修改用户token
+        Boolean aBoolean = jwtUtil.revokeToken(reviseMemberInfoParam.getId(), organizationId);
+        if (aBoolean == null) {
+            return CommonResult.fail("已完成修改，强制登出用户失败，请该用户重新登陆");
+        }
+
         return CommonResult.success("请求成功，社团成员信息已修改");
     }
 
@@ -274,6 +283,12 @@ public class AccountManageServiceImpl implements AccountManageService {
             return CommonResult.fail("请求失败，该成员不存在");
         }
 
+        //清楚被修改用户token
+        Boolean aBoolean = jwtUtil.revokeToken(reviseMemberPasswdParam.getUserId(), organizationId);
+        if (aBoolean == null) {
+            return CommonResult.fail("已完成修改，强制登出用户失败，请该用户重新登陆");
+        }
+
         return CommonResult.success("请求成功，社团成员密码已更新");
     }
 
@@ -302,6 +317,12 @@ public class AccountManageServiceImpl implements AccountManageService {
             throw new DateBaseException("数据库删除数据异常");
         } else if (deleteNum == 0) {
             return CommonResult.fail("请求失败，该成员不存在");
+        }
+
+        //清楚被修改用户token
+        Boolean aBoolean = jwtUtil.revokeToken(deleteMemberParam.getUserId(), organizationId);
+        if (aBoolean == null) {
+            return CommonResult.fail("已完成修改，强制登出用户失败，请该用户重新登陆");
         }
 
         return CommonResult.success("请求成功，社团成员已删除");
