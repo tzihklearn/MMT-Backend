@@ -9,6 +9,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * ICode（社团邀请码）操作工具类
+ *
  * @author tzih
  * @version v1.0
  * @since 2023.05.20
@@ -17,15 +18,15 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class ICodeUtil {
 
-    private final RedisUtil redisUtil;
-
     /**
      * ICode的在redis的key的后缀
      */
     private final static String ICodeKeyPrefix = "ICode:";
+    private final RedisUtil redisUtil;
 
     /**
      * 私有方法，生成对应社团的邀请码
+     *
      * @param length 生成的社团邀请码长度
      * @return 社团邀请码
      */
@@ -51,8 +52,9 @@ public class ICodeUtil {
 
     /**
      * 调用generateRandomString方法生成对应社团的邀请码，同时将其缓存到redis中，时间限制10min
+     *
      * @param organizationId 社团组织id
-     * @param length 要生成的社团邀请码的长度
+     * @param length         要生成的社团邀请码的长度
      * @return 返回生成好的社团邀请码
      */
     public String setICodeRedis(Integer organizationId, int length) {
@@ -88,8 +90,9 @@ public class ICodeUtil {
 
     /**
      * 验证社团邀请码
+     *
      * @param ICode 待验证的社团邀请码
-     * @return 返回验证成功后邀请码对应的社团组织id,若失败返回null
+     * @return 返回验证成功后邀请码对应的社团组织id, 若失败返回null
      */
     public Integer verifyICode(String ICode) {
         return redisUtil.getString(ICodeKeyPrefix + ICode, Integer.class);

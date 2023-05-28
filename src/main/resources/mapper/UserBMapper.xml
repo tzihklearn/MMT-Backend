@@ -6,16 +6,16 @@
             resultType="com.sipc.mmtbackend.pojo.domain.po.UserBMemberPo" parameterType="java.lang.Integer">
         SELECT user_b.id, user_b.student_id, user_b.user_name, user_b.phone, role.permission_id
         FROM user_b
-                 JOIN user_role_merge AS urm ON user_b.id = urm.user_id
-                 JOIN role ON urm.role_id = role.id
+        JOIN user_role_merge AS urm ON user_b.id = urm.user_id
+        JOIN role ON urm.role_id = role.id
         WHERE organization_id = #{organizationId}
-            AND role.is_deleted = 0
-            AND urm.is_deleted = 0
-            AND user_b.is_deleted = 0
+        AND role.is_deleted = 0
+        AND urm.is_deleted = 0
+        AND user_b.is_deleted = 0
         <if test="permissionId != 0">
             AND role.permission_id = #{permissionId}
         </if>
-            LIMIT #{startNum}, #{endNum}
+        LIMIT #{startNum}, #{endNum}
         <if test="sort != 0">
             ORDER BY user_b.student_id DESC
         </if>

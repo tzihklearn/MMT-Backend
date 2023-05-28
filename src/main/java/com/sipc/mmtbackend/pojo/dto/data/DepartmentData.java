@@ -8,6 +8,7 @@ import javax.validation.constraints.Size;
 
 /**
  * 社团纳新部门相关信息的封装实体类
+ *
  * @author tzih
  * @version v1.0
  * @since 2023.04.23
