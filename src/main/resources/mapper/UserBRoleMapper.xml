@@ -54,7 +54,7 @@
             resultType="com.sipc.mmtbackend.pojo.domain.UserRoleMerge">
         SELECT user_role_merge.*
         FROM user_role_merge
-                 LEFT JOIN role
+                 LEFT JOIN role ON user_role_merge.role_id = role.id
         WHERE user_role_merge.is_deleted != 1
           AND role.is_deleted != 1
           AND role.organization_id = #{organizationId,jdbcType=INTEGER}
