@@ -7,9 +7,11 @@ import com.sipc.mmtbackend.mapper.InterviewBoardDataMapper;
 import com.sipc.mmtbackend.pojo.domain.Admission;
 import com.sipc.mmtbackend.pojo.domain.Department;
 import com.sipc.mmtbackend.pojo.domain.po.InterviewBoardPo.PersonNumGroupByDepartmentPo;
+import com.sipc.mmtbackend.pojo.domain.po.InterviewBoardPo.TotalNumPo;
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
 import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResult.GetDepartmentsResult;
 import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResult.GetNumberGroupByDepartment;
+import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResult.GetSignUpNum;
 import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResult.po.GetDepartmentPo;
 import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResult.po.GetNumberGroupByDepartmentPo;
 import com.sipc.mmtbackend.service.InterviewBoardService;
@@ -22,6 +24,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor(onConstructor_ = {@Autowired})
@@ -85,6 +88,41 @@ public class InterviewBoardServiceImpl implements InterviewBoardService {
             results.add(dep);
         }
         result.setDepNum(results.size());
+        return CommonResult.success(result);
+    }
+
+    /**
+     * 获取组织或指定部门的报名人数与第一志愿人数
+     *
+     * @param departmentId 组织ID
+     * @return 总人数与第一志愿人数
+     */
+    @Override
+    public CommonResult<GetSignUpNum> getSignupNum(Integer departmentId) {
+        BTokenSwapPo context = ThreadLocalContextUtil.getContext();
+        Admission admission = admissionMapper.selectOne(
+                new QueryWrapper<Admission>()
+                        .eq("organization_id", context.getOrganizationId())
+                        .orderByDesc("id"));
+        if (admission == null) {
+            log.warn("用户 " + context + " 尝试在无活动的纳新时查询已报名人数");
+            return CommonResult.fail("查询失败：未开始纳新或纳新已结束");
+        }
+        if (departmentId != null) {
+            Department department = departmentMapper.selectById(departmentId);
+            if (department == null || !Objects.equals(department.getOrganizationId(), context.getOrganizationId())) {
+                log.info("B 端用户 " + context + " 尝试访问不存在或不属于已登录组织的部门 " + department + " 的信息");
+                return CommonResult.fail("查询失败：部门不存在");
+            }
+        }
+        TotalNumPo totalNumPo = interviewBoardDataMapper.selectTotalNumByDepartmentIdAndAdmissionId(departmentId, admission.getId());
+        if (totalNumPo == null) {
+            log.warn("用户" + context + "查询组织 " + departmentId + " 的报名人数时出现异常，数据库返回空");
+            return CommonResult.serverError();
+        }
+        GetSignUpNum result = new GetSignUpNum();
+        result.setFirstChoiceNum(totalNumPo.getFirstChoiceNum());
+        result.setTotalNum(totalNumPo.getTotalNum());
         return CommonResult.success(result);
     }
 }

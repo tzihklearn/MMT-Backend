@@ -39,6 +39,7 @@ public class CheckRoleUtil {
         apiPermissions.put("/b/user/loginedorgs", PermissionEnum.NUMBER);
         apiPermissions.put("/b/interview/departments", PermissionEnum.NUMBER);
         apiPermissions.put("/b/interview/numGroupByDepartment", PermissionEnum.NUMBER);
+        apiPermissions.put("/b/interview/totalNum", PermissionEnum.NUMBER);
         this.apiPermissions = apiPermissions;
     }
 

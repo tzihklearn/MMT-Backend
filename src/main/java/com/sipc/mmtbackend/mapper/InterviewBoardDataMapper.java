@@ -1,6 +1,7 @@
 package com.sipc.mmtbackend.mapper;
 
 import com.sipc.mmtbackend.pojo.domain.po.InterviewBoardPo.PersonNumGroupByDepartmentPo;
+import com.sipc.mmtbackend.pojo.domain.po.InterviewBoardPo.TotalNumPo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -15,5 +16,8 @@ import java.util.List;
 public interface InterviewBoardDataMapper {
     List<PersonNumGroupByDepartmentPo> selectSignInPersonNumberGroupByDepartmentByOrganizationIdAndAdmissionId(
             @Param("organizationId") Integer organizationId,
+            @Param("admissionId") Integer admissionId);
+    TotalNumPo selectTotalNumByDepartmentIdAndAdmissionId(
+            @Param("departmentId") Integer departmentId,
             @Param("admissionId") Integer admissionId);
 }
