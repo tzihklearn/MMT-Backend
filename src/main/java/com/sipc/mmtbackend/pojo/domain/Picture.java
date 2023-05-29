@@ -8,11 +8,11 @@ import java.io.Serializable;
 
 /**
  * <p>
- *
+ * 
  * </p>
  *
  * @author DoudiNCer
- * @since 2023-05-26
+ * @since 2023-05-29
  */
 @Getter
 @Setter
@@ -36,8 +36,8 @@ public class Picture implements Serializable {
     /**
      * 图片用途
      */
-    @TableField("usage")
-    private String usage;
+    @TableField("pic_usage")
+    private String picUsage;
 
     /**
      * 是否删除

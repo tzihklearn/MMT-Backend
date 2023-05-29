@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.sipc.mmtbackend.mapper.InterviewBoardDataMapper">
+    <select id="selectSignInPersonNumberGroupByDepartmentByOrganizationIdAndAdmissionId"
+            resultType="com.sipc.mmtbackend.pojo.domain.po.InterviewBoardPo.PersonNumGroupByDepartmentPo">
+        SELECT COUNT(1) AS "number",
+               d.`name` AS "departmentName"
+        FROM user_volunteer uv
+                 LEFT JOIN department d ON uv.department_id = d.id
+        WHERE uv.is_deleted != 1
+            AND d.is_deleted != 1
+	        AND uv.organization_order = 1
+	        AND uv.admission_id = 2
+        GROUP BY
+            d.`name`
+    </select>
+</mapper>
