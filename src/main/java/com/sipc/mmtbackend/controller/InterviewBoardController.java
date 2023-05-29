@@ -3,9 +3,11 @@ package com.sipc.mmtbackend.controller;
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
 import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResult.GetDepartmentsResult;
 import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResult.GetNumberGroupByDepartment;
+import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResult.GetSignUpNum;
 import com.sipc.mmtbackend.service.InterviewBoardService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
@@ -34,5 +36,16 @@ public class InterviewBoardController {
     @GetMapping("/numGroupByDepartment")
     public CommonResult<GetNumberGroupByDepartment> getNumberGroupByDepartment() {
         return interviewBoardService.getNumberGroupByDepartment();
+    }
+
+    /**
+     * 获取组织或指定部门的报名人数与第一志愿人数
+     *
+     * @param departmentId 组织ID
+     * @return 总人数与第一志愿人数
+     */
+    @GetMapping("/totalNum")
+    public CommonResult<GetSignUpNum> getSignupNum(@RequestParam(value = "departmentId", required = false) Integer departmentId) {
+        return interviewBoardService.getSignupNum(departmentId);
     }
 }
