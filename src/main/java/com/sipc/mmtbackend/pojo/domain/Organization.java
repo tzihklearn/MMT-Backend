@@ -8,11 +8,11 @@ import java.io.Serializable;
 
 /**
  * <p>
- *
+ * 
  * </p>
  *
- * @author tzih
- * @since 2023-05-03
+ * @author DoudiNCer
+ * @since 2023-05-29
  */
 @Getter
 @Setter
@@ -30,8 +30,8 @@ public class Organization implements Serializable {
     @TableField("description")
     private String description;
 
-    @TableField("avatar_url")
-    private String avatarUrl;
+    @TableField("avatar_id")
+    private String avatarId;
 
     @TableField("is_deleted")
     @TableLogic

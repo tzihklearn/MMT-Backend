@@ -9,8 +9,8 @@ import org.apache.ibatis.annotations.Mapper;
  * Mapper 接口
  * </p>
  *
- * @author tzih
- * @since 2023-05-03
+ * @author DoudiNCer
+ * @since 2023-05-29
  */
 @Mapper
 public interface OrganizationMapper extends BaseMapper<Organization> {
