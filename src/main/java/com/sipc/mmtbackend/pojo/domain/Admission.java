@@ -12,8 +12,8 @@ import java.time.LocalDateTime;
  *
  * </p>
  *
- * @author tzih
- * @since 2023-05-03
+ * @author DoudiNCer
+ * @since 2023-05-29
  */
 @Getter
 @Setter
@@ -25,9 +25,15 @@ public class Admission implements Serializable {
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
+    /**
+     * 发起者
+     */
     @TableField("initiator")
     private Integer initiator;
 
+    /**
+     * 组织ID
+     */
     @TableField("organization_id")
     private Integer organizationId;
 
@@ -38,13 +44,13 @@ public class Admission implements Serializable {
     private LocalDateTime endTime;
 
     /**
-     * 允许纳新部门数
+     * 允许报名部门数
      */
     @TableField("allow_department_amount")
     private Integer allowDepartmentAmount;
 
     /**
-     * 面试轮次
+     * 计划总面试轮次
      */
     @TableField("rounds")
     private Integer rounds;

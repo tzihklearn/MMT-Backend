@@ -2,6 +2,7 @@ package com.sipc.mmtbackend.controller;
 
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
 import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResult.GetDepartmentsResult;
+import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResult.GetNumberGroupByDepartment;
 import com.sipc.mmtbackend.service.InterviewBoardService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,5 +24,10 @@ public class InterviewBoardController {
     @GetMapping("/departments")
     public CommonResult<GetDepartmentsResult> getDepartments() {
         return interviewBoardService.getDepartments();
+    }
+
+    @GetMapping("/numGroupByDepartment")
+    public CommonResult<GetNumberGroupByDepartment> getNumberGroupByDepartment(){
+        return interviewBoardService.getNumberGroupByDepartment();
     }
 }
