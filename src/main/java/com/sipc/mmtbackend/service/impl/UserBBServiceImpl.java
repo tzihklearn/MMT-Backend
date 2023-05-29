@@ -62,6 +62,12 @@ public class UserBBServiceImpl implements UserBService {
         // 科协测试邀请码
         if (Objects.equals(param.getKey(), "qwertyuiop"))
             orgId = 1;
+        // 学生会
+        if (Objects.equals(param.getKey(), "asdfghjklf"))
+            orgId = 2;
+        // test
+        if (Objects.equals(param.getKey(), "qazxswedcv"))
+            orgId = 6;
         if (orgId == null)
             return CommonResult.fail("注册失败：邀请码无效");
         UserB userB = userBMapper.selectOne(new QueryWrapper<UserB>().eq("phone", param.getPhoneNum()));
@@ -298,6 +304,12 @@ public class UserBBServiceImpl implements UserBService {
         // 科协测试邀请码
         if (Objects.equals(param.getKey(), "qwertyuiop"))
             orgId = 1;
+        // 学生会
+        if (Objects.equals(param.getKey(), "asdfghjklf"))
+            orgId = 2;
+        // test
+        if (Objects.equals(param.getKey(), "qazxswedcv"))
+            orgId = 6;
         if (orgId == null)
             return CommonResult.fail("注册失败：邀请码无效");
         UserB userB = userBMapper.selectById(context.getUserId());
