@@ -24,7 +24,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .addPathPatterns("/b/**")
                 .excludePathPatterns("/b/user/loginp")
                 .excludePathPatterns("/b/user/reg")
-                .excludePathPatterns("/b/user/orgs");
+                .excludePathPatterns("/b/user/orgs")
+                .excludePathPatterns("/b/admin/organization/test");
 
     }
 }
