@@ -496,7 +496,7 @@ public class OrganizationServiceImpl implements OrganizationService {
         //拼装要返回的社团纳新宣传信息实体类对象
         OrganizationInfoResult organizationInfoResult = new OrganizationInfoResult();
         organizationInfoResult.setName(organization.getName());
-        organizationInfoResult.setAvatarUrl(pictureUtil.getPictureURL(organization.getAvatarUrl()));
+        organizationInfoResult.setAvatarUrl(pictureUtil.getPictureURL(organization.getAvatarId()));
         organizationInfoResult.setBriefIntroduction(organization.getDescription());
         organizationInfoResult.setTagList(tagDataList);
         organizationInfoResult.setIntroduction(organizationRecruit.getDescription());
@@ -545,7 +545,7 @@ public class OrganizationServiceImpl implements OrganizationService {
         Organization organization = new Organization();
 
         organization.setId(organizationId);
-        organization.setAvatarUrl(pictureId);
+        organization.setAvatarId(pictureId);
 
         int updateNum = organizationMapper.updateById(organization);
         if (updateNum != 0) {
