@@ -32,6 +32,13 @@ public class UserBController {
         }
     }
 
+    /**
+     * 获取 B 端用户加入组织列表
+     *
+     * @param studentId 用户账号（学号）
+     * @return 加入的组织列表
+     * @author DoudiNCer
+     */
     @GetMapping("/orgs")
     public CommonResult<JoinOrgsResult> getJoinedOrgs(@RequestParam("studentId") String studentId) {
         return userBService.getJoinedOrgs(studentId);
@@ -56,6 +63,16 @@ public class UserBController {
     @GetMapping("/userinfo")
     public CommonResult<GetBUserInfoResult> getUserInfo() {
         return userBService.getUserInfo();
+    }
+
+    /**
+     * 登录后获取已加入的组织及当前登录的组织
+     *
+     * @return 用户已加入的组织及是否为当前组织
+     */
+    @GetMapping("/loginedorgs")
+    public CommonResult<LoginedJoinOrgsResult> getJoinedOrgs() {
+        return userBService.getLoginedJoinedOrgs();
     }
 
     /**

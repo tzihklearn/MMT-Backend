@@ -84,4 +84,10 @@ public interface UserBService {
      * @author DoudiNCer
      */
     CommonResult<PutUserAvatarResult> putUserAvatar(MultipartFile avatar);
+
+    /**
+     * 登录后获取已加入的组织及当前登录的组织
+     * @return 用户已加入的组织及是否为当前组织
+     */
+    CommonResult<LoginedJoinOrgsResult> getLoginedJoinedOrgs();
 }
