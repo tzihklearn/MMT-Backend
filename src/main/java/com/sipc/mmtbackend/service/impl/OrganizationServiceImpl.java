@@ -57,15 +57,11 @@ public class OrganizationServiceImpl implements OrganizationService {
 
     private final OrganizationRecruitMapper organizationRecruitMapper;
 
-    private final OrganizationDepartmentMergeMapper organizationDepartmentMergeMapper;
-
     private final DepartmentMapper departmentMapper;
 
     private final HttpServletRequest httpServletRequest;
 
     private final PictureUtil pictureUtil;
-
-    private final HttpServletRequest request;
 
 
     /**
@@ -93,7 +89,7 @@ public class OrganizationServiceImpl implements OrganizationService {
          */
         Organization organization = new Organization();
         organization.setId(organizationId);
-//        organization.setName(organizationInfoParam.getName());
+
         organization.setDescription(organizationInfoParam.getBriefIntroduction());
         int updateNum = organizationMapper.updateById(organization);
         if (updateNum != 1) {
@@ -106,9 +102,8 @@ public class OrganizationServiceImpl implements OrganizationService {
           处理标签
          */
         if (organizationInfoParam.getTagList() != null) {
-//            //删除之前的社团标签数据。目前来说，只好删除之前的全部记录，因为不好修改具体的标签
-//            organizationTagMergeMapper.delete(new QueryWrapper<OrganizationTagMerge>()
-//                    .eq("organization_id", organizationId));
+            //删除之前的社团标签数据。目前来说，只好删除之前的全部记录，因为不好修改具体的标签
+
 
             //利用stream流对TagList作排序，使得其为从系统标签到自定义标签排序,Comparator.comparing(TagData::getType).reversed()从大到小输出
             organizationInfoParam.setTagList(
@@ -133,26 +128,10 @@ public class OrganizationServiceImpl implements OrganizationService {
                 }
             }
 
-//            Iterator<OrganizationTagMerge> organizationTagMergeIterator = organizationTagMerges.listIterator();
-
             //遍历请求里的标签参数
             int typeI = 0;
             int typeJ = 2;
             for (TagData tagData : organizationInfoParam.getTagList()) {
-
-//                if (tagData.getId() != null) {
-//                    for (OrganizationTagMerge organizationTagMerge : organizationTagMerges) {
-//                        if (tagData.getId().equals(organizationTagMerge.getTagId())) {
-//                            boolean remove = organizationTagMerges.remove(organizationTagMerge);
-//                            if (!remove) {
-//                                log.info("删除社团已有标签出错，出错社团id：{}，出错标签id：{}",
-//                                        organizationId, organizationTagMerge.getTagId());
-//                                throw new RunException("ada");
-//                            }
-//                            break;
-//                        }
-//                    }
-//                }
 
                 //处理系统标签
                 if (tagData.getType() == 1) {
@@ -202,16 +181,6 @@ public class OrganizationServiceImpl implements OrganizationService {
                 }
                 //处理自定义标签
                 else if (tagData.getType() == 2) {
-//                    Tag tag = new Tag();
-//                    tag.setName(tagData.getTag());
-//                    tag.setType(tagData.getType());
-//                    //插入或更新
-//                    boolean isUpdate = tagIService.saveOrUpdate(tag,
-//                            new QueryWrapper<Tag>().eq("name", tagData.getTag()).eq("type", tagData.getType()));
-//                    if (!isUpdate) {
-//                        log.error("更新社团宣传信息接口异常，插入或更新自定义标签数出错，插入自定义标签名：{}", tagData.getTag());
-//                        throw new DateBaseException("数据库插入数据异常");
-//                    }
 
                     //查找标签信息
                     Tag tag = tagMapper.selectOne(new QueryWrapper<Tag>()
@@ -310,18 +279,16 @@ public class OrganizationServiceImpl implements OrganizationService {
              设置社团纳新部门信息
             */
             //获取当前社团纳新部门的数据。
-            List<OrganizationDepartmentMerge> organizationDepartmentMerges = organizationDepartmentMergeMapper.selectList(
-                    new QueryWrapper<OrganizationDepartmentMerge>()
-                            .eq("organization_id", organizationId)
-                            .orderByAsc("department_id")
-            );
-            //遍历请求来的社团数据
+            List<Department> departments = departmentMapper.selectList(new QueryWrapper<Department>().eq("organization_id", organizationId));
+
+            //遍历请求来的社团部门数据
             for (DepartmentData departmentData : organizationInfoParam.getDepartmentList()) {
                 //处理有id的部门
                 Department department = new Department();
                 if (departmentData.getId() != null) {
                     //拼装纳新部门信息实体类
                     department.setId(departmentData.getId());
+                    department.setOrganizationId(organizationId);
                     department.setName(departmentData.getName());
                     department.setBriefDescription(departmentData.getBriefIntroduction());
                     department.setDescription(departmentData.getIntroduction());
@@ -335,9 +302,9 @@ public class OrganizationServiceImpl implements OrganizationService {
                         throw new DateBaseException("数据库更新操作异常");
                     }
                     int flag = -1;
-                    for (OrganizationDepartmentMerge organizationDepartmentMerge : organizationDepartmentMerges) {
-                        if (organizationDepartmentMerge.getDepartmentId().equals(departmentData.getId())) {
-                            organizationDepartmentMerges.remove(organizationDepartmentMerge);
+                    for (Department departmentPo : departments) {
+                        if (departmentPo.getId().equals(departmentData.getId())) {
+                            departments.remove(departmentPo);
                             flag = 1;
                             break;
                         }
@@ -350,40 +317,28 @@ public class OrganizationServiceImpl implements OrganizationService {
                 //处理没有id的部门，即新增的纳新部门
                 else {
                     //拼装纳新部门信息实体类
+                    department.setOrganizationId(organizationId);
                     department.setName(departmentData.getName());
                     department.setBriefDescription(departmentData.getBriefIntroduction());
                     department.setDescription(departmentData.getIntroduction());
                     department.setStandard(departmentData.getStandard());
 
-                    //插入纳新部门信息
+                    //插入纳新部门信息和与纳新社团的对应关系
                     int insertNum = departmentMapper.insert(department);
                     if (insertNum != 1) {
                         log.error("更新社团宣传信息接口异常，插入纳新部门信息数出错，插入纳新部门信息数：{}，插入新纳新部门名称：{}",
                                 insertNum, department.getName());
                         throw new DateBaseException("数据库插入操作异常");
                     }
-
-                    //设置社团要纳新的部门
-                    //拼装社团要参加纳新的部门的实体类
-                    OrganizationDepartmentMerge organizationDepartmentMerge = new OrganizationDepartmentMerge();
-                    organizationDepartmentMerge.setOrganizationId(organizationId);
-                    organizationDepartmentMerge.setDepartmentId(department.getId());
-                    insertNum = organizationDepartmentMergeMapper.insert(organizationDepartmentMerge);
-                    if (insertNum != 1) {
-                        log.error("更新社团宣传信息接口异常，新增社团要参加纳新的部门数出错，新增社团要参加纳新的部门数：{}，新增社团要参加纳新的部门数的社团id：{}，新增社团要参加纳新的部门id：{}",
-                                insertNum, organizationId, department.getId());
-                        throw new DateBaseException("数据库插入操作异常");
-                    }
                 }
-
             }
 
             //删除原有社团剩下的不在请求里的纳新部门和社团的联系
-            for (OrganizationDepartmentMerge organizationDepartmentMerge : organizationDepartmentMerges) {
-                int deleteNum = organizationDepartmentMergeMapper.deleteById(organizationDepartmentMerge);
+            for (Department departmentPo : departments) {
+                int deleteNum = departmentMapper.deleteById(departmentPo);
                 if (deleteNum != 1) {
                     log.error("更新社团宣传信息接口异常，删除社团要参加纳新的部门数出错，删除社团要参加纳新的部门数：{}，删除社团要参加纳新的部门数的社团id：{}，删除社团要参加纳新的部门id：{}",
-                            deleteNum, organizationDepartmentMerge.getOrganizationId(), organizationDepartmentMerge.getDepartmentId());
+                            deleteNum, organizationId, departmentPo.getId());
                     throw new DateBaseException("数据库删除操作异常");
                 }
             }
@@ -461,42 +416,26 @@ public class OrganizationServiceImpl implements OrganizationService {
                 if (tag != null) {
                     tagDataList.add(new TagData(tag.getName(), Integer.valueOf(tag.getType())));
                 }
-//                if (!isAdd) {
-//                    log.warn("获取社团宣传信息异常，社团标签信息列表添加信息失败，出错的社团id：{}，未添加的标签id：{}",
-//                            organizationId, organizationTagMerge.getTagId());
-//                }
             }
         }
 
         /*
           获取社团的纳新部门
          */
-        //获取对应的社团纳新部门id列表
-        List<OrganizationDepartmentMerge> organizationDepartmentMergeList = organizationDepartmentMergeMapper.selectList(
-                new QueryWrapper<OrganizationDepartmentMerge>().eq("organization_id", organizationId)
-        );
-
         //社团纳新部门纳新宣传信息列表
         List<DepartmentData> departmentDataList = new ArrayList<>();
-        //循环处理对应的社团纳新部门id，并获取相应的纳新部门的纳新宣传信息
-        if (organizationDepartmentMergeList != null) {
-            for (OrganizationDepartmentMerge organizationDepartmentMerge : organizationDepartmentMergeList) {
-                Department department = departmentMapper.selectById(organizationDepartmentMerge.getDepartmentId());
-                if (department == null) {
-                    log.error("获取社团宣传信息异常，社团组织纳新部门表的纳新部门id在部门表中不存在，相应的社团id：{}，不存在的纳新部门id：{}",
-                            organizationId, organizationDepartmentMerge.getDepartmentId());
-                } else {
-                    departmentDataList.add(new DepartmentData(
-                            department.getId(), department.getName(), department.getBriefDescription(),
-                            department.getDescription(), department.getStandard()
-                    ));
-                }
-            }
+        for (Department department : departmentMapper.selectList(new QueryWrapper<Department>().eq("organization_id", organizationId))) {
+            departmentDataList.add(new DepartmentData(
+                        department.getId(), department.getName(), department.getBriefDescription(),
+                        department.getDescription(), department.getStandard()
+            ));
+
         }
 
         //拼装要返回的社团纳新宣传信息实体类对象
         OrganizationInfoResult organizationInfoResult = new OrganizationInfoResult();
         organizationInfoResult.setName(organization.getName());
+        //设置社团头像信息，如果社团头像为空，则使用默认头像
         if (organization.getAvatarId() == null || organization.getAvatarId().length() == 0) {
             organizationInfoResult.setAvatarUrl(
                     pictureUtil.getPictureURL(DefaultPictureIdEnum.ORG_AVATAR.getPictureId(), true));
@@ -548,6 +487,9 @@ public class OrganizationServiceImpl implements OrganizationService {
         //上传图像
         String pictureId = pictureUtil.uploadPicture(avatar, new PictureUsage(UsageEnum.ORG_AVATAR, token));
 
+        /*
+          更新数据库中社团头像信息
+         */
         Organization organization = new Organization();
 
         organization.setId(organizationId);
