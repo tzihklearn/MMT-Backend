@@ -9,6 +9,7 @@ import com.sipc.mmtbackend.pojo.dto.CommonResult;
 import com.sipc.mmtbackend.pojo.dto.param.UserBParam.*;
 import com.sipc.mmtbackend.pojo.dto.result.UserBResult.*;
 import com.sipc.mmtbackend.pojo.dto.result.UserBResult.po.JoinedOrgResultPo;
+import com.sipc.mmtbackend.pojo.dto.result.UserBResult.po.LoginedJoinedOrgResultPo;
 import com.sipc.mmtbackend.service.UserBService;
 import com.sipc.mmtbackend.utils.CheckroleBUtil.JWTUtil;
 import com.sipc.mmtbackend.utils.CheckroleBUtil.PasswordUtil;
@@ -367,6 +368,28 @@ public class UserBBServiceImpl implements UserBService {
         }
         PutUserAvatarResult result = new PutUserAvatarResult();
         result.setAvatarUrl(pictureUtil.getPictureURL(pictureId));
+        return CommonResult.success(result);
+    }
+
+    /**
+     * 登录后获取已加入的组织及当前登录的组织
+     *
+     * @return 用户已加入的组织及是否为当前组织
+     */
+    @Override
+    public CommonResult<LoginedJoinOrgsResult> getLoginedJoinedOrgs() {
+        BTokenSwapPo context = ThreadLocalContextUtil.getContext();
+        List<LoginedJoinedOrgResultPo> results = new LinkedList<>();
+        for (JoinedOrgPo joinedOrgPo : userBRoleMapper.selectJoinedOrganizationsByBUserId(context.getUserId())) {
+            LoginedJoinedOrgResultPo po = new LoginedJoinedOrgResultPo();
+            po.setOrganizationId(joinedOrgPo.getOrganizationId());
+            po.setOrganizationName(joinedOrgPo.getOrganizationName());
+            po.setActive(Objects.equals(context.getOrganizationId(), joinedOrgPo.getOrganizationId()));
+            results.add(po);
+        }
+        LoginedJoinOrgsResult result = new LoginedJoinOrgsResult();
+        result.setNum(results.size());
+        result.setOrganizations(results);
         return CommonResult.success(result);
     }
 }
