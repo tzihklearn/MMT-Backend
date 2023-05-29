@@ -33,13 +33,16 @@ public class PictureUtil {
     /**
      * 根据 pictureId 获取图片访问链接
      *
-     * @param pictureId 图片唯一ID
+     * @param pictureId 图片唯一ID, iis_default_id 是否为默认头像
      * @return 一个字符串，为公网访问图片的链接，若图片不存在返回 null
      * @author DoudiNCer
      */
-    public String getPictureURL(String pictureId) {
-        Picture picture = pictureMapper.selectOne(new QueryWrapper<Picture>().eq("pic_id", pictureId));
-        if (picture == null) return null;
+    public String getPictureURL(String pictureId, boolean is_default_id) {
+        if (! is_default_id) {
+            Picture picture = pictureMapper.selectOne(new QueryWrapper<Picture>().eq("pic_id", pictureId));
+            if (picture == null)
+                return null;
+        }
         return minioUtil.getPictureURL(pictureId);
     }
 
@@ -62,7 +65,7 @@ public class PictureUtil {
         if (pictureId == null) return null;
         Picture picture = new Picture();
         picture.setPicId(pictureId);
-        picture.setUsage(usageJson);
+        picture.setPicUsage(usageJson);
         int insertPic = pictureMapper.insert(picture);
         if (insertPic != 1) {
             log.warn("上传图片插入数据" + picture + "异常，受影响行数：" + insertPic);

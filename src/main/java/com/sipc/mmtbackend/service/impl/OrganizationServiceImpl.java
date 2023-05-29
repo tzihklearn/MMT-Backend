@@ -15,6 +15,7 @@ import com.sipc.mmtbackend.pojo.exceptions.RunException;
 import com.sipc.mmtbackend.service.OrganizationService;
 import com.sipc.mmtbackend.utils.CheckroleBUtil.pojo.BTokenSwapPo;
 import com.sipc.mmtbackend.utils.PictureUtil.PictureUtil;
+import com.sipc.mmtbackend.utils.PictureUtil.pojo.DefaultPictureIdEnum;
 import com.sipc.mmtbackend.utils.PictureUtil.pojo.PictureUsage;
 import com.sipc.mmtbackend.utils.PictureUtil.pojo.UsageEnum;
 import com.sipc.mmtbackend.utils.ThreadLocalContextUtil;
@@ -496,7 +497,12 @@ public class OrganizationServiceImpl implements OrganizationService {
         //拼装要返回的社团纳新宣传信息实体类对象
         OrganizationInfoResult organizationInfoResult = new OrganizationInfoResult();
         organizationInfoResult.setName(organization.getName());
-        organizationInfoResult.setAvatarUrl(pictureUtil.getPictureURL(organization.getAvatarId()));
+        if (organization.getAvatarId() == null || organization.getAvatarId().length() == 0) {
+            organizationInfoResult.setAvatarUrl(
+                    pictureUtil.getPictureURL(DefaultPictureIdEnum.ORG_AVATAR.getPictureId(), true));
+        } else {
+            organizationInfoResult.setAvatarUrl(pictureUtil.getPictureURL(organization.getAvatarId(), false));
+        }
         organizationInfoResult.setBriefIntroduction(organization.getDescription());
         organizationInfoResult.setTagList(tagDataList);
         organizationInfoResult.setIntroduction(organizationRecruit.getDescription());

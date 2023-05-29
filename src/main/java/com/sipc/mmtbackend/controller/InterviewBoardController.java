@@ -26,8 +26,13 @@ public class InterviewBoardController {
         return interviewBoardService.getDepartments();
     }
 
+    /**
+     * 查询当前登录组织各个部门已报名人数
+     *
+     * @return GetNumberGroupByDepartment 组织已报名总人数、各个部门的人数
+     */
     @GetMapping("/numGroupByDepartment")
-    public CommonResult<GetNumberGroupByDepartment> getNumberGroupByDepartment(){
+    public CommonResult<GetNumberGroupByDepartment> getNumberGroupByDepartment() {
         return interviewBoardService.getNumberGroupByDepartment();
     }
 }

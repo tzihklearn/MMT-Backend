@@ -24,6 +24,7 @@ import com.sipc.mmtbackend.utils.ThreadLocalContextUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.jsqlparser.util.validation.metadata.DatabaseException;
+import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -205,9 +206,9 @@ public class UserBBServiceImpl implements UserBService {
         // 获取头像链接
         String avatarUrl;
         if (userB.getAvatarId() == null || userB.getAvatarId().length() == 0)
-            avatarUrl = pictureUtil.getPictureURL(DefaultPictureIdEnum.B_USER_AVATAR.getPictureId());
+            avatarUrl = pictureUtil.getPictureURL(DefaultPictureIdEnum.B_USER_AVATAR.getPictureId(), true);
         else
-            avatarUrl = pictureUtil.getPictureURL(userB.getAvatarId());
+            avatarUrl = pictureUtil.getPictureURL(userB.getAvatarId(), false);
         result.setAvatarUrl(avatarUrl);
         return CommonResult.success(result);
     }
@@ -379,7 +380,7 @@ public class UserBBServiceImpl implements UserBService {
             return CommonResult.serverError();
         }
         PutUserAvatarResult result = new PutUserAvatarResult();
-        result.setAvatarUrl(pictureUtil.getPictureURL(pictureId));
+        result.setAvatarUrl(pictureUtil.getPictureURL(pictureId, false));
         return CommonResult.success(result);
     }
 
