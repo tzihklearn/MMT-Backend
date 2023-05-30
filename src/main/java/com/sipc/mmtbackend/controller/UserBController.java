@@ -115,7 +115,7 @@ public class UserBController {
      * @param param 要切换的组织
      * @return 权限信息、新 Token
      */
-    @PutMapping("/switchOrg")
+    @PostMapping("/switchOrg")
     public CommonResult<SwitchOrgResult> switchOrganization(@RequestBody SwitchOrgParam param) {
         return userBService.switchOrganization(param);
     }
