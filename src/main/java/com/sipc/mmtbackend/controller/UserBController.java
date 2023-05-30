@@ -95,7 +95,7 @@ public class UserBController {
      * @author DoudiNCer
      */
     @PutMapping("/password")
-    public CommonResult<String> changeUserNewPassword(PutUserPasswordParam param) {
+    public CommonResult<String> changeUserNewPassword(@RequestBody PutUserPasswordParam param) {
         return userBService.putUserNewPassword(param);
     }
 
@@ -116,7 +116,7 @@ public class UserBController {
      * @return 权限信息、新 Token
      */
     @PutMapping("/switchOrg")
-    public CommonResult<SwitchOrgResult> switchOrganization(SwitchOrgParam param) {
+    public CommonResult<SwitchOrgResult> switchOrganization(@RequestBody SwitchOrgParam param) {
         return userBService.switchOrganization(param);
     }
 
@@ -127,7 +127,7 @@ public class UserBController {
      * @return 处理结果
      */
     @PostMapping("/addNewOrg")
-    public CommonResult<String> addNewOrganization(AddNewOrgParam param) {
+    public CommonResult<String> addNewOrganization(@RequestBody AddNewOrgParam param) {
         try {
             return userBService.addNewOrganization(param);
         } catch (DatabaseException e) {
