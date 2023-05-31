@@ -1,54 +1,63 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.sipc.mmtbackend.mapper.InterviewBoardDataMapper">
-    <select id="selectSignInPersonNumberGroupByDepartmentByOrganizationIdAndAdmissionId"
+    <select id="selectSignInPersonNumberGroupByDepartmentByAndAdmissionId"
             resultType="com.sipc.mmtbackend.pojo.domain.po.InterviewBoardPo.PersonNumGroupByDepartmentPo">
-        SELECT COUNT(1) AS "number",
-               d.`name` AS "departmentName"
-        FROM user_volunteer uv
-                 LEFT JOIN department d ON uv.department_id = d.id
-        WHERE uv.is_deleted != 1
-            AND d.is_deleted != 1
-	        AND uv.organization_order = 1
-	        AND uv.admission_id = 2
-        GROUP BY
-            d.`name`
+        SELECT `name` AS "departmentName",
+               z      AS "number",
+               x      AS "firstChoiceNum"
+        FROM (
+            SELECT department_id, COUNT(1) AS z
+            FROM user_volunteer
+            WHERE is_deleted != 1
+                AND admission_id = #{admissionId,jdbcType=INTEGER}
+            GROUP BY department_id) AS zml
+            LEFT JOIN (
+                    SELECT department_id, COUNT(1) AS x
+                    FROM user_volunteer
+                    WHERE is_deleted != 1
+                    	AND organization_order = 1
+		                AND department_order = 1
+		                AND admission_id = #{admissionId,jdbcType=INTEGER}
+                   GROUP BY
+                       department_id) AS xq
+            ON zml.department_id = xq.department_id
+            LEFT JOIN department ON zml.department_id = department.id
+        WHERE department.is_deleted != 1
     </select>
     <select id="selectTotalNumByDepartmentIdAndAdmissionId"
             resultType="com.sipc.mmtbackend.pojo.domain.po.InterviewBoardPo.TotalNumPo">
         SELECT
             uva.c AS "totalNum",
             uvb.c AS "firstChoiceNum"
-        FROM
-            (
-                SELECT
-                    COUNT( 1 ) c
-                FROM
-                    user_volunteer uv
-                WHERE
-                    uv.is_deleted != 1
-		            AND uv.admission_id = #{admissionId,jdbcType=INTEGER}
-		<if test="departmentId != null and departmentId > 0">
-		            AND uv.department_id = #{departmentId,jdbcType=INTEGER}
-        </if>
-                GROUP BY
-                    uv.admission_id
-            ) AS uva,
-            (
-                SELECT
-                    COUNT( 1 ) c
-                FROM
-                    user_volunteer uv
-                WHERE
-                    uv.is_deleted != 1
-		            AND uv.admission_id = #{admissionId,jdbcType=INTEGER}
+        FROM (
+            SELECT
+                COUNT( 1 ) c
+            FROM
+                user_volunteer uv
+            WHERE
+                uv.is_deleted != 1
+                AND uv.admission_id = #{admissionId,jdbcType=INTEGER}
         <if test="departmentId != null and departmentId > 0">
-		            AND uv.department_id = #{departmentId,jdbcType=INTEGER}
-		            AND uv.department_order = 1
+                AND uv.department_id = #{departmentId,jdbcType=INTEGER}
         </if>
-		            AND uv.organization_order = 1
-                GROUP BY
-                    uv.admission_id
-            ) AS uvb
+            GROUP BY
+                uv.admission_id
+        ) AS uva, (
+            SELECT
+                COUNT( 1 ) c
+            FROM
+                user_volunteer uv
+            WHERE
+                uv.is_deleted != 1
+                AND uv.admission_id = #{admissionId,jdbcType=INTEGER}
+        <if test="departmentId != null and departmentId > 0">
+                AND uv.department_id = #{departmentId,jdbcType=INTEGER}
+                AND uv.department_order = 1
+        </if>
+                AND uv.organization_order = 1
+            GROUP BY
+                uv.admission_id
+        ) AS uvb
     </select>
 </mapper>

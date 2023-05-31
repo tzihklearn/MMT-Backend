@@ -14,8 +14,7 @@ import java.util.List;
  */
 @Mapper
 public interface InterviewBoardDataMapper {
-    List<PersonNumGroupByDepartmentPo> selectSignInPersonNumberGroupByDepartmentByOrganizationIdAndAdmissionId(
-            @Param("organizationId") Integer organizationId,
+    List<PersonNumGroupByDepartmentPo> selectSignInPersonNumberGroupByDepartmentByAndAdmissionId(
             @Param("admissionId") Integer admissionId);
     TotalNumPo selectTotalNumByDepartmentIdAndAdmissionId(
             @Param("departmentId") Integer departmentId,
