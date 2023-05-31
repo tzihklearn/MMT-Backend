@@ -59,9 +59,9 @@ public class InterviewBoardServiceImpl implements InterviewBoardService {
     }
 
     /**
-     * 查询当前登录组织各个部门已报名人数
+     * 查询当前登录组织各个部门已报名人数、第一志愿人数
      *
-     * @return GetNumberGroupByDepartment 组织已报名总人数、各个部门的人数
+     * @return GetNumberGroupByDepartment 组织已报名总人数、各个部门的人数与第一志愿人数
      */
     @Override
     public CommonResult<GetNumberGroupByDepartment> getNumberGroupByDepartment() {
@@ -75,8 +75,8 @@ public class InterviewBoardServiceImpl implements InterviewBoardService {
             return CommonResult.fail("查询失败：未开始纳新或纳新已结束");
         }
         List<PersonNumGroupByDepartmentPo> deps =
-                interviewBoardDataMapper.selectSignInPersonNumberGroupByDepartmentByOrganizationIdAndAdmissionId(
-                        context.getOrganizationId(), admission.getId());
+                interviewBoardDataMapper.selectSignInPersonNumberGroupByDepartmentByAndAdmissionId(
+                        admission.getId());
         GetNumberGroupByDepartment result = new GetNumberGroupByDepartment();
         result.setCNum(0);
         List<GetNumberGroupByDepartmentPo> results = new LinkedList<>();
@@ -84,6 +84,7 @@ public class InterviewBoardServiceImpl implements InterviewBoardService {
             GetNumberGroupByDepartmentPo dep = new GetNumberGroupByDepartmentPo();
             dep.setNum(po.getNumber());
             dep.setDepartmentName(po.getDepartmentName());
+            dep.setFirstChoiceNum(po.getFirstChoiceNum());
             result.setCNum(result.getCNum() + po.getNumber());
             results.add(dep);
         }

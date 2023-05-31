@@ -29,9 +29,9 @@ public class InterviewBoardController {
     }
 
     /**
-     * 查询当前登录组织各个部门已报名人数
+     * 查询当前登录组织各个部门已报名人数、第一志愿人数
      *
-     * @return GetNumberGroupByDepartment 组织已报名总人数、各个部门的人数
+     * @return GetNumberGroupByDepartment 组织已报名总人数、各个部门的人数与第一志愿人数
      */
     @GetMapping("/numGroupByDepartment")
     public CommonResult<GetNumberGroupByDepartment> getNumberGroupByDepartment() {
