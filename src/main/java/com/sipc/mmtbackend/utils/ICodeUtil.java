@@ -78,7 +78,7 @@ public class ICodeUtil {
         }
 
         //将生成的社团邀请码放入redis缓存
-        boolean isSet = redisUtil.setString(ICode, organizationId, 10, TimeUnit.MINUTES);
+        boolean isSet = redisUtil.setString(ICodeKeyPrefix + ICode, organizationId,  10, TimeUnit.MINUTES);
 
         if (isSet) {
             return ICode;
