@@ -10,8 +10,8 @@ import com.sipc.mmtbackend.pojo.domain.po.InterviewBoardPo.PersonNumGroupByDepar
 import com.sipc.mmtbackend.pojo.domain.po.InterviewBoardPo.TotalNumPo;
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
 import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResult.GetDepartmentsResult;
-import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResult.GetNumberGroupByDepartment;
-import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResult.GetSignUpNum;
+import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResult.GetNumberGroupByDepartmentResult;
+import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResult.GetSignUpNumResult;
 import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResult.po.GetDepartmentPo;
 import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResult.po.GetNumberGroupByDepartmentPo;
 import com.sipc.mmtbackend.service.InterviewBoardService;
@@ -61,10 +61,10 @@ public class InterviewBoardServiceImpl implements InterviewBoardService {
     /**
      * 查询当前登录组织各个部门已报名人数、第一志愿人数
      *
-     * @return GetNumberGroupByDepartment 组织已报名总人数、各个部门的人数与第一志愿人数
+     * @return GetNumberGroupByDepartmentResult 组织已报名总人数、各个部门的人数与第一志愿人数
      */
     @Override
-    public CommonResult<GetNumberGroupByDepartment> getNumberGroupByDepartment() {
+    public CommonResult<GetNumberGroupByDepartmentResult> getNumberGroupByDepartment() {
         BTokenSwapPo context = ThreadLocalContextUtil.getContext();
         Admission admission = admissionMapper.selectOne(
                 new QueryWrapper<Admission>()
@@ -77,7 +77,7 @@ public class InterviewBoardServiceImpl implements InterviewBoardService {
         List<PersonNumGroupByDepartmentPo> deps =
                 interviewBoardDataMapper.selectSignInPersonNumberGroupByDepartmentByAndAdmissionId(
                         admission.getId());
-        GetNumberGroupByDepartment result = new GetNumberGroupByDepartment();
+        GetNumberGroupByDepartmentResult result = new GetNumberGroupByDepartmentResult();
         result.setCNum(0);
         List<GetNumberGroupByDepartmentPo> results = new LinkedList<>();
         for (PersonNumGroupByDepartmentPo po : deps) {
@@ -99,7 +99,7 @@ public class InterviewBoardServiceImpl implements InterviewBoardService {
      * @return 总人数与第一志愿人数
      */
     @Override
-    public CommonResult<GetSignUpNum> getSignupNum(Integer departmentId) {
+    public CommonResult<GetSignUpNumResult> getSignupNum(Integer departmentId) {
         BTokenSwapPo context = ThreadLocalContextUtil.getContext();
         Admission admission = admissionMapper.selectOne(
                 new QueryWrapper<Admission>()
@@ -121,7 +121,7 @@ public class InterviewBoardServiceImpl implements InterviewBoardService {
             log.warn("用户" + context + "查询组织 " + departmentId + " 的报名人数时出现异常，数据库返回空");
             return CommonResult.serverError();
         }
-        GetSignUpNum result = new GetSignUpNum();
+        GetSignUpNumResult result = new GetSignUpNumResult();
         result.setFirstChoiceNum(totalNumPo.getFirstChoiceNum());
         result.setTotalNum(totalNumPo.getTotalNum());
         return CommonResult.success(result);
