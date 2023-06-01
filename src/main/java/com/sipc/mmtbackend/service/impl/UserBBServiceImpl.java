@@ -226,7 +226,7 @@ public class UserBBServiceImpl implements UserBService {
         }
         userRoleMerge.setPassword(PasswordUtil.hashPassword(param.getNewPassword()));
         int updateById = userRoleMergeMapper.updateById(userRoleMerge);
-        if (updateById != -1) {
+        if (updateById != 1) {
             log.warn("更新用户 " + userRoleMerge + " 密码错误，受影响行数：" + updateById);
             return CommonResult.serverError();
         }
