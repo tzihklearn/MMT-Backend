@@ -60,15 +60,6 @@ public class UserBBServiceImpl implements UserBService {
     @Transactional(rollbackFor = Exception.class)
     public CommonResult<String> registUser(RegParam param) throws DatabaseException {
         Integer orgId = iCodeUtil.verifyICode(param.getKey());
-        // 科协测试邀请码
-        if (Objects.equals(param.getKey(), "qwertyuiop"))
-            orgId = 1;
-        // 学生会
-        if (Objects.equals(param.getKey(), "asdfghjklf"))
-            orgId = 2;
-        // test
-        if (Objects.equals(param.getKey(), "qazxswedcv"))
-            orgId = 6;
         if (orgId == null)
             return CommonResult.fail("注册失败：邀请码无效");
         UserB userB = userBMapper.selectOne(new QueryWrapper<UserB>().eq("phone", param.getPhoneNum()));
@@ -82,7 +73,7 @@ public class UserBBServiceImpl implements UserBService {
             return CommonResult.fail("注册失败：学号重复");
         }
         // 初始化一个新组织的新角色
-        Role role = roleMapper.selectOne(new QueryWrapper<Role>().eq("organization_id", orgId).eq("permission_id", PermissionEnum.COMMITTEE.getId()));
+        Role role = roleMapper.selectOne(new QueryWrapper<Role>().eq("organization_id", orgId).eq("permission_id", PermissionEnum.NUMBER.getId()));
         if (role == null) {
             role = new Role();
             role.setOrganizationId(orgId);
@@ -235,7 +226,7 @@ public class UserBBServiceImpl implements UserBService {
         }
         userRoleMerge.setPassword(PasswordUtil.hashPassword(param.getNewPassword()));
         int updateById = userRoleMergeMapper.updateById(userRoleMerge);
-        if (updateById != -1) {
+        if (updateById != 1) {
             log.warn("更新用户 " + userRoleMerge + " 密码错误，受影响行数：" + updateById);
             return CommonResult.serverError();
         }
@@ -299,18 +290,9 @@ public class UserBBServiceImpl implements UserBService {
     @Transactional(rollbackFor = Exception.class)
     public CommonResult<String> addNewOrganization(AddNewOrgParam param) throws DatabaseException {
         BTokenSwapPo context = ThreadLocalContextUtil.getContext();
-        if (context.getPermissionId() < PermissionEnum.COMMITTEE.getId())
+        if (context.getPermissionId() < PermissionEnum.NUMBER.getId())
             return CommonResult.fail("Super Admin 不允许加入其他组织");
         Integer orgId = iCodeUtil.verifyICode(param.getKey());
-        // 科协测试邀请码
-        if (Objects.equals(param.getKey(), "qwertyuiop"))
-            orgId = 1;
-        // 学生会
-        if (Objects.equals(param.getKey(), "asdfghjklf"))
-            orgId = 2;
-        // test
-        if (Objects.equals(param.getKey(), "qazxswedcv"))
-            orgId = 6;
         if (orgId == null)
             return CommonResult.fail("注册失败：邀请码无效");
         UserB userB = userBMapper.selectById(context.getUserId());

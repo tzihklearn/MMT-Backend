@@ -6,7 +6,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class GetNumberGroupByDepartment {
+public class GetNumberGroupByDepartmentResult {
     // 有报名数据的部门数
     private Integer depNum;
     // 总报名人数

@@ -131,7 +131,7 @@ public class UserBController {
         try {
             return userBService.addNewOrganization(param);
         } catch (DatabaseException e) {
-            return CommonResult.fail(e.getMessage());
+            return CommonResult.serverError();
         }
     }
 }

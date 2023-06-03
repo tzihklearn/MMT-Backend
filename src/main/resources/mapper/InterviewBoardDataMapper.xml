@@ -1,6 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.sipc.mmtbackend.mapper.InterviewBoardDataMapper">
+    <resultMap id="LineChartLineData" type="com.sipc.mmtbackend.pojo.domain.po.InterviewBoardPo.LineChartLineDataDaoPo">
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <collection property="data"
+                    ofType="com.sipc.mmtbackend.pojo.domain.po.InterviewBoardPo.LineChartLineDataPDaoPo">
+            <result column="date" property="date" jdbcType="VARCHAR"/>
+            <result column="number" property="number" jdbcType="INTEGER"/>
+        </collection>
+    </resultMap>
+
     <select id="selectSignInPersonNumberGroupByDepartmentByAndAdmissionId"
             resultType="com.sipc.mmtbackend.pojo.domain.po.InterviewBoardPo.PersonNumGroupByDepartmentPo">
         SELECT `name` AS "departmentName",
@@ -59,5 +68,36 @@
             GROUP BY
                 uv.admission_id
         ) AS uvb
+    </select>
+    <select id="selectInterviewNumberLineChartGroupByDepartmentDataByOrganizationIdAndAdmissionId"
+            resultMap="LineChartLineData">
+        SELECT xq.`name`  AS "name",
+               xq.`date`  AS "date",
+               zml.number AS "number"
+        FROM (SELECT d.id,
+                     d.`name`,
+                     t.`date`
+              FROM (SELECT id,
+                           `name`
+                    FROM department d
+                    WHERE d.is_deleted != 1
+                            AND d.organization_id = #{organizationId,jdbcType=INTEGER}) AS `d`
+                       LEFT JOIN (SELECT DISTINCT DATE_FORMAT(register_time, "%m-%d") AS "date"
+                                  FROM user_volunteer u
+                                  WHERE u.is_deleted != 1 AND u.admission_id = #{admissionId,jdbcType=INTEGER}) AS `t`
+                                 ON 114 != 514) AS `xq`
+                 LEFT JOIN (SELECT COUNT(1)                            AS "number",
+                                   department_id,
+                                   DATE_FORMAT(register_time, "%m-%d") AS "date"
+                            FROM user_volunteer uv
+                            WHERE uv.is_deleted != 1
+		AND uv.admission_id = #{admissionId,jdbcType=INTEGER}
+                            GROUP BY
+                                department_id,
+                                `date`
+                            ORDER BY
+                                department_id,
+                                `date`) AS `zml` ON xq.`date` = zml.`date`
+            AND xq.id = zml.department_id
     </select>
 </mapper>

@@ -8,7 +8,7 @@ import lombok.Data;
  * @author DoudiNCer
  */
 @Data
-public class GetSignUpNum {
+public class GetSignUpNumResult {
     private Integer totalNum;
     private Integer firstChoiceNum;
 }

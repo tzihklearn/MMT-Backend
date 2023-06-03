@@ -6,14 +6,17 @@ import com.sipc.mmtbackend.mapper.DepartmentMapper;
 import com.sipc.mmtbackend.mapper.InterviewBoardDataMapper;
 import com.sipc.mmtbackend.pojo.domain.Admission;
 import com.sipc.mmtbackend.pojo.domain.Department;
+import com.sipc.mmtbackend.pojo.domain.po.InterviewBoardPo.LineChartLineDataDaoPo;
 import com.sipc.mmtbackend.pojo.domain.po.InterviewBoardPo.PersonNumGroupByDepartmentPo;
 import com.sipc.mmtbackend.pojo.domain.po.InterviewBoardPo.TotalNumPo;
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
 import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResult.GetDepartmentsResult;
-import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResult.GetNumberGroupByDepartment;
-import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResult.GetSignUpNum;
+import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResult.GetNumberGroupByDepartmentResult;
+import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResult.GetNumberGroupByTimeAndDepartmentResult;
+import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResult.GetSignUpNumResult;
 import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResult.po.GetDepartmentPo;
 import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResult.po.GetNumberGroupByDepartmentPo;
+import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResult.po.LineChartLineDataPo;
 import com.sipc.mmtbackend.service.InterviewBoardService;
 import com.sipc.mmtbackend.utils.CheckroleBUtil.pojo.BTokenSwapPo;
 import com.sipc.mmtbackend.utils.ThreadLocalContextUtil;
@@ -22,9 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor(onConstructor_ = {@Autowired})
@@ -61,10 +62,10 @@ public class InterviewBoardServiceImpl implements InterviewBoardService {
     /**
      * 查询当前登录组织各个部门已报名人数、第一志愿人数
      *
-     * @return GetNumberGroupByDepartment 组织已报名总人数、各个部门的人数与第一志愿人数
+     * @return GetNumberGroupByDepartmentResult 组织已报名总人数、各个部门的人数与第一志愿人数
      */
     @Override
-    public CommonResult<GetNumberGroupByDepartment> getNumberGroupByDepartment() {
+    public CommonResult<GetNumberGroupByDepartmentResult> getNumberGroupByDepartment() {
         BTokenSwapPo context = ThreadLocalContextUtil.getContext();
         Admission admission = admissionMapper.selectOne(
                 new QueryWrapper<Admission>()
@@ -77,7 +78,7 @@ public class InterviewBoardServiceImpl implements InterviewBoardService {
         List<PersonNumGroupByDepartmentPo> deps =
                 interviewBoardDataMapper.selectSignInPersonNumberGroupByDepartmentByAndAdmissionId(
                         admission.getId());
-        GetNumberGroupByDepartment result = new GetNumberGroupByDepartment();
+        GetNumberGroupByDepartmentResult result = new GetNumberGroupByDepartmentResult();
         result.setCNum(0);
         List<GetNumberGroupByDepartmentPo> results = new LinkedList<>();
         for (PersonNumGroupByDepartmentPo po : deps) {
@@ -99,7 +100,7 @@ public class InterviewBoardServiceImpl implements InterviewBoardService {
      * @return 总人数与第一志愿人数
      */
     @Override
-    public CommonResult<GetSignUpNum> getSignupNum(Integer departmentId) {
+    public CommonResult<GetSignUpNumResult> getSignupNum(Integer departmentId) {
         BTokenSwapPo context = ThreadLocalContextUtil.getContext();
         Admission admission = admissionMapper.selectOne(
                 new QueryWrapper<Admission>()
@@ -121,9 +122,42 @@ public class InterviewBoardServiceImpl implements InterviewBoardService {
             log.warn("用户" + context + "查询组织 " + departmentId + " 的报名人数时出现异常，数据库返回空");
             return CommonResult.serverError();
         }
-        GetSignUpNum result = new GetSignUpNum();
+        GetSignUpNumResult result = new GetSignUpNumResult();
         result.setFirstChoiceNum(totalNumPo.getFirstChoiceNum());
         result.setTotalNum(totalNumPo.getTotalNum());
+        return CommonResult.success(result);
+    }
+
+    /**
+     * 获取组织各个部门报名人数随时间变化情况（组织总况的折线图）
+     *
+     * @return 折线图横坐标（日期）、折线数据（折线名称与数据）
+     */
+    @Override
+    public CommonResult<GetNumberGroupByTimeAndDepartmentResult> getNumberGroupByByTimeAndDepartment() {
+        BTokenSwapPo context = ThreadLocalContextUtil.getContext();
+        Admission admission = admissionMapper.selectOne(
+                new QueryWrapper<Admission>()
+                        .eq("organization_id", context.getOrganizationId())
+                        .orderByDesc("id"));
+        if (admission == null) {
+            log.warn("用户 " + context + " 尝试在无活动的纳新时查询已报名人数");
+            return CommonResult.fail("查询失败：未开始纳新或纳新已结束");
+        }
+        // 数据库查询到的数据
+        List<LineChartLineDataDaoPo> daoDatas = interviewBoardDataMapper.selectInterviewNumberLineChartGroupByDepartmentDataByOrganizationIdAndAdmissionId(
+                context.getOrganizationId(), admission.getId());
+        // 响应体数据
+        GetNumberGroupByTimeAndDepartmentResult result = new GetNumberGroupByTimeAndDepartmentResult();
+        result.setDate(daoDatas.get(0).getAbscissaData());
+        List<LineChartLineDataPo> departmentDates = new LinkedList<>();
+        for (LineChartLineDataDaoPo data : daoDatas){
+            LineChartLineDataPo depData = new LineChartLineDataPo();
+            depData.setName(data.getName());
+            depData.setData(data.getYDatas());
+            departmentDates.add(depData);
+        }
+        result.setDepartments(departmentDates);
         return CommonResult.success(result);
     }
 }
