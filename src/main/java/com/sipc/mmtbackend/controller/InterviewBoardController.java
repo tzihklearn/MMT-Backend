@@ -4,6 +4,7 @@ import com.sipc.mmtbackend.pojo.dto.CommonResult;
 import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResult.GetDepartmentsResult;
 import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResult.GetNumberGroupByDepartmentResult;
 import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResult.GetSignUpNumResult;
+import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResult.GetNumberGroupByTimeAndDepartmentResult;
 import com.sipc.mmtbackend.service.InterviewBoardService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -47,5 +48,15 @@ public class InterviewBoardController {
     @GetMapping("/totalNum")
     public CommonResult<GetSignUpNumResult> getSignupNum(@RequestParam(value = "departmentId", required = false) Integer departmentId) {
         return interviewBoardService.getSignupNum(departmentId);
+    }
+
+    /**
+     * 获取组织各个部门报名人数随时间变化情况（组织总况的折线图）
+     *
+     * @return 折线图横坐标（日期）、折线数据（折线名称与数据）
+     */
+    @GetMapping("/numGroupByTimeAndDepartment")
+    public CommonResult<GetNumberGroupByTimeAndDepartmentResult> getNumberGroupByByTimeAndDepartment(){
+        return interviewBoardService.getNumberGroupByByTimeAndDepartment();
     }
 }

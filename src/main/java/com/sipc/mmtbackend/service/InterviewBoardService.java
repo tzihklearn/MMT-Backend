@@ -3,6 +3,7 @@ package com.sipc.mmtbackend.service;
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
 import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResult.GetDepartmentsResult;
 import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResult.GetNumberGroupByDepartmentResult;
+import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResult.GetNumberGroupByTimeAndDepartmentResult;
 import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResult.GetSignUpNumResult;
 
 public interface InterviewBoardService {
@@ -27,4 +28,10 @@ public interface InterviewBoardService {
      * @return 总人数与第一志愿人数
      */
     CommonResult<GetSignUpNumResult> getSignupNum(Integer departmentId);
+    /**
+     * 获取组织各个部门报名人数随时间变化情况（组织总况的折线图）
+     *
+     * @return 折线图横坐标（日期）、折线数据（折线名称与数据）
+     */
+    CommonResult<GetNumberGroupByTimeAndDepartmentResult> getNumberGroupByByTimeAndDepartment();
 }
