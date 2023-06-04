@@ -2,7 +2,7 @@ package com.sipc.mmtbackend.controller.superAdmin;
 
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
 import com.sipc.mmtbackend.pojo.dto.param.superAdmin.OrganizationInfoParam;
-import com.sipc.mmtbackend.pojo.dto.param.superAdmin.OrganizationPublishParam;
+import com.sipc.mmtbackend.pojo.dto.param.superAdmin.AdmissionPublishParam;
 import com.sipc.mmtbackend.pojo.dto.result.superAdmin.OrganizationInfoResult;
 import com.sipc.mmtbackend.pojo.dto.result.superAdmin.UploadAvatarResult;
 import com.sipc.mmtbackend.pojo.exceptions.DateBaseException;
@@ -63,8 +63,8 @@ public class OrganizationController {
     }
 
     @PostMapping("/admission/publish")
-    public CommonResult<String> publishAdmission(@RequestBody OrganizationPublishParam organizationPublishParam) throws RunException, DateBaseException {
-        return organizationService.publishAdmission(organizationPublishParam);
+    public CommonResult<String> publishAdmission(@RequestBody AdmissionPublishParam admissionPublishParam) throws RunException, DateBaseException {
+        return organizationService.publishAdmission(admissionPublishParam);
     }
 
     @PostMapping("/test")

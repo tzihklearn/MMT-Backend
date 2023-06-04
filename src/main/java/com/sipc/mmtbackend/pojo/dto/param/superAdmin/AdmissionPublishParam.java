@@ -11,7 +11,7 @@ import java.util.List;
  * @since 2023.05.03
  */
 @Data
-public class OrganizationPublishParam {
+public class AdmissionPublishParam {
 
     private String endTime;
 

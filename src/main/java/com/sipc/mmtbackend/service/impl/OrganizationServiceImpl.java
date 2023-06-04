@@ -12,7 +12,7 @@ import com.sipc.mmtbackend.pojo.dto.data.QuestionPoData;
 import com.sipc.mmtbackend.pojo.dto.data.QuestionValueData;
 import com.sipc.mmtbackend.pojo.dto.data.TagData;
 import com.sipc.mmtbackend.pojo.dto.param.superAdmin.OrganizationInfoParam;
-import com.sipc.mmtbackend.pojo.dto.param.superAdmin.OrganizationPublishParam;
+import com.sipc.mmtbackend.pojo.dto.param.superAdmin.AdmissionPublishParam;
 import com.sipc.mmtbackend.pojo.dto.result.superAdmin.OrganizationInfoResult;
 import com.sipc.mmtbackend.pojo.dto.result.superAdmin.UploadAvatarResult;
 import com.sipc.mmtbackend.pojo.exceptions.DateBaseException;
@@ -532,7 +532,7 @@ public class OrganizationServiceImpl implements OrganizationService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public synchronized CommonResult<String> publishAdmission(OrganizationPublishParam organizationPublishParam) throws DateBaseException, RunException {
+    public synchronized CommonResult<String> publishAdmission(AdmissionPublishParam admissionPublishParam) throws DateBaseException, RunException {
 
         //获取操作用户信息，并获取其操作社团id
         BTokenSwapPo context = ThreadLocalContextUtil.getContext();
@@ -565,9 +565,9 @@ public class OrganizationServiceImpl implements OrganizationService {
             admission.setInitiator(context.getUserId());
             admission.setOrganizationId(organizationId);
             admission.setStartTime(LocalDateTime.now());
-            admission.setEndTime(TimeTransUtil.transStringToTime(organizationPublishParam.getEndTime()));
-            admission.setDepartmentNum(organizationPublishParam.getDepartmentNum());
-            admission.setAllowDepartmentAmount(organizationPublishParam.getMaxDepartmentNum());
+            admission.setEndTime(TimeTransUtil.transStringToTime(admissionPublishParam.getEndTime()));
+            admission.setDepartmentNum(admissionPublishParam.getDepartmentNum());
+            admission.setAllowDepartmentAmount(admissionPublishParam.getMaxDepartmentNum());
             admission.setRounds(0);
             admission.setIsDeleted((byte) 0);
 
@@ -575,7 +575,7 @@ public class OrganizationServiceImpl implements OrganizationService {
             int insertNum = admissionMapper.insert(admission);
             if (insertNum != 1) {
                 log.error("发布纳新接口异常，插入admission表数据数错误，插入admission表数据数：{}，插入社团id：{}，插入信息：{}",
-                        insertNum, organizationId, organizationPublishParam);
+                        insertNum, organizationId, admissionPublishParam);
                 throw new DateBaseException("插入数据库操作异常");
             }
 
@@ -583,15 +583,15 @@ public class OrganizationServiceImpl implements OrganizationService {
         }
 
         //设置纳新报名表基本问题
-        if (organizationPublishParam.getEssentialQuestionList() != null) {
-            setQuestion(organizationPublishParam.getEssentialQuestionList(), organizationId, admissionId, 1);
+        if (admissionPublishParam.getEssentialQuestionList() != null) {
+            setQuestion(admissionPublishParam.getEssentialQuestionList(), organizationId, admissionId, 1);
         }
 
         //设置纳新报名表部门问题
-        setQuestion(organizationPublishParam.getDepartmentQuestionList(), organizationId, admissionId, 2);
+        setQuestion(admissionPublishParam.getDepartmentQuestionList(), organizationId, admissionId, 2);
 
         //设置纳新报名表综合问题
-        setQuestion(organizationPublishParam.getComprehensiveQuestionList(), organizationId, admissionId, 3);
+        setQuestion(admissionPublishParam.getComprehensiveQuestionList(), organizationId, admissionId, 3);
 
         return CommonResult.success("发起纳新成功");
     }
