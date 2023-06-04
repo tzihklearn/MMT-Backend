@@ -21,7 +21,10 @@ public class OrganizationRecruit implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @TableId(value = "organization_id", type = IdType.AUTO)
+    @TableId(value = "id", type = IdType.AUTO)
+    private Integer id;
+
+    @TableField(value = "organization_id")
     private Integer organizationId;
 
     @TableField(value = "description", updateStrategy = FieldStrategy.IGNORED)
