@@ -30,6 +30,13 @@ public class CheckRoleUtil {
         apiPermissions.put("/b/admin/organization/info/update", PermissionEnum.SUPER_ADMIN);
         apiPermissions.put("/b/admin/organization/info/get", PermissionEnum.SUPER_ADMIN);
         apiPermissions.put("/b/admin/organization/avatar/upload", PermissionEnum.SUPER_ADMIN);
+
+        apiPermissions.put("/b/admin/organization/admission/publish", PermissionEnum.SUPER_ADMIN);
+        apiPermissions.put("/b/admin/organization/registration/form/save", PermissionEnum.SUPER_ADMIN);
+        apiPermissions.put("/b/admin/organization/registration/form/info", PermissionEnum.SUPER_ADMIN);
+        apiPermissions.put("/b/admin/organization/registration/form/system/question", PermissionEnum.SUPER_ADMIN);
+        apiPermissions.put("/b/admin/organization/registration/form/select/type", PermissionEnum.SUPER_ADMIN);
+
         apiPermissions.put("/b/admin/account/icode/generated", PermissionEnum.SUPER_ADMIN);
         apiPermissions.put("/b/admin/account/members/info", PermissionEnum.SUPER_ADMIN);
         apiPermissions.put("/b/admin/account/members/info/sift", PermissionEnum.SUPER_ADMIN);
