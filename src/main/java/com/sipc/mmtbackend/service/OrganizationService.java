@@ -3,6 +3,7 @@ package com.sipc.mmtbackend.service;
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
 import com.sipc.mmtbackend.pojo.dto.param.superAdmin.OrganizationInfoParam;
 import com.sipc.mmtbackend.pojo.dto.param.superAdmin.AdmissionPublishParam;
+import com.sipc.mmtbackend.pojo.dto.param.superAdmin.RegistrationFormParam;
 import com.sipc.mmtbackend.pojo.dto.result.superAdmin.OrganizationInfoResult;
 import com.sipc.mmtbackend.pojo.dto.result.superAdmin.UploadAvatarResult;
 import com.sipc.mmtbackend.pojo.exceptions.DateBaseException;
@@ -18,4 +19,5 @@ public interface OrganizationService {
 
     CommonResult<String> publishAdmission(AdmissionPublishParam admissionPublishParam) throws DateBaseException, RunException;
 
+    CommonResult<String> saveRegistrationForm(RegistrationFormParam registrationFormParam) throws DateBaseException, RunException;
 }

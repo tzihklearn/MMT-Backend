@@ -7,12 +7,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sipc.mmtbackend.mapper.*;
 import com.sipc.mmtbackend.pojo.domain.*;
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
-import com.sipc.mmtbackend.pojo.dto.data.DepartmentData;
-import com.sipc.mmtbackend.pojo.dto.data.QuestionPoData;
-import com.sipc.mmtbackend.pojo.dto.data.QuestionValueData;
-import com.sipc.mmtbackend.pojo.dto.data.TagData;
+import com.sipc.mmtbackend.pojo.dto.data.*;
 import com.sipc.mmtbackend.pojo.dto.param.superAdmin.OrganizationInfoParam;
 import com.sipc.mmtbackend.pojo.dto.param.superAdmin.AdmissionPublishParam;
+import com.sipc.mmtbackend.pojo.dto.param.superAdmin.RegistrationFormParam;
 import com.sipc.mmtbackend.pojo.dto.result.superAdmin.OrganizationInfoResult;
 import com.sipc.mmtbackend.pojo.dto.result.superAdmin.UploadAvatarResult;
 import com.sipc.mmtbackend.pojo.exceptions.DateBaseException;
@@ -281,6 +279,7 @@ public class OrganizationServiceImpl implements OrganizationService {
         );
 
         if (organizationRecruitNow != null) {
+            organizationRecruit.setId(organizationRecruitNow.getId());
             updateNum = organizationRecruitMapper.updateById(organizationRecruit);
             if (updateNum != 1) {
                 log.error("更新社团宣传信息接口异常，更新社团宣传信息数出错，更新社团宣传信息数：{}，更新社团id：{}",
@@ -538,62 +537,60 @@ public class OrganizationServiceImpl implements OrganizationService {
         BTokenSwapPo context = ThreadLocalContextUtil.getContext();
         Integer organizationId = context.getOrganizationId();
 
-        //从数据库中查找是否有已经保存的信息
-        Admission admissionNow = admissionMapper.selectOne(new QueryWrapper<Admission>()
-                .select("id")
-                .eq("organization_id", organizationId)
-                .isNull("start_time")
-                .orderByDesc("id")
-                .last("limit 1"));
+        boolean isAdmissionNow = isAdmission(organizationId);
 
-        /*
-          判断是否有已经保存的纳新信息
-         */
-
-        Integer admissionId;
-
-        if (admissionNow != null) {
-
-            admissionId = admissionNow.getId();
-
-            //删除已经保存的社团报名表问题信息
-            admissionQuestionMapper.delete(new QueryWrapper<AdmissionQuestion>().eq("admission_id", admissionId));
-
-        } else {
-            //没有已经保存的数据，插入一个新的纳新信息
-            Admission admission = new Admission();
-            admission.setInitiator(context.getUserId());
-            admission.setOrganizationId(organizationId);
-            admission.setStartTime(LocalDateTime.now());
-            admission.setEndTime(TimeTransUtil.transStringToTime(admissionPublishParam.getEndTime()));
-            admission.setDepartmentNum(admissionPublishParam.getDepartmentNum());
-            admission.setAllowDepartmentAmount(admissionPublishParam.getMaxDepartmentNum());
-            admission.setRounds(0);
-            admission.setIsDeleted((byte) 0);
-
-            //插入新的纳新记录
-            int insertNum = admissionMapper.insert(admission);
-            if (insertNum != 1) {
-                log.error("发布纳新接口异常，插入admission表数据数错误，插入admission表数据数：{}，插入社团id：{}，插入信息：{}",
-                        insertNum, organizationId, admissionPublishParam);
-                throw new DateBaseException("插入数据库操作异常");
-            }
-
-            admissionId = admission.getId();
+        if (!isAdmissionNow) {
+            return CommonResult.fail("已经发起纳新，请先结束此次纳新，再发起新的纳新");
         }
 
-        //设置纳新报名表基本问题
-        if (admissionPublishParam.getEssentialQuestionList() != null) {
-            setQuestion(admissionPublishParam.getEssentialQuestionList(), organizationId, admissionId, 1);
+        //拼装RegistrationFormData实体类，为添加报名表做准备
+        RegistrationFormData registrationFormData = new RegistrationFormData();
+        registrationFormData.setDepartmentNum(admissionPublishParam.getDepartmentNum());
+        registrationFormData.setMaxDepartmentNum(admissionPublishParam.getMaxDepartmentNum());
+        registrationFormData.setIsTransfers(admissionPublishParam.getIsTransfers());
+        registrationFormData.setEssentialQuestionList(admissionPublishParam.getEssentialQuestionList());
+        registrationFormData.setDepartmentQuestionList(admissionPublishParam.getDepartmentQuestionList());
+        registrationFormData.setComprehensiveQuestionList(admissionPublishParam.getComprehensiveQuestionList());
+
+        //获取admissionId
+        int admissionId = setAdmissionInfo(organizationId, context.getUserId(), admissionPublishParam.getEndTime(), registrationFormData);
+
+        //设置报名表相关信息
+        setRegistrationForm(registrationFormData, organizationId, admissionId);
+
+        return CommonResult.success("保存报名表成功");
+    }
+
+    @Override
+    public CommonResult<String> saveRegistrationForm(RegistrationFormParam registrationFormParam) throws DateBaseException, RunException {
+
+        //获取操作用户信息，并获取其操作社团id
+        BTokenSwapPo context = ThreadLocalContextUtil.getContext();
+        Integer organizationId = context.getOrganizationId();
+
+        boolean isAdmissionNow = isAdmission(organizationId);
+
+        if (!isAdmissionNow) {
+            return CommonResult.fail("已经发起纳新，请先结束此次纳新，再发起新的纳新");
         }
 
-        //设置纳新报名表部门问题
-        setQuestion(admissionPublishParam.getDepartmentQuestionList(), organizationId, admissionId, 2);
+        //拼装RegistrationFormData实体类，为添加报名表做准备
+        RegistrationFormData registrationFormData = new RegistrationFormData();
+        registrationFormData.setDepartmentNum(registrationFormParam.getDepartmentNum());
+        registrationFormData.setMaxDepartmentNum(registrationFormParam.getMaxDepartmentNum());
+        registrationFormData.setIsTransfers(registrationFormParam.getIsTransfers());
+        registrationFormData.setEssentialQuestionList(registrationFormParam.getEssentialQuestionList());
+        registrationFormData.setDepartmentQuestionList(registrationFormParam.getDepartmentQuestionList());
+        registrationFormData.setComprehensiveQuestionList(registrationFormParam.getComprehensiveQuestionList());
 
-        //设置纳新报名表综合问题
-        setQuestion(admissionPublishParam.getComprehensiveQuestionList(), organizationId, admissionId, 3);
+        //获取admissionId
+        int admissionId = setAdmissionInfo(organizationId, context.getUserId(), null, registrationFormData);
 
-        return CommonResult.success("发起纳新成功");
+        //设置报名表相关信息
+        setRegistrationForm(registrationFormData, organizationId, admissionId);
+
+        return CommonResult.success("保存报名表成功");
+
     }
 
     /**
@@ -642,6 +639,92 @@ public class OrganizationServiceImpl implements OrganizationService {
             }
         }
         return depth;
+    }
+
+    private boolean isAdmission(int organizationId) {
+        LocalDateTime timeNow = LocalDateTime.now();
+
+        Admission admissionNow = admissionMapper.selectOne(
+                new QueryWrapper<Admission>()
+                        .select("id")
+                        .eq("organization_id", organizationId)
+                        .ge("start_time", timeNow)
+                        .le("end_time", timeNow)
+                        .orderByDesc("id")
+                        .last("limit 1")
+        );
+        return admissionNow == null;
+    }
+
+    private int setAdmissionInfo(int organizationId, int userId, String endTime, RegistrationFormData registrationForm) throws DateBaseException {
+        //从数据库中查找是否有已经保存的信息
+        Admission admissionNow = admissionMapper.selectOne(new QueryWrapper<Admission>()
+                .select("id")
+                .eq("organization_id", organizationId)
+                .isNull("start_time")
+                .orderByDesc("id")
+                .last("limit 1"));
+
+        /*
+          判断是否有已经保存的纳新信息
+         */
+
+        Integer admissionId;
+
+        if (admissionNow != null) {
+
+            admissionId = admissionNow.getId();
+
+            //删除已经保存的社团报名表问题信息
+            admissionQuestionMapper.delete(new QueryWrapper<AdmissionQuestion>().eq("admission_id", admissionId));
+
+        } else {
+            //没有已经保存的数据，插入一个新的纳新信息
+            Admission admission = new Admission();
+            admission.setInitiator(userId);
+            admission.setOrganizationId(organizationId);
+            //根据endTime是不是空来判断是发起报名还是保存报名表
+            if (endTime != null) {
+                admission.setStartTime(LocalDateTime.now());
+                admission.setEndTime(TimeTransUtil.transStringToTime(endTime));
+            } else {
+                admission.setStartTime(null);
+                admission.setEndTime(null);
+            }
+            admission.setDepartmentNum(registrationForm.getDepartmentNum());
+            admission.setAllowDepartmentAmount(registrationForm.getMaxDepartmentNum());
+            admission.setRounds(0);
+            admission.setIsDeleted((byte) 0);
+
+            //插入新的纳新记录
+            int insertNum = admissionMapper.insert(admission);
+            if (insertNum != 1) {
+                log.error("发布纳新接口异常，插入admission表数据数错误，插入admission表数据数：{}，插入社团id：{}，插入信息：{}",
+                        insertNum, organizationId, registrationForm);
+                throw new DateBaseException("插入数据库操作异常");
+            }
+
+            admissionId = admission.getId();
+        }
+        return admissionId;
+    }
+
+    private void setRegistrationForm(RegistrationFormData registrationForm, int organizationId, int admissionId) throws DateBaseException, RunException {
+
+        //设置纳新报名表基本问题
+        if (registrationForm.getEssentialQuestionList() != null) {
+            setQuestion(registrationForm.getEssentialQuestionList(), organizationId, admissionId, 1);
+        }
+
+        //设置纳新报名表部门问题
+        if (registrationForm.getDepartmentQuestionList() != null) {
+            setQuestion(registrationForm.getDepartmentQuestionList(), organizationId, admissionId, 2);
+        }
+
+        //设置纳新报名表综合问题
+        if (registrationForm.getComprehensiveQuestionList() != null) {
+            setQuestion(registrationForm.getComprehensiveQuestionList(), organizationId, admissionId, 3);
+        }
     }
 
     private void setQuestion(List<QuestionPoData> questionPoDataList, int organizationId, int admissionId, int questionType) throws RunException, DateBaseException {

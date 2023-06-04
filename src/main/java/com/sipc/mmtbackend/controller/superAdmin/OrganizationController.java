@@ -3,6 +3,7 @@ package com.sipc.mmtbackend.controller.superAdmin;
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
 import com.sipc.mmtbackend.pojo.dto.param.superAdmin.OrganizationInfoParam;
 import com.sipc.mmtbackend.pojo.dto.param.superAdmin.AdmissionPublishParam;
+import com.sipc.mmtbackend.pojo.dto.param.superAdmin.RegistrationFormParam;
 import com.sipc.mmtbackend.pojo.dto.result.superAdmin.OrganizationInfoResult;
 import com.sipc.mmtbackend.pojo.dto.result.superAdmin.UploadAvatarResult;
 import com.sipc.mmtbackend.pojo.exceptions.DateBaseException;
@@ -65,6 +66,11 @@ public class OrganizationController {
     @PostMapping("/admission/publish")
     public CommonResult<String> publishAdmission(@RequestBody AdmissionPublishParam admissionPublishParam) throws RunException, DateBaseException {
         return organizationService.publishAdmission(admissionPublishParam);
+    }
+
+    @PostMapping("/registration/form/save")
+    public CommonResult<String> saveRegistrationForm(@RequestBody RegistrationFormParam registrationFormParam) throws RunException, DateBaseException {
+        return organizationService.saveRegistrationForm(registrationFormParam);
     }
 
     @PostMapping("/test")
