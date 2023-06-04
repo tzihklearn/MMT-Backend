@@ -2,8 +2,8 @@ package com.sipc.mmtbackend.controller.superAdmin;
 
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
 import com.sipc.mmtbackend.pojo.dto.data.QuestionPoData;
-import com.sipc.mmtbackend.pojo.dto.param.superAdmin.OrganizationInfoParam;
 import com.sipc.mmtbackend.pojo.dto.param.superAdmin.AdmissionPublishParam;
+import com.sipc.mmtbackend.pojo.dto.param.superAdmin.OrganizationInfoParam;
 import com.sipc.mmtbackend.pojo.dto.param.superAdmin.RegistrationFormParam;
 import com.sipc.mmtbackend.pojo.dto.result.superAdmin.OrganizationInfoResult;
 import com.sipc.mmtbackend.pojo.dto.result.superAdmin.RegistrationFormResult;
@@ -70,9 +70,10 @@ public class OrganizationController {
 
     /**
      * 提交报名表并发起纳新的接口，请求方法Post,请求路径/b/admin/organization/admission/publish
+     *
      * @param admissionPublishParam 提交报名表并发起纳新的接口的请求参数
      * @return CommonResult<String> 返回接口处理结果
-     * @throws RunException 自定义的运行时异常，抛出用于统一异常处理
+     * @throws RunException      自定义的运行时异常，抛出用于统一异常处理
      * @throws DateBaseException 自定义的数据库操作异常，抛出用于统一异常处理
      * @see AdmissionPublishParam
      */
@@ -83,9 +84,10 @@ public class OrganizationController {
 
     /**
      * 保存社团报名表信息接口，请求方法Post,请求路径/b/admin/organization/registration/form/save
+     *
      * @param registrationFormParam 保存社团报名表信息接口的请求参数
      * @return CommonResult<String> 返回接口处理结果
-     * @throws RunException 自定义的运行时异常，抛出用于统一异常处理
+     * @throws RunException      自定义的运行时异常，抛出用于统一异常处理
      * @throws DateBaseException 自定义的数据库操作异常，抛出用于统一异常处理
      * @see RegistrationFormParam
      */
@@ -96,6 +98,7 @@ public class OrganizationController {
 
     /**
      * 获取社团报名表信息接口，请求方法Get,请求路径/b/admin/organization/registration/form/info
+     *
      * @return CommonResult<RegistrationFormResult> 返回社团报名表相关信息的实体类
      * @throws RunException 自定义的运行时异常，抛出用于统一异常处理
      * @see RegistrationFormResult
@@ -107,6 +110,7 @@ public class OrganizationController {
 
     /**
      * 获取系统内置问题接口，请求方法Get,请求路径/b/admin/organization/registration/form/system/question
+     *
      * @return 返回系统内置问题列表
      * @throws RunException 自定义的运行时异常，抛出用于统一异常处理
      * @see QuestionPoData
@@ -118,6 +122,7 @@ public class OrganizationController {
 
     /**
      * 获取选择类型列表接口，请求方法Get,请求路径/b/admin/organization/registration/form/select/type
+     *
      * @return 返回选择类型列表
      * @see SelectTypePo
      */

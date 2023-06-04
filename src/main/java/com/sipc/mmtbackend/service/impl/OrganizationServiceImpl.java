@@ -8,8 +8,8 @@ import com.sipc.mmtbackend.mapper.*;
 import com.sipc.mmtbackend.pojo.domain.*;
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
 import com.sipc.mmtbackend.pojo.dto.data.*;
-import com.sipc.mmtbackend.pojo.dto.param.superAdmin.OrganizationInfoParam;
 import com.sipc.mmtbackend.pojo.dto.param.superAdmin.AdmissionPublishParam;
+import com.sipc.mmtbackend.pojo.dto.param.superAdmin.OrganizationInfoParam;
 import com.sipc.mmtbackend.pojo.dto.param.superAdmin.RegistrationFormParam;
 import com.sipc.mmtbackend.pojo.dto.result.superAdmin.OrganizationInfoResult;
 import com.sipc.mmtbackend.pojo.dto.result.superAdmin.RegistrationFormResult;
@@ -454,8 +454,8 @@ public class OrganizationServiceImpl implements OrganizationService {
         List<DepartmentData> departmentDataList = new ArrayList<>();
         for (Department department : departmentMapper.selectList(new QueryWrapper<Department>().eq("organization_id", organizationId))) {
             departmentDataList.add(new DepartmentData(
-                        department.getId(), department.getName(), department.getBriefDescription(),
-                        department.getDescription(), department.getStandard()
+                    department.getId(), department.getName(), department.getBriefDescription(),
+                    department.getDescription(), department.getStandard()
             ));
 
         }
@@ -535,10 +535,11 @@ public class OrganizationServiceImpl implements OrganizationService {
 
     /**
      * 提交报名表并发起纳新接口的业务处理方法
+     *
      * @param admissionPublishParam 提交报名表并发起纳新的接口的请求参数
      * @return CommonResult<String> 返回接口处理结果
      * @throws DateBaseException 自定义的数据库操作异常，抛出用于事务处理回滚
-     * @throws RunException 自定义的运行时异常，抛出用于事务处理回滚
+     * @throws RunException      自定义的运行时异常，抛出用于事务处理回滚
      * @see AdmissionPublishParam
      */
     @Override
@@ -575,10 +576,11 @@ public class OrganizationServiceImpl implements OrganizationService {
 
     /**
      * 保存社团报名表信息接口的业务处理方法
+     *
      * @param registrationFormParam 保存社团报名表信息接口的请求参数
      * @return CommonResult<String> 返回接口处理结果
      * @throws DateBaseException 自定义的数据库操作异常，抛出用于事务处理回滚
-     * @throws RunException 自定义的运行时异常，抛出用于事务处理回滚
+     * @throws RunException      自定义的运行时异常，抛出用于事务处理回滚
      * @see AdmissionPublishParam
      */
     @Override
@@ -616,6 +618,7 @@ public class OrganizationServiceImpl implements OrganizationService {
 
     /**
      * 获取社团报名表信息接口的业务处理方法
+     *
      * @return CommonResult<RegistrationFormResult> 返回社团报名表相关信息的实体类
      * @throws RunException 自定义的运行时异常，抛出用于事务处理回滚
      * @see RegistrationFormResult
@@ -663,6 +666,7 @@ public class OrganizationServiceImpl implements OrganizationService {
 
     /**
      * 获取系统内置问题接口的业务处理方法
+     *
      * @return 返回系统内置问题列表
      * @throws RunException 自定义的运行时异常，抛出用于统一异常处理
      * @see QuestionPoData
@@ -699,6 +703,7 @@ public class OrganizationServiceImpl implements OrganizationService {
 
     /**
      * 获取选择类型列表接口的业务处理方法
+     *
      * @return 返回选择类型列表
      * @see SelectTypePo
      */
@@ -721,6 +726,7 @@ public class OrganizationServiceImpl implements OrganizationService {
 
     /**
      * 获取questionValueDataList的深度的方法
+     *
      * @param questionValueDataList questionValueDataList对象
      * @return 返回questionValueDataList的深度，几级级联选择器
      */
@@ -731,8 +737,9 @@ public class OrganizationServiceImpl implements OrganizationService {
 
     /**
      * 递归QuestionValueDataList获取其深度的方法
+     *
      * @param questionValueDataList QuestionValueDataList对象
-     * @param depth 当前深度
+     * @param depth                 当前深度
      * @return 返回当前新的深度
      */
     private int recursionQuestionValueDataList(List<QuestionValueData> questionValueDataList, int depth) {
@@ -769,6 +776,7 @@ public class OrganizationServiceImpl implements OrganizationService {
 
     /**
      * 是否存在纳新报名信息
+     *
      * @param organizationId 社团组织id
      * @return 是否有社团的纳新报名信息，false为没有，true为有
      */
@@ -789,11 +797,12 @@ public class OrganizationServiceImpl implements OrganizationService {
 
     /**
      * 设置社团纳新报名信息
-     * @param organizationId 社团组织id
-     * @param userId 操作人b端用户id
-     * @param endTime 纳新结束时间，为空则代表只保存信息，不发起纳新
+     *
+     * @param organizationId   社团组织id
+     * @param userId           操作人b端用户id
+     * @param endTime          纳新结束时间，为空则代表只保存信息，不发起纳新
      * @param registrationForm 相关报名表设置信息的参数实体类
-     * @return 返回admissionId,即纳新id
+     * @return 返回admissionId, 即纳新id
      * @throws DateBaseException 抛出自定义的数据库操作异常类
      * @see RegistrationFormData
      */
@@ -848,7 +857,7 @@ public class OrganizationServiceImpl implements OrganizationService {
             if (registrationForm.getIsTransfers()) {
                 admission.setIsTransfers((byte) 1);
             } else {
-                admission.setIsTransfers((byte) 0) ;
+                admission.setIsTransfers((byte) 0);
             }
             admission.setIsDeleted((byte) 0);
 
@@ -867,11 +876,12 @@ public class OrganizationServiceImpl implements OrganizationService {
 
     /**
      * 设置报名表问题列表
+     *
      * @param registrationForm 相关报名表色或者信息的参数实体类
-     * @param organizationId 社团组织id
-     * @param admissionId 纳新id
+     * @param organizationId   社团组织id
+     * @param admissionId      纳新id
      * @throws DateBaseException 抛出自定义的数据库操作异常类
-     * @throws RunException 抛出自定义的运行时异常类
+     * @throws RunException      抛出自定义的运行时异常类
      * @see RegistrationFormData
      */
     private void setRegistrationFormQuestion(RegistrationFormData registrationForm, int organizationId, int admissionId) throws DateBaseException, RunException {
@@ -894,11 +904,12 @@ public class OrganizationServiceImpl implements OrganizationService {
 
     /**
      * 设置问题列表
+     *
      * @param questionPoDataList 报名表问题列表
-     * @param organizationId 社团组织id
-     * @param admissionId 纳新id
-     * @param questionType 问题类型，1基本问题，2部门问题，3综合问题
-     * @throws RunException 抛出自定义的运行时异常类
+     * @param organizationId     社团组织id
+     * @param admissionId        纳新id
+     * @param questionType       问题类型，1基本问题，2部门问题，3综合问题
+     * @throws RunException      抛出自定义的运行时异常类
      * @throws DateBaseException 抛出自定义的数据库操作异常类
      * @see QuestionPoData
      */
@@ -1018,7 +1029,8 @@ public class OrganizationServiceImpl implements OrganizationService {
 
     /**
      * 拼接报名表问题列表
-     * @param admissionId 纳新id
+     *
+     * @param admissionId  纳新id
      * @param questionType 问题类型，1基本问题，2部门问题，3综合问题
      * @return List<QuestionPoData> 拼接好的问题列表
      * @throws RunException 抛出自定义的运行时异常类
