@@ -5,6 +5,7 @@ import com.sipc.mmtbackend.pojo.dto.param.superAdmin.OrganizationInfoParam;
 import com.sipc.mmtbackend.pojo.dto.param.superAdmin.AdmissionPublishParam;
 import com.sipc.mmtbackend.pojo.dto.param.superAdmin.RegistrationFormParam;
 import com.sipc.mmtbackend.pojo.dto.result.superAdmin.OrganizationInfoResult;
+import com.sipc.mmtbackend.pojo.dto.result.superAdmin.RegistrationFormResult;
 import com.sipc.mmtbackend.pojo.dto.result.superAdmin.UploadAvatarResult;
 import com.sipc.mmtbackend.pojo.exceptions.DateBaseException;
 import com.sipc.mmtbackend.pojo.exceptions.RunException;
@@ -71,6 +72,11 @@ public class OrganizationController {
     @PostMapping("/registration/form/save")
     public CommonResult<String> saveRegistrationForm(@RequestBody RegistrationFormParam registrationFormParam) throws RunException, DateBaseException {
         return organizationService.saveRegistrationForm(registrationFormParam);
+    }
+
+    @GetMapping("/registration/form/info")
+    public CommonResult<RegistrationFormResult> getRegistrationForm() throws RunException {
+        return organizationService.getRegistrationForm();
     }
 
     @PostMapping("/test")

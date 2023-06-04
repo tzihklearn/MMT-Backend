@@ -3,6 +3,7 @@ package com.sipc.mmtbackend.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sipc.mmtbackend.mapper.*;
 import com.sipc.mmtbackend.pojo.domain.*;
@@ -12,6 +13,7 @@ import com.sipc.mmtbackend.pojo.dto.param.superAdmin.OrganizationInfoParam;
 import com.sipc.mmtbackend.pojo.dto.param.superAdmin.AdmissionPublishParam;
 import com.sipc.mmtbackend.pojo.dto.param.superAdmin.RegistrationFormParam;
 import com.sipc.mmtbackend.pojo.dto.result.superAdmin.OrganizationInfoResult;
+import com.sipc.mmtbackend.pojo.dto.result.superAdmin.RegistrationFormResult;
 import com.sipc.mmtbackend.pojo.dto.result.superAdmin.UploadAvatarResult;
 import com.sipc.mmtbackend.pojo.exceptions.DateBaseException;
 import com.sipc.mmtbackend.pojo.exceptions.RunException;
@@ -562,6 +564,7 @@ public class OrganizationServiceImpl implements OrganizationService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public CommonResult<String> saveRegistrationForm(RegistrationFormParam registrationFormParam) throws DateBaseException, RunException {
 
         //获取操作用户信息，并获取其操作社团id
@@ -591,6 +594,47 @@ public class OrganizationServiceImpl implements OrganizationService {
 
         return CommonResult.success("保存报名表成功");
 
+    }
+
+    @Override
+    public CommonResult<RegistrationFormResult> getRegistrationForm() throws RunException {
+
+        //获取操作用户信息，并获取其操作社团id
+        BTokenSwapPo context = ThreadLocalContextUtil.getContext();
+        Integer organizationId = context.getOrganizationId();
+
+        Admission admission = admissionMapper.selectOne(
+                new QueryWrapper<Admission>()
+                        .eq("organization_id", organizationId)
+                        .orderByDesc("id")
+                        .last("limit 1")
+        );
+
+        RegistrationFormResult registrationFormResult = new RegistrationFormResult();
+
+        //如果社团没有保存任何报名表信息，则直接返回
+        if (admission == null) {
+            return CommonResult.success(registrationFormResult);
+        }
+
+        Integer admissionId = admission.getId();
+
+        registrationFormResult.setDepartmentNum(admission.getDepartmentNum());
+        registrationFormResult.setMaxDepartmentNum(admission.getAllowDepartmentAmount());
+        if (admission.getIsTransfers() != null) {
+            registrationFormResult.setIsTransfers(admission.getIsTransfers() == 1);
+        }
+
+        //获取基本问题列表
+        registrationFormResult.setEssentialQuestionList(assemblingQuestionList(admissionId, 1));
+
+        //获取部门问题列表
+        registrationFormResult.setDepartmentQuestionList(assemblingQuestionList(admissionId, 2));
+
+        //获取综合问题列表
+        registrationFormResult.setComprehensiveQuestionList(assemblingQuestionList(admissionId, 3));
+
+        return CommonResult.success(registrationFormResult);
     }
 
     /**
@@ -671,35 +715,50 @@ public class OrganizationServiceImpl implements OrganizationService {
 
         Integer admissionId;
 
+        //创建admission对象，用于更新或插入操作
+        Admission admission = new Admission();
+        admission.setInitiator(userId);
+        admission.setOrganizationId(organizationId);
+        //根据endTime是不是空来判断是发起报名还是保存报名表
+        if (endTime != null) {
+            admission.setStartTime(LocalDateTime.now());
+            admission.setEndTime(TimeTransUtil.transStringToTime(endTime));
+        } else {
+            admission.setStartTime(null);
+            admission.setEndTime(null);
+        }
+        admission.setDepartmentNum(registrationForm.getDepartmentNum());
+        admission.setAllowDepartmentAmount(registrationForm.getMaxDepartmentNum());
+        admission.setRounds(0);
+
         if (admissionNow != null) {
 
             admissionId = admissionNow.getId();
-
+            admission.setId(admissionId);
+            int updateNum = admissionMapper.updateById(admission);
+            if (updateNum != 1) {
+                log.error("发布纳新或保存报名表接口异常，更新admission表数据数错误，更新admission表数据数：{}，插入社团id：{}，更新信息：{}",
+                        updateNum, organizationId, admission);
+                throw new DateBaseException("更新数据库操作异常");
+            }
             //删除已经保存的社团报名表问题信息
             admissionQuestionMapper.delete(new QueryWrapper<AdmissionQuestion>().eq("admission_id", admissionId));
 
         } else {
             //没有已经保存的数据，插入一个新的纳新信息
-            Admission admission = new Admission();
-            admission.setInitiator(userId);
-            admission.setOrganizationId(organizationId);
-            //根据endTime是不是空来判断是发起报名还是保存报名表
-            if (endTime != null) {
-                admission.setStartTime(LocalDateTime.now());
-                admission.setEndTime(TimeTransUtil.transStringToTime(endTime));
+
+            //设置是否允许调剂
+            if (registrationForm.getIsTransfers()) {
+                admission.setIsTransfers((byte) 1);
             } else {
-                admission.setStartTime(null);
-                admission.setEndTime(null);
+                admission.setIsTransfers((byte) 0) ;
             }
-            admission.setDepartmentNum(registrationForm.getDepartmentNum());
-            admission.setAllowDepartmentAmount(registrationForm.getMaxDepartmentNum());
-            admission.setRounds(0);
             admission.setIsDeleted((byte) 0);
 
             //插入新的纳新记录
             int insertNum = admissionMapper.insert(admission);
             if (insertNum != 1) {
-                log.error("发布纳新接口异常，插入admission表数据数错误，插入admission表数据数：{}，插入社团id：{}，插入信息：{}",
+                log.error("发布纳新或保存报名表接口异常，插入admission表数据数错误，插入admission表数据数：{}，插入社团id：{}，插入信息：{}",
                         insertNum, organizationId, registrationForm);
                 throw new DateBaseException("插入数据库操作异常");
             }
@@ -788,6 +847,7 @@ public class OrganizationServiceImpl implements OrganizationService {
                 try {
                     json = objectMapper.writeValueAsString(questionPoData.getSelectValue());
                 } catch (JsonProcessingException e) {
+                    log.error("发布纳新或保存报名表接口异常，对象转换json异常，对象为:{}", questionPoData.getSelectValue());
                     throw new RunException("对象转换json字符串异常，异常为JsonProcessingException");
                 }
                 questionData.setValue(json);
@@ -811,7 +871,7 @@ public class OrganizationServiceImpl implements OrganizationService {
                 //在question_data表中插入问题信息
                 int insertNum = questionDataMapper.insert(questionData);
                 if (insertNum != 1) {
-                    log.error("发布纳新接口异常，插入question_date表数据数错误，插入question_date表数据数：{}，插入社团id：{}，插入问题信息：{}",
+                    log.error("发布纳新或保存报名表接口异常，插入question_date表数据数错误，插入question_date表数据数：{}，插入社团id：{}，插入问题信息：{}",
                             insertNum, organizationId, questionPoData);
                     throw new DateBaseException("插入数据库操作异常");
                 }
@@ -840,5 +900,42 @@ public class OrganizationServiceImpl implements OrganizationService {
         }
     }
 
+    private List<QuestionPoData> assemblingQuestionList(int admissionId, int questionType) throws RunException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        //TODO:之后采用sql联表查询
+        List<QuestionPoData> questionList = new ArrayList<>();
+        for (AdmissionQuestion admissionQuestion : admissionQuestionMapper.selectList(
+                new QueryWrapper<AdmissionQuestion>()
+                        .eq("admission_id", admissionId)
+                        .eq("question_type", questionType)
+                        .orderByAsc("`order`")
+        )) {
+            QuestionData questionData = questionDataMapper.selectOne(
+                    new QueryWrapper<QuestionData>()
+                            .eq("id", admissionQuestion.getQuestionId())
+            );
+            if (questionData == null) {
+                continue;
+            }
+
+            //拼装questionPoData对象
+            QuestionPoData questionPoData = new QuestionPoData();
+            questionPoData.setName(questionData.getQuestion());
+            questionPoData.setType(questionData.getType() == 1);
+            questionPoData.setSelectType(questionData.getSelectTypeId());
+
+            try {
+                questionPoData.setSelectValue(objectMapper.readValue(questionData.getValue(), QuestionValueListData.class));
+            } catch (JsonProcessingException e) {
+                log.error("发布纳新或保存报名表接口异常，json转换对象异常，对象为:{}", questionData.getValue());
+                throw new RunException("json转换对象出错");
+            }
+
+            //将拼装好的questionPoData对象放入essentialQuestionList中
+            questionList.add(questionPoData);
+        }
+
+        return questionList;
+    }
 
 }

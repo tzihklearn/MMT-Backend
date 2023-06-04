@@ -1,10 +1,7 @@
 package com.sipc.mmtbackend.pojo.domain;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableLogic;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
+
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import lombok.Getter;
@@ -49,20 +46,26 @@ public class Admission implements Serializable {
     @TableField("end_time")
     private LocalDateTime endTime;
 
-    @TableField("department_num")
+    @TableField(value = "department_num", updateStrategy = FieldStrategy.IGNORED)
     private Integer departmentNum;
 
     /**
      * 允许报名部门数
      */
-    @TableField("allow_department_amount")
+    @TableField(value = "allow_department_amount", updateStrategy = FieldStrategy.IGNORED)
     private Integer allowDepartmentAmount;
 
     /**
      * 计划总面试轮次
      */
-    @TableField("rounds")
+    @TableField(value = "rounds", updateStrategy = FieldStrategy.IGNORED)
     private Integer rounds;
+
+    /**
+     * 是否允许调剂，0不允许，1允许
+     */
+    @TableField(value = "is_transfers", updateStrategy = FieldStrategy.IGNORED)
+    private Byte isTransfers;
 
     @TableField("is_deleted")
     @TableLogic
