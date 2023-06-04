@@ -64,16 +64,38 @@ public class OrganizationController {
         return organizationService.uploadAvatar();
     }
 
+    /**
+     * 提交报名表并发起纳新的接口，请求方法Post,请求路径/b/admin/organization/admission/publish
+     * @param admissionPublishParam 提交报名表并发起纳新的接口的请求参数
+     * @return CommonResult<String> 返回接口处理结果
+     * @throws RunException 自定义的运行时异常，抛出用于统一异常处理
+     * @throws DateBaseException 自定义的数据库操作异常，抛出用于统一异常处理
+     * @see AdmissionPublishParam
+     */
     @PostMapping("/admission/publish")
     public CommonResult<String> publishAdmission(@RequestBody AdmissionPublishParam admissionPublishParam) throws RunException, DateBaseException {
         return organizationService.publishAdmission(admissionPublishParam);
     }
 
+    /**
+     * 保存社团报名表信息接口，请求方法Post,请求路径/b/admin/organization/registration/form/save
+     * @param registrationFormParam 保存社团报名表信息接口的请求参数
+     * @return CommonResult<String> 返回接口处理结果
+     * @throws RunException 自定义的运行时异常，抛出用于统一异常处理
+     * @throws DateBaseException 自定义的数据库操作异常，抛出用于统一异常处理
+     * @see RegistrationFormParam
+     */
     @PostMapping("/registration/form/save")
     public CommonResult<String> saveRegistrationForm(@RequestBody RegistrationFormParam registrationFormParam) throws RunException, DateBaseException {
         return organizationService.saveRegistrationForm(registrationFormParam);
     }
 
+    /**
+     * 获取社团报名表信息接口，请求方法Get,请求路径/b/admin/organization/registration/form/info
+     * @return CommonResult<RegistrationFormResult> 返回社团报名表相关信息的实体类
+     * @throws RunException 自定义的运行时异常，抛出用于统一异常处理
+     * @see RegistrationFormResult
+     */
     @GetMapping("/registration/form/info")
     public CommonResult<RegistrationFormResult> getRegistrationForm() throws RunException {
         return organizationService.getRegistrationForm();
