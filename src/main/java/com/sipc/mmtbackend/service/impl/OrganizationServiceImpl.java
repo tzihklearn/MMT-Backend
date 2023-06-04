@@ -14,6 +14,7 @@ import com.sipc.mmtbackend.pojo.dto.param.superAdmin.RegistrationFormParam;
 import com.sipc.mmtbackend.pojo.dto.result.superAdmin.OrganizationInfoResult;
 import com.sipc.mmtbackend.pojo.dto.result.superAdmin.RegistrationFormResult;
 import com.sipc.mmtbackend.pojo.dto.result.superAdmin.UploadAvatarResult;
+import com.sipc.mmtbackend.pojo.dto.result.superAdmin.po.SelectTypePo;
 import com.sipc.mmtbackend.pojo.exceptions.DateBaseException;
 import com.sipc.mmtbackend.pojo.exceptions.RunException;
 import com.sipc.mmtbackend.service.OrganizationService;
@@ -67,6 +68,8 @@ public class OrganizationServiceImpl implements OrganizationService {
     private final AdmissionQuestionMapper admissionQuestionMapper;
 
     private final QuestionDataMapper questionDataMapper;
+
+    private final SelectTypeMapper selectTypeMapper;
 
     private final HttpServletRequest httpServletRequest;
 
@@ -659,6 +662,64 @@ public class OrganizationServiceImpl implements OrganizationService {
     }
 
     /**
+     * 获取系统内置问题接口的业务处理方法
+     * @return 返回系统内置问题列表
+     * @throws RunException 自定义的运行时异常，抛出用于统一异常处理
+     * @see QuestionPoData
+     */
+    @Override
+    public CommonResult<List<QuestionPoData>> getSystemQuestion() throws RunException {
+
+        List<QuestionPoData> result = new ArrayList<>();
+
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        //获取系统内置问题
+        for (QuestionData questionData : questionDataMapper.selectList(
+                new QueryWrapper<QuestionData>()
+                        .eq("type", 1)
+        )) {
+            //拼装questionPoData
+            QuestionPoData questionPoData = new QuestionPoData();
+
+            questionPoData.setName(questionData.getQuestion());
+            questionPoData.setType(questionData.getType() == 1);
+            try {
+                questionPoData.setSelectValue(objectMapper.readValue(questionData.getValue(), QuestionValueListData.class));
+            } catch (JsonProcessingException e) {
+                log.error("获取系统内置问题接口异常，json转换对象异常，对象为:{}", questionData.getValue());
+                throw new RunException("json转换对象出错");
+            }
+
+            result.add(questionPoData);
+        }
+
+        return CommonResult.success(result);
+    }
+
+    /**
+     * 获取选择类型列表接口的业务处理方法
+     * @return 返回选择类型列表
+     * @see SelectTypePo
+     */
+    @Override
+    public CommonResult<List<SelectTypePo>> getSelectType() {
+
+        List<SelectTypePo> result = new ArrayList<>();
+
+        for (SelectType selectType : selectTypeMapper.selectList(new QueryWrapper<>())) {
+            SelectTypePo selectTypePo = new SelectTypePo();
+
+            selectTypePo.setId(selectType.getId());
+            selectTypePo.setName(selectTypePo.getName());
+
+            result.add(selectTypePo);
+        }
+
+        return CommonResult.success(result);
+    }
+
+    /**
      * 获取questionValueDataList的深度的方法
      * @param questionValueDataList questionValueDataList对象
      * @return 返回questionValueDataList的深度，几级级联选择器
@@ -892,7 +953,7 @@ public class OrganizationServiceImpl implements OrganizationService {
                 /*
               在question_date表中插入问题信息
              */
-                questionData.setType((byte) 1);
+                questionData.setType((byte) 0);
                 questionData.setSelectTypeId(questionPoData.getSelectType());
                 questionData.setQuestion(questionPoData.getName());
 

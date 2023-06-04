@@ -1,18 +1,22 @@
 package com.sipc.mmtbackend.controller.superAdmin;
 
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
+import com.sipc.mmtbackend.pojo.dto.data.QuestionPoData;
 import com.sipc.mmtbackend.pojo.dto.param.superAdmin.OrganizationInfoParam;
 import com.sipc.mmtbackend.pojo.dto.param.superAdmin.AdmissionPublishParam;
 import com.sipc.mmtbackend.pojo.dto.param.superAdmin.RegistrationFormParam;
 import com.sipc.mmtbackend.pojo.dto.result.superAdmin.OrganizationInfoResult;
 import com.sipc.mmtbackend.pojo.dto.result.superAdmin.RegistrationFormResult;
 import com.sipc.mmtbackend.pojo.dto.result.superAdmin.UploadAvatarResult;
+import com.sipc.mmtbackend.pojo.dto.result.superAdmin.po.SelectTypePo;
 import com.sipc.mmtbackend.pojo.exceptions.DateBaseException;
 import com.sipc.mmtbackend.pojo.exceptions.RunException;
 import com.sipc.mmtbackend.service.OrganizationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * 社团宣传与面试相关接口的控制层
@@ -99,6 +103,27 @@ public class OrganizationController {
     @GetMapping("/registration/form/info")
     public CommonResult<RegistrationFormResult> getRegistrationForm() throws RunException {
         return organizationService.getRegistrationForm();
+    }
+
+    /**
+     * 获取系统内置问题接口，请求方法Get,请求路径/b/admin/organization/registration/form/system/question
+     * @return 返回系统内置问题列表
+     * @throws RunException 自定义的运行时异常，抛出用于统一异常处理
+     * @see QuestionPoData
+     */
+    @GetMapping("/registration/form/system/question")
+    public CommonResult<List<QuestionPoData>> getSystemQuestion() throws RunException {
+        return organizationService.getSystemQuestion();
+    }
+
+    /**
+     * 获取选择类型列表接口，请求方法Get,请求路径/b/admin/organization/registration/form/select/type
+     * @return 返回选择类型列表
+     * @see SelectTypePo
+     */
+    @GetMapping("/registration/form/select/type")
+    public CommonResult<List<SelectTypePo>> getSelectType() {
+        return organizationService.getSelectType();
     }
 
     @PostMapping("/test")
