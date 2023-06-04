@@ -6,7 +6,6 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
-import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -16,54 +15,54 @@ import lombok.Setter;
  * </p>
  *
  * @author tzih
- * @since 2023-06-03
+ * @since 2023-06-04
  */
 @Getter
 @Setter
-@TableName("admission")
-public class Admission implements Serializable {
+@TableName("question_data")
+public class QuestionData implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    /**
+     * 主键id
+     */
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
     /**
-     * 发起者
+     * 类型，1为系统内置问题，0为自定义内型
      */
-    @TableField("initiator")
-    private Integer initiator;
+    @TableField("type")
+    private Byte type;
 
     /**
-     * 组织ID
+     * 选择类型，1单选，2多选，3下拉框，4输入框，5级联选择器
      */
-    @TableField("organization_id")
-    private Integer organizationId;
+    @TableField("select_type_id")
+    private Integer selectTypeId;
 
     /**
-     * 为空时代表还没有发布纳新
+     * 问题名称
      */
-    @TableField("start_time")
-    private LocalDateTime startTime;
-
-    @TableField("end_time")
-    private LocalDateTime endTime;
-
-    @TableField("department_num")
-    private Integer departmentNum;
+    @TableField("question")
+    private String question;
 
     /**
-     * 允许报名部门数
+     * 问题可选择的值，输入框则为提示
      */
-    @TableField("allow_department_amount")
-    private Integer allowDepartmentAmount;
+    @TableField("value")
+    private String value;
 
     /**
-     * 计划总面试轮次
+     * 可选择的条目，级联选择器为一共有几级
      */
-    @TableField("rounds")
-    private Integer rounds;
+    @TableField("num")
+    private Integer num;
 
+    /**
+     * 逻辑删除字段
+     */
     @TableField("is_deleted")
     @TableLogic
     private Byte isDeleted;

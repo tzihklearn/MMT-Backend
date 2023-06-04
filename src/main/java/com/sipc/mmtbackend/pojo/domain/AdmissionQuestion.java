@@ -6,7 +6,6 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
-import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -20,50 +19,50 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-@TableName("admission")
-public class Admission implements Serializable {
+@TableName("admission_question")
+public class AdmissionQuestion implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    /**
+     * 主键id
+     */
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
     /**
-     * 发起者
+     * 纳新id
      */
-    @TableField("initiator")
-    private Integer initiator;
+    @TableField("admission_id")
+    private Integer admissionId;
 
     /**
-     * 组织ID
+     * 部门id
      */
-    @TableField("organization_id")
-    private Integer organizationId;
+    @TableField("department_id")
+    private Integer departmentId;
 
     /**
-     * 为空时代表还没有发布纳新
+     * 问题id
      */
-    @TableField("start_time")
-    private LocalDateTime startTime;
-
-    @TableField("end_time")
-    private LocalDateTime endTime;
-
-    @TableField("department_num")
-    private Integer departmentNum;
+    @TableField("question_id")
+    private Integer questionId;
 
     /**
-     * 允许报名部门数
+     * 问题类型， 1基本问题，2部门问题，3自定义问题
      */
-    @TableField("allow_department_amount")
-    private Integer allowDepartmentAmount;
+    @TableField("question_type")
+    private Integer questionType;
 
     /**
-     * 计划总面试轮次
+     * 问题次序
      */
-    @TableField("rounds")
-    private Integer rounds;
+    @TableField("`order`")
+    private Integer order;
 
+    /**
+     * 逻辑删除字段
+     */
     @TableField("is_deleted")
     @TableLogic
     private Byte isDeleted;
