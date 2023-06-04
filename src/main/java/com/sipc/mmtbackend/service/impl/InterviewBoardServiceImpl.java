@@ -100,7 +100,7 @@ public class InterviewBoardServiceImpl implements InterviewBoardService {
      * @return 总人数与第一志愿人数
      */
     @Override
-    public CommonResult<GetSignUpNumResult> getSignupNum(Integer departmentId) {
+    public CommonResult<GetSignUpNumResult> getDeptSignupNum(Integer departmentId) {
         BTokenSwapPo context = ThreadLocalContextUtil.getContext();
         Admission admission = admissionMapper.selectOne(
                 new QueryWrapper<Admission>()

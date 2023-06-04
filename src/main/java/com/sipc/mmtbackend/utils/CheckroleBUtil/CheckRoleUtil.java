@@ -38,9 +38,9 @@ public class CheckRoleUtil {
         apiPermissions.put("/b/admin/account/members/delete", PermissionEnum.SUPER_ADMIN);
         apiPermissions.put("/b/user/loginedorgs", PermissionEnum.NUMBER);
         apiPermissions.put("/b/interview/departments", PermissionEnum.NUMBER);
-        apiPermissions.put("/b/interview/numGroupByDepartment", PermissionEnum.NUMBER);
-        apiPermissions.put("/b/interview/totalNum", PermissionEnum.NUMBER);
-        apiPermissions.put("/b/interview/numGroupByTimeAndDepartment", PermissionEnum.NUMBER);
+        apiPermissions.put("/b/interview/orgPieChart", PermissionEnum.NUMBER);
+        apiPermissions.put("/b/interview/oegLineChart", PermissionEnum.NUMBER);
+        apiPermissions.put("/b/interview/numData", PermissionEnum.NUMBER);
         this.apiPermissions = apiPermissions;
     }
 

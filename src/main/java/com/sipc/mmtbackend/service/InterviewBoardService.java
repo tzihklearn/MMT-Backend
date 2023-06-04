@@ -27,7 +27,8 @@ public interface InterviewBoardService {
      * @param departmentId 组织ID
      * @return 总人数与第一志愿人数
      */
-    CommonResult<GetSignUpNumResult> getSignupNum(Integer departmentId);
+    CommonResult<GetSignUpNumResult> getDeptSignupNum(Integer departmentId);
+
     /**
      * 获取组织各个部门报名人数随时间变化情况（组织总况的折线图）
      *
