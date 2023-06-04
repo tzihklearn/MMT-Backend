@@ -63,8 +63,8 @@ public class OrganizationController {
     }
 
     @PostMapping("/admission/publish")
-    public CommonResult<String> publishAdmission(@RequestBody OrganizationPublishParam organizationPublishParam) {
-        return null;
+    public CommonResult<String> publishAdmission(@RequestBody OrganizationPublishParam organizationPublishParam) throws RunException, DateBaseException {
+        return organizationService.publishAdmission(organizationPublishParam);
     }
 
     @PostMapping("/test")

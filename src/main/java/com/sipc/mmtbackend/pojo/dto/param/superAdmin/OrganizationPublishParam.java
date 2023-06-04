@@ -1,6 +1,9 @@
 package com.sipc.mmtbackend.pojo.dto.param.superAdmin;
 
+import com.sipc.mmtbackend.pojo.dto.data.QuestionPoData;
 import lombok.Data;
+
+import java.util.List;
 
 /**
  * @author tzih
@@ -12,6 +15,16 @@ public class OrganizationPublishParam {
 
     private String endTime;
 
-//    private
+    private Integer departmentNum;
+
+    private Integer maxDepartmentNum;
+
+    private Boolean isTransfers;
+
+    private List<QuestionPoData> essentialQuestionList;
+
+    private List<QuestionPoData> departmentQuestionList;
+
+    private List<QuestionPoData> comprehensiveQuestionList;
 
 }
