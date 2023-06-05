@@ -2,6 +2,7 @@ package com.sipc.mmtbackend.interceptor;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
+import com.sipc.mmtbackend.utils.CheckroleBUtil.CheckPermissionUtil;
 import com.sipc.mmtbackend.utils.CheckroleBUtil.CheckRoleUtil;
 import com.sipc.mmtbackend.utils.CheckroleBUtil.JWTUtil;
 import com.sipc.mmtbackend.utils.CheckroleBUtil.pojo.BTokenSwapPo;
@@ -11,11 +12,13 @@ import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Objects;
 
 /**
@@ -29,12 +32,12 @@ public class BCheckRoleHandlerInterceptor implements HandlerInterceptor {
 
     private final CheckRoleUtil checkRoleUtil;
 
-    private final RedisUtil redisUtil;
-
     private final JWTUtil jwtUtil;
 
     @Override
-    public boolean preHandle(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler) throws Exception {
+    public boolean preHandle(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler) {
+
+        HandlerMethod handlerMethod = (HandlerMethod) handler;
 
         /*
           获取token,并且解析token信息
@@ -51,6 +54,12 @@ public class BCheckRoleHandlerInterceptor implements HandlerInterceptor {
                     /*
                       校验B端用户权限
                      */
+
+                    boolean isPermission = CheckPermissionUtil.checkBPermission(handlerMethod, bTokenSwapPo.getPermissionId());
+                    if (isPermission) {
+                        return true;
+                    }
+
                     boolean isCheck = checkRoleUtil.bCheck(bTokenSwapPo.getPermissionId(), requestURI);
                     if (isCheck) {
                         //将token解析出的用户信息放入本地线程变量

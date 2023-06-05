@@ -1,5 +1,6 @@
 package com.sipc.mmtbackend.controller.superAdmin;
 
+import com.sipc.mmtbackend.annotation.BPermission;
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
 import com.sipc.mmtbackend.pojo.dto.param.superAdmin.DeleteMemberParam;
 import com.sipc.mmtbackend.pojo.dto.param.superAdmin.ReviseMemberInfoParam;
@@ -8,6 +9,7 @@ import com.sipc.mmtbackend.pojo.dto.result.superAdmin.ICodeResult;
 import com.sipc.mmtbackend.pojo.dto.result.superAdmin.MemberInfoResult;
 import com.sipc.mmtbackend.pojo.exceptions.DateBaseException;
 import com.sipc.mmtbackend.service.AccountManageService;
+import com.sipc.mmtbackend.utils.CheckroleBUtil.pojo.PermissionEnum;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/b/admin/account")
 @RequiredArgsConstructor(onConstructor_ = {@Autowired})
+@BPermission(PermissionEnum.SUPER_ADMIN)
 public class AccountManageController {
 
     /**
