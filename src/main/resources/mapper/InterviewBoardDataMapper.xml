@@ -74,30 +74,53 @@
         SELECT xq.`name`  AS "name",
                xq.`date`  AS "date",
                zml.number AS "number"
-        FROM (SELECT d.id,
-                     d.`name`,
-                     t.`date`
-              FROM (SELECT id,
-                           `name`
-                    FROM department d
-                    WHERE d.is_deleted != 1
-                            AND d.organization_id = #{organizationId,jdbcType=INTEGER}) AS `d`
-                       LEFT JOIN (SELECT DISTINCT DATE_FORMAT(register_time, "%m-%d") AS "date"
-                                  FROM user_volunteer u
-                                  WHERE u.is_deleted != 1 AND u.admission_id = #{admissionId,jdbcType=INTEGER}) AS `t`
-                                 ON 114 != 514) AS `xq`
-                 LEFT JOIN (SELECT COUNT(1)                            AS "number",
-                                   department_id,
-                                   DATE_FORMAT(register_time, "%m-%d") AS "date"
-                            FROM user_volunteer uv
-                            WHERE uv.is_deleted != 1
-		AND uv.admission_id = #{admissionId,jdbcType=INTEGER}
-                            GROUP BY
-                                department_id,
-                                `date`
-                            ORDER BY
-                                department_id,
-                                `date`) AS `zml` ON xq.`date` = zml.`date`
-            AND xq.id = zml.department_id
+        FROM (
+                SELECT d.id,
+                       d.`name`,
+                       t.`date`
+                FROM (
+                        SELECT id,
+                               `name`
+                        FROM department d
+                        WHERE d.is_deleted != 1
+                            AND d.organization_id = #{organizationId,jdbcType=INTEGER}
+                ) AS `d`
+                LEFT JOIN (
+                            SELECT DISTINCT DATE_FORMAT(register_time, "%m-%d") AS "date"
+                            FROM user_volunteer u
+                            WHERE u.is_deleted != 1
+                                AND u.admission_id = #{admissionId,jdbcType=INTEGER}) AS `t`
+                ON 114 != 514
+        ) AS `xq`
+        LEFT JOIN (
+                    SELECT COUNT(1) AS "number",
+                           department_id,
+                           DATE_FORMAT(register_time, "%m-%d") AS "date"
+                    FROM user_volunteer uv
+                    WHERE uv.is_deleted != 1
+                    		AND uv.admission_id = #{admissionId,jdbcType=INTEGER}
+                    GROUP BY
+                        department_id,
+                        `date`
+                    ORDER BY
+                        department_id,
+                        `date`
+            ) AS `zml`
+        ON xq.`date` = zml.`date`
+               AND xq.id = zml.department_id
+    </select>
+    <select id="selectNumberGroupByOrderByAdmissionIdAndDepartmentId"
+            resultType="com.sipc.mmtbackend.pojo.domain.po.InterviewBoardPo.PersonNumGroupByOrderPo">
+        SELECT
+            u.oo AS "orderNum",
+            COUNT( 1 ) AS "number"
+        FROM
+            user_volunteer u
+        WHERE
+            u.is_deleted != 1
+            	AND u.admission_id = #{admissionId,jdbcType=INTEGER}
+            	AND u.department_id = #{departmentId,jdbcType=INTEGER}
+        GROUP BY
+            u.organization_order oo
     </select>
 </mapper>

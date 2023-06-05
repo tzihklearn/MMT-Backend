@@ -21,12 +21,6 @@ public class CheckRoleUtil {
     @Autowired
     public CheckRoleUtil() {
         Map<String, PermissionEnum> apiPermissions = new HashMap<>();
-        apiPermissions.put("/b/user/userinfo", PermissionEnum.NUMBER);
-        apiPermissions.put("/b/user/password", PermissionEnum.NUMBER);
-        apiPermissions.put("/b/user/logout", PermissionEnum.NUMBER);
-        apiPermissions.put("/b/user/switchOrg", PermissionEnum.NUMBER);
-        apiPermissions.put("/b/user/addNewOrg", PermissionEnum.NUMBER);
-        apiPermissions.put("/b/user/avatar", PermissionEnum.NUMBER);
         apiPermissions.put("/b/admin/organization/info/update", PermissionEnum.SUPER_ADMIN);
         apiPermissions.put("/b/admin/organization/info/get", PermissionEnum.SUPER_ADMIN);
         apiPermissions.put("/b/admin/organization/avatar/upload", PermissionEnum.SUPER_ADMIN);
@@ -43,11 +37,6 @@ public class CheckRoleUtil {
         apiPermissions.put("/b/admin/account/members/revise/info", PermissionEnum.SUPER_ADMIN);
         apiPermissions.put("/b/admin/account/members/revise/permission", PermissionEnum.SUPER_ADMIN);
         apiPermissions.put("/b/admin/account/members/delete", PermissionEnum.SUPER_ADMIN);
-        apiPermissions.put("/b/user/loginedorgs", PermissionEnum.NUMBER);
-        apiPermissions.put("/b/interview/departments", PermissionEnum.NUMBER);
-        apiPermissions.put("/b/interview/numGroupByDepartment", PermissionEnum.NUMBER);
-        apiPermissions.put("/b/interview/totalNum", PermissionEnum.NUMBER);
-        apiPermissions.put("/b/interview/numGroupByTimeAndDepartment", PermissionEnum.NUMBER);
         this.apiPermissions = apiPermissions;
     }
 
