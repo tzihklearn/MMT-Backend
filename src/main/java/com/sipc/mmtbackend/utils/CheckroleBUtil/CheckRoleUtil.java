@@ -21,12 +21,6 @@ public class CheckRoleUtil {
     @Autowired
     public CheckRoleUtil() {
         Map<String, PermissionEnum> apiPermissions = new HashMap<>();
-        apiPermissions.put("/b/user/userinfo", PermissionEnum.NUMBER);
-        apiPermissions.put("/b/user/password", PermissionEnum.NUMBER);
-        apiPermissions.put("/b/user/logout", PermissionEnum.NUMBER);
-        apiPermissions.put("/b/user/switchOrg", PermissionEnum.NUMBER);
-        apiPermissions.put("/b/user/addNewOrg", PermissionEnum.NUMBER);
-        apiPermissions.put("/b/user/avatar", PermissionEnum.NUMBER);
         apiPermissions.put("/b/admin/organization/info/update", PermissionEnum.SUPER_ADMIN);
         apiPermissions.put("/b/admin/organization/info/get", PermissionEnum.SUPER_ADMIN);
         apiPermissions.put("/b/admin/organization/avatar/upload", PermissionEnum.SUPER_ADMIN);

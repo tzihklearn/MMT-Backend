@@ -1,10 +1,12 @@
 package com.sipc.mmtbackend.controller;
 
+import com.sipc.mmtbackend.annotation.BPermission;
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
 import com.sipc.mmtbackend.pojo.dto.param.UserBParam.*;
 import com.sipc.mmtbackend.pojo.dto.result.UserBResult.*;
 import com.sipc.mmtbackend.pojo.exceptions.DateBaseException;
 import com.sipc.mmtbackend.service.UserBService;
+import com.sipc.mmtbackend.utils.CheckroleBUtil.pojo.PermissionEnum;
 import net.sf.jsqlparser.util.validation.metadata.DatabaseException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -13,6 +15,7 @@ import javax.annotation.Resource;
 
 @RestController
 @RequestMapping("/b/user")
+@BPermission(PermissionEnum.NUMBER)
 public class UserBController {
     @Resource
     UserBService userBService;
