@@ -2,6 +2,7 @@ package com.sipc.mmtbackend.mapper;
 
 import com.sipc.mmtbackend.pojo.domain.po.InterviewBoardPo.LineChartLineDataDaoPo;
 import com.sipc.mmtbackend.pojo.domain.po.InterviewBoardPo.PersonNumGroupByDepartmentPo;
+import com.sipc.mmtbackend.pojo.domain.po.InterviewBoardPo.PersonNumGroupByOrderPo;
 import com.sipc.mmtbackend.pojo.domain.po.InterviewBoardPo.TotalNumPo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -45,4 +46,15 @@ public interface InterviewBoardDataMapper {
     List<LineChartLineDataDaoPo> selectInterviewNumberLineChartGroupByDepartmentDataByOrganizationIdAndAdmissionId(
             @Param("organizationId") Integer organizationId,
             @Param("admissionId") Integer admissionId);
+
+    /**
+     * 根据纳新 ID 与 部门 ID 查询部门各个志愿人数
+     *
+     * @param admissionId  纳新 ID
+     * @param departmentId 部门ID
+     * @return 志愿编号与人数
+     */
+    List<PersonNumGroupByOrderPo> selectNumberGroupByOrderByAdmissionIdAndDepartmentId(
+            @Param("admissionId") Integer admissionId,
+            @Param("departmentId") Integer departmentId);
 }

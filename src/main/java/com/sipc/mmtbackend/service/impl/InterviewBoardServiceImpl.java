@@ -8,14 +8,13 @@ import com.sipc.mmtbackend.pojo.domain.Admission;
 import com.sipc.mmtbackend.pojo.domain.Department;
 import com.sipc.mmtbackend.pojo.domain.po.InterviewBoardPo.LineChartLineDataDaoPo;
 import com.sipc.mmtbackend.pojo.domain.po.InterviewBoardPo.PersonNumGroupByDepartmentPo;
+import com.sipc.mmtbackend.pojo.domain.po.InterviewBoardPo.PersonNumGroupByOrderPo;
 import com.sipc.mmtbackend.pojo.domain.po.InterviewBoardPo.TotalNumPo;
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
-import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResult.GetDepartmentsResult;
-import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResult.GetNumberGroupByDepartmentResult;
-import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResult.GetNumberGroupByTimeAndDepartmentResult;
-import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResult.GetSignUpNumResult;
+import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResult.*;
 import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResult.po.GetDepartmentPo;
 import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResult.po.GetNumberGroupByDepartmentPo;
+import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResult.po.GetNumberGroupByOrderPo;
 import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResult.po.LineChartLineDataPo;
 import com.sipc.mmtbackend.service.InterviewBoardService;
 import com.sipc.mmtbackend.utils.CheckroleBUtil.pojo.BTokenSwapPo;
@@ -158,6 +157,46 @@ public class InterviewBoardServiceImpl implements InterviewBoardService {
             departmentDates.add(depData);
         }
         result.setDepartments(departmentDates);
+        return CommonResult.success(result);
+    }
+
+    /**
+     * 获取指定组织不同志愿人数
+     *
+     * @param departmentId 组织 ID
+     * @return 指定组织不同志愿人数
+     */
+    @Override
+    public CommonResult<GetNumberGroupByOrderResult> getNumberGroupByOrder(Integer departmentId) {
+        BTokenSwapPo context = ThreadLocalContextUtil.getContext();
+        Admission admission = admissionMapper.selectOne(
+                new QueryWrapper<Admission>()
+                        .eq("organization_id", context.getOrganizationId())
+                        .orderByDesc("id"));
+        if (admission == null) {
+            log.warn("用户 " + context + " 尝试在无活动的纳新时查询已报名人数");
+            return CommonResult.fail("查询失败：未开始纳新或纳新已结束");
+        }
+        Department department = departmentMapper.selectById(departmentId);
+        if (department == null || !Objects.equals(department.getOrganizationId(), context.getOrganizationId())){
+            log.warn("用户 " + context + " 尝试在查询不存在的组织或不属于其部门的组织 " + departmentId + " 的信息");
+            return CommonResult.fail("查询失败：部门不存在");
+        }
+        List<PersonNumGroupByOrderPo> depPos =
+                interviewBoardDataMapper.selectNumberGroupByOrderByAdmissionIdAndDepartmentId(
+                        admission.getId(), department.getId());
+        GetNumberGroupByOrderResult result = new GetNumberGroupByOrderResult();
+        result.setTotalNum(0);
+        List<GetNumberGroupByOrderPo> results = new LinkedList<>();
+        for (PersonNumGroupByOrderPo po : depPos){
+            GetNumberGroupByOrderPo r = new GetNumberGroupByOrderPo();
+            r.setOrderNum(po.getOrderNum());
+            r.setNum(po.getNumber());
+            results.add(r);
+            result.setTotalNum(result.getTotalNum() + r.getNum());
+        }
+        result.setNums(results);
+        result.setOrderNum(results.size());
         return CommonResult.success(result);
     }
 }

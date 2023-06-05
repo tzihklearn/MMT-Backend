@@ -1,8 +1,10 @@
 package com.sipc.mmtbackend.controller;
 
+import com.sipc.mmtbackend.annotation.BPermission;
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
 import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResult.*;
 import com.sipc.mmtbackend.service.InterviewBoardService;
+import com.sipc.mmtbackend.utils.CheckroleBUtil.pojo.PermissionEnum;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -12,6 +14,7 @@ import javax.annotation.Resource;
 
 @RestController
 @RequestMapping("/b/interview")
+@BPermission(PermissionEnum.NUMBER)
 public class InterviewBoardController {
     @Resource
     InterviewBoardService interviewBoardService;
@@ -56,4 +59,10 @@ public class InterviewBoardController {
     public CommonResult<GetNumberGroupByTimeAndDepartmentResult> getNumberGroupByByTimeAndDepartment(){
         return interviewBoardService.getNumberGroupByByTimeAndDepartment();
     }
+
+    @GetMapping("orgPieChart")
+    public CommonResult<GetNumberGroupByOrderResult> getNumberGroupByChoise(@RequestParam(value = "departmentId") Integer departmentId){
+        return interviewBoardService.getNumberGroupByOrder(departmentId);
+    }
+
 }
