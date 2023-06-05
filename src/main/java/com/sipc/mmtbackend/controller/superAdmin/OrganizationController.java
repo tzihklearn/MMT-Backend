@@ -1,5 +1,6 @@
 package com.sipc.mmtbackend.controller.superAdmin;
 
+import com.sipc.mmtbackend.annotation.BPermission;
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
 import com.sipc.mmtbackend.pojo.dto.data.QuestionPoData;
 import com.sipc.mmtbackend.pojo.dto.param.superAdmin.AdmissionPublishParam;
@@ -12,6 +13,7 @@ import com.sipc.mmtbackend.pojo.dto.result.superAdmin.po.SelectTypePo;
 import com.sipc.mmtbackend.pojo.exceptions.DateBaseException;
 import com.sipc.mmtbackend.pojo.exceptions.RunException;
 import com.sipc.mmtbackend.service.OrganizationService;
+import com.sipc.mmtbackend.utils.CheckroleBUtil.pojo.PermissionEnum;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -28,6 +30,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/b/admin/organization")
 @RequiredArgsConstructor(onConstructor_ = {@Autowired})
+@BPermission(PermissionEnum.SUPER_ADMIN)
 public class OrganizationController {
 
 
