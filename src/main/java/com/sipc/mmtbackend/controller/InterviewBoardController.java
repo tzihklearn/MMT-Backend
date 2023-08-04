@@ -55,7 +55,7 @@ public class InterviewBoardController {
      *
      * @return 折线图横坐标（日期）、折线数据（折线名称与数据）
      */
-    @GetMapping("/oegLineChart")
+    @GetMapping("/orgLineChart")
     public CommonResult<GetNumberGroupByTimeAndDepartmentResult> getNumberGroupByByTimeAndDepartment() {
         return interviewBoardService.getNumberGroupByByTimeAndDepartment();
     }
