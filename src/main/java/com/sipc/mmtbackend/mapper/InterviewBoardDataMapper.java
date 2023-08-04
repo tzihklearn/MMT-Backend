@@ -57,4 +57,14 @@ public interface InterviewBoardDataMapper {
     List<PersonNumGroupByOrderPo> selectNumberGroupByOrderByAdmissionIdAndDepartmentId(
             @Param("admissionId") Integer admissionId,
             @Param("departmentId") Integer departmentId);
+    /**
+     * 根据北叶门 ID 与纳新 ID 查询各个志愿报名人数折线图数据
+     *
+     * @param departmentId   部门 ID
+     * @param admissionId    纳新 ID
+     * @return 折线图数据
+     */
+    List<LineChartLineDataDaoPo> selectInterviewNumberLineChartGroupByDataByDepartmentIdIdAndAdmissionId(
+            @Param("departmentId") Integer departmentId,
+            @Param("admissionId") Integer admissionId);
 }

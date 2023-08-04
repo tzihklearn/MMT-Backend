@@ -179,7 +179,7 @@ public class InterviewBoardServiceImpl implements InterviewBoardService {
         }
         Department department = departmentMapper.selectById(departmentId);
         if (department == null || !Objects.equals(department.getOrganizationId(), context.getOrganizationId())){
-            log.warn("用户 " + context + " 尝试在查询不存在的组织或不属于其部门的组织 " + departmentId + " 的信息");
+            log.warn("用户 " + context + " 尝试查询不存在的组织或不属于其部门的组织 " + departmentId + " 的信息");
             return CommonResult.fail("查询失败：部门不存在");
         }
         List<PersonNumGroupByOrderPo> depPos =
@@ -197,6 +197,44 @@ public class InterviewBoardServiceImpl implements InterviewBoardService {
         }
         result.setNums(results);
         result.setOrderNum(results.size());
+        return CommonResult.success(result);
+    }
+
+    /**
+     * 获取指定组织不同志愿人数随时间变化情况
+     *
+     * @param departmentId 组织 ID
+     * @return 不同志愿人数随时间变化情况
+     */
+    @Override
+    public CommonResult<GetNumberGroupByTimeAndOrderResult> getNumberGroupByTimeAndOrder(Integer departmentId) {
+        BTokenSwapPo context = ThreadLocalContextUtil.getContext();
+        Admission admission = admissionMapper.selectOne(
+                new QueryWrapper<Admission>()
+                        .eq("organization_id", context.getOrganizationId())
+                        .orderByDesc("id"));
+        if (admission == null) {
+            log.warn("用户 " + context + " 尝试在无活动的纳新时查询已报名人数");
+            return CommonResult.fail("查询失败：未开始纳新或纳新已结束");
+        }
+        Department department = departmentMapper.selectById(departmentId);
+        if (department == null || !Objects.equals(department.getOrganizationId(), context.getOrganizationId())){
+            log.warn("用户 " + context + " 尝试查询不存在的组织或不属于其部门的组织 " + departmentId + " 的信息");
+            return CommonResult.fail("查询失败：部门不存在");
+        }
+        // 数据库查询到的数据
+        List<LineChartLineDataDaoPo> daoDatas = interviewBoardDataMapper.selectInterviewNumberLineChartGroupByDataByDepartmentIdIdAndAdmissionId(
+                departmentId, admission.getId());
+        GetNumberGroupByTimeAndOrderResult result = new GetNumberGroupByTimeAndOrderResult();
+        result.setDate(daoDatas.get(0).getAbscissaData());
+        List<LineChartLineDataPo> departmentDates = new LinkedList<>();
+        for (LineChartLineDataDaoPo data : daoDatas){
+            LineChartLineDataPo depData = new LineChartLineDataPo();
+            depData.setName(data.getName());
+            depData.setData(data.getYDatas());
+            departmentDates.add(depData);
+        }
+        result.setDepartments(departmentDates);
         return CommonResult.success(result);
     }
 }

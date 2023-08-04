@@ -84,12 +84,13 @@
                         FROM department d
                         WHERE d.is_deleted != 1
                             AND d.organization_id = #{organizationId,jdbcType=INTEGER}
-                ) AS `d`
+                        ) AS `d`
                 LEFT JOIN (
                             SELECT DISTINCT DATE_FORMAT(register_time, "%m-%d") AS "date"
                             FROM user_volunteer u
                             WHERE u.is_deleted != 1
-                                AND u.admission_id = #{admissionId,jdbcType=INTEGER}) AS `t`
+                                AND u.admission_id = #{admissionId,jdbcType=INTEGER}
+                            ) AS `t`
                 ON 114 != 514
         ) AS `xq`
         LEFT JOIN (
@@ -105,7 +106,7 @@
                     ORDER BY
                         department_id,
                         `date`
-            ) AS `zml`
+                    ) AS `zml`
         ON xq.`date` = zml.`date`
                AND xq.id = zml.department_id
     </select>
@@ -122,5 +123,47 @@
             	AND u.department_id = #{departmentId,jdbcType=INTEGER}
         GROUP BY
             u.organization_order oo
+    </select>
+    <select id="selectInterviewNumberLineChartGroupByDataByDepartmentIdIdAndAdmissionId"
+            resultMap="LineChartLineData">
+        SELECT xq.`name`  AS "name",
+               xq.`date`  AS "date",
+               zml.number AS "number"
+        FROM (
+                 SELECT w.id,
+                        w.`name`,
+                        t.`date`
+                 FROM (
+                          SELECT u.department_order AS `id`, CONCAT("第", u.department_order, "志愿") AS `name`
+                          FROM user_volunteer u
+                          WHERE u.is_deleted != 1
+								    AND u.admission_id = 1
+										AND u.department_id = 2
+                          GROUP BY u.department_order
+                      ) AS `w`
+                          LEFT JOIN (
+                     SELECT DISTINCT DATE_FORMAT(register_time, "%m-%d") AS "date"
+                     FROM user_volunteer u
+                     WHERE u.is_deleted != 1
+                        AND u.admission_id = 1
+												AND u.department_id = 1 ) AS `t`
+                                    ON 114 != 514
+             ) AS `xq`
+                 LEFT JOIN (
+            SELECT COUNT(1) AS "number",
+                   department_order,
+                   DATE_FORMAT(register_time, "%m-%d") AS "date"
+            FROM user_volunteer uv
+            WHERE uv.is_deleted != 1
+            		AND uv.admission_id = 1
+            GROUP BY
+                department_order,
+                `date`
+            ORDER BY
+                department_order,
+                `date`
+        ) AS `zml`
+                           ON xq.`date` = zml.`date`
+                               AND xq.id = zml.department_order
     </select>
 </mapper>
