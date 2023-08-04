@@ -55,7 +55,7 @@ public class InterviewBoardController {
      *
      * @return 折线图横坐标（日期）、折线数据（折线名称与数据）
      */
-    @GetMapping("/oegLineChart")
+    @GetMapping("/orgLineChart")
     public CommonResult<GetNumberGroupByTimeAndDepartmentResult> getNumberGroupByByTimeAndDepartment() {
         return interviewBoardService.getNumberGroupByByTimeAndDepartment();
     }
@@ -72,6 +72,7 @@ public class InterviewBoardController {
     }
 
     /**
+     *获取指定部门各个志愿报名人数随时间变化情况（部门折线图）
      *
      * @param departmentId 部门ID
      * @return 折线图横坐标（日期）、折线数据（折线名称与数据）
