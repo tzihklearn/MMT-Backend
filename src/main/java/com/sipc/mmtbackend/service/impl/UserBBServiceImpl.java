@@ -30,6 +30,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -44,6 +45,7 @@ public class UserBBServiceImpl implements UserBService {
     private final UserRoleMergeMapper userRoleMergeMapper;
     private final OrganizationMapper organizationMapper;
     private final PermissionMapper permissionMapper;
+    private final FeedbackMapper feedbackMapper;
     private final ICodeUtil iCodeUtil;
     private final JWTUtil jwtUtil;
     private final PictureUtil pictureUtil;
@@ -386,5 +388,29 @@ public class UserBBServiceImpl implements UserBService {
         result.setNum(results.size());
         result.setOrganizations(results);
         return CommonResult.success(result);
+    }
+
+    /**
+     * B 端反馈
+     *
+     * @param param 用户名、邮箱与反馈信息
+     * @return 反馈结果
+     */
+    @Override
+    public CommonResult<String> feedback(BFeedbackParam param) {
+        BTokenSwapPo context = ThreadLocalContextUtil.getContext();
+        Feedback feedback = new Feedback();
+        feedback.setDate(LocalDateTime.now());
+        feedback.setEmail(param.getEmail());
+        feedback.setFeedback(param.getFeedback());
+        feedback.setIsB(true);
+        feedback.setName(param.getName());
+        feedback.setUserId(context.getUserId());
+        int insert = feedbackMapper.insert(feedback);
+        if (insert != 1){
+            log.warn("用户 " + context + " 反馈问题 " + feedback + "时出现异常");
+            return CommonResult.serverError();
+        }
+        return CommonResult.success();
     }
 }
