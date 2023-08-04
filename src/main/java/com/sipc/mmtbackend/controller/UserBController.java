@@ -137,4 +137,15 @@ public class UserBController {
             return CommonResult.serverError();
         }
     }
+
+    /**
+     * B 端反馈
+     *
+     * @param param 用户名、邮箱与反馈信息
+     * @return 反馈结果
+     */
+    @PostMapping("/feedback")
+    public CommonResult<String> feedbackB(@RequestBody BFeedbackParam param){
+        return userBService.feedback(param);
+    }
 }

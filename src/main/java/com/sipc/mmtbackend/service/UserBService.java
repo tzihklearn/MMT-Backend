@@ -90,4 +90,12 @@ public interface UserBService {
      * @return 用户已加入的组织及是否为当前组织
      */
     CommonResult<LoginedJoinOrgsResult> getLoginedJoinedOrgs();
+
+    /**
+     * B 端反馈
+     *
+     * @param param 用户名、邮箱与反馈信息
+     * @return 反馈结果
+     */
+    CommonResult<String> feedback(BFeedbackParam param);
 }

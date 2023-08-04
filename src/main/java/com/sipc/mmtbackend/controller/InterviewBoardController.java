@@ -56,13 +56,28 @@ public class InterviewBoardController {
      * @return 折线图横坐标（日期）、折线数据（折线名称与数据）
      */
     @GetMapping("/oegLineChart")
-    public CommonResult<GetNumberGroupByTimeAndDepartmentResult> getNumberGroupByByTimeAndDepartment(){
+    public CommonResult<GetNumberGroupByTimeAndDepartmentResult> getNumberGroupByByTimeAndDepartment() {
         return interviewBoardService.getNumberGroupByByTimeAndDepartment();
     }
 
-    @GetMapping("orgPieChart")
-    public CommonResult<GetNumberGroupByOrderResult> getNumberGroupByChoise(@RequestParam(value = "departmentId") Integer departmentId){
+    /**
+     * 获取指定组织不同志愿人数（部门饼图）
+     *
+     * @param departmentId 组织 ID
+     * @return 指定组织不同志愿人数
+     */
+    @GetMapping("depPieChart")
+    public CommonResult<GetNumberGroupByOrderResult> getNumberGroupByChoise(@RequestParam(value = "departmentId") Integer departmentId) {
         return interviewBoardService.getNumberGroupByOrder(departmentId);
     }
 
+    /**
+     *
+     * @param departmentId 部门ID
+     * @return 折线图横坐标（日期）、折线数据（折线名称与数据）
+     */
+    @GetMapping("/depLineChart")
+    public CommonResult<GetNumberGroupByTimeAndOrderResult> getNumberGroupByTimeAndOrder(@RequestParam(value = "departmentId") Integer departmentId){
+        return interviewBoardService.getNumberGroupByTimeAndOrder(departmentId);
+    }
 }

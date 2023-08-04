@@ -27,7 +27,7 @@ public interface InterviewBoardService {
     CommonResult<GetSignUpNumResult> getDeptSignupNum(Integer departmentId);
 
     /**
-     * 获取组织各个部门报名人数随时间变化情况（组织总况的折线图）
+     * 获取组织各个部门报名人数随时间变化情况
      *
      * @return 折线图横坐标（日期）、折线数据（折线名称与数据）
      */
@@ -40,4 +40,12 @@ public interface InterviewBoardService {
      * @return 指定组织不同志愿人数
      */
     CommonResult<GetNumberGroupByOrderResult> getNumberGroupByOrder(Integer departmentId);
+
+    /**
+     * 获取指定组织不同志愿人数随时间变化情况
+     *
+     * @param departmentId 组织 ID
+     * @return 不同志愿人数随时间变化情况
+     */
+    CommonResult<GetNumberGroupByTimeAndOrderResult> getNumberGroupByTimeAndOrder(Integer departmentId);
 }
