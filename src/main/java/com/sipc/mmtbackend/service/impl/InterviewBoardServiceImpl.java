@@ -227,14 +227,14 @@ public class InterviewBoardServiceImpl implements InterviewBoardService {
                 departmentId, admission.getId());
         GetNumberGroupByTimeAndOrderResult result = new GetNumberGroupByTimeAndOrderResult();
         result.setDate(daoDatas.get(0).getAbscissaData());
-        List<LineChartLineDataPo> departmentDates = new LinkedList<>();
+        List<LineChartLineDataPo> orderDates = new LinkedList<>();
         for (LineChartLineDataDaoPo data : daoDatas){
             LineChartLineDataPo depData = new LineChartLineDataPo();
             depData.setName(data.getName());
             depData.setData(data.getYDatas());
-            departmentDates.add(depData);
+            orderDates.add(depData);
         }
-        result.setDepartments(departmentDates);
+        result.setOrders(orderDates);
         return CommonResult.success(result);
     }
 }
