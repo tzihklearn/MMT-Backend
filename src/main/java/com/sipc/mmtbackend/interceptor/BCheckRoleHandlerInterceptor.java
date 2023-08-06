@@ -59,12 +59,10 @@ public class BCheckRoleHandlerInterceptor implements HandlerInterceptor {
                         return false;
                     }
 
-                    boolean isCheck = checkRoleUtil.bCheck(bTokenSwapPo.getPermissionId(), requestURI);
-                    if (isCheck) {
-                        //将token解析出的用户信息放入本地线程变量
-                        ThreadLocalContextUtil.setTHREAD_LOCAL_Context(bTokenSwapPo);
-                        return true;
-                    }
+                    //将token解析出的用户信息放入本地线程变量
+                    ThreadLocalContextUtil.setTHREAD_LOCAL_Context(bTokenSwapPo);
+                    return true;
+
                 }
             }
         }
