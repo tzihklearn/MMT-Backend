@@ -15,9 +15,9 @@
         <if test="permissionId != 0">
             AND role.permission_id = #{permissionId}
         </if>
-        LIMIT #{startNum}, #{endNum}
         <if test="sort != 0">
             ORDER BY user_b.student_id DESC
         </if>
+        LIMIT #{startNum}, #{endNum}
     </select>
 </mapper>
