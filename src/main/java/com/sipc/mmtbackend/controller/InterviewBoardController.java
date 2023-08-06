@@ -66,7 +66,7 @@ public class InterviewBoardController {
      * @param departmentId 组织 ID
      * @return 指定组织不同志愿人数
      */
-    @GetMapping("depPieChart")
+    @GetMapping("/depPieChart")
     public CommonResult<GetNumberGroupByOrderResult> getNumberGroupByChoise(@RequestParam(value = "departmentId") Integer departmentId) {
         return interviewBoardService.getNumberGroupByOrder(departmentId);
     }
