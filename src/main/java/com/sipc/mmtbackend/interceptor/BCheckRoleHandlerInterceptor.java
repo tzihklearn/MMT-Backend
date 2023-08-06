@@ -6,7 +6,6 @@ import com.sipc.mmtbackend.utils.CheckroleBUtil.CheckPermissionUtil;
 import com.sipc.mmtbackend.utils.CheckroleBUtil.CheckRoleUtil;
 import com.sipc.mmtbackend.utils.CheckroleBUtil.JWTUtil;
 import com.sipc.mmtbackend.utils.CheckroleBUtil.pojo.BTokenSwapPo;
-import com.sipc.mmtbackend.utils.RedisUtil;
 import com.sipc.mmtbackend.utils.ThreadLocalContextUtil;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -18,7 +17,6 @@ import org.springframework.web.servlet.HandlerInterceptor;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Objects;
 
 /**
@@ -56,8 +54,9 @@ public class BCheckRoleHandlerInterceptor implements HandlerInterceptor {
                      */
 
                     boolean isPermission = CheckPermissionUtil.checkBPermission(handlerMethod, bTokenSwapPo.getPermissionId());
-                    if (isPermission) {
-                        return true;
+                    //权限不符合，返回false
+                    if (!isPermission) {
+                        return false;
                     }
 
                     boolean isCheck = checkRoleUtil.bCheck(bTokenSwapPo.getPermissionId(), requestURI);
@@ -76,7 +75,7 @@ public class BCheckRoleHandlerInterceptor implements HandlerInterceptor {
     }
 
     @Override
-    public void afterCompletion(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler, Exception ex) throws Exception {
+    public void afterCompletion(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler, Exception ex) {
 
         //删除本地线程变量中的值
         ThreadLocalContextUtil.remove();
