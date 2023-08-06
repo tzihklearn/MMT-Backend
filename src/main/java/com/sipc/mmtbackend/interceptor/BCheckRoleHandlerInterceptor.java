@@ -56,6 +56,7 @@ public class BCheckRoleHandlerInterceptor implements HandlerInterceptor {
                     boolean isPermission = CheckPermissionUtil.checkBPermission(handlerMethod, bTokenSwapPo.getPermissionId());
                     //权限不符合，返回false
                     if (!isPermission) {
+                        setResponse(response, CommonResult.userAuthError());
                         return false;
                     }
 
