@@ -15,7 +15,7 @@ import javax.annotation.Resource;
 
 @RestController
 @RequestMapping("/b/interview/realtime")
-@BPermission(PermissionEnum.NUMBER)
+@BPermission(PermissionEnum.MEMBER)
 public class RealtimeInterviewController {
     @Resource
     RealtimeInterviewService realtimeInterviewService;
