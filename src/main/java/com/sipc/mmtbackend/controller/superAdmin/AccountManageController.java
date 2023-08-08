@@ -2,12 +2,11 @@ package com.sipc.mmtbackend.controller.superAdmin;
 
 import com.sipc.mmtbackend.annotation.BPermission;
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
-import com.sipc.mmtbackend.pojo.dto.param.superAdmin.DeleteMemberParam;
-import com.sipc.mmtbackend.pojo.dto.param.superAdmin.ReviseMemberInfoParam;
-import com.sipc.mmtbackend.pojo.dto.param.superAdmin.ReviseMemberPasswdParam;
+import com.sipc.mmtbackend.pojo.dto.param.superAdmin.*;
 import com.sipc.mmtbackend.pojo.dto.result.superAdmin.ICodeResult;
 import com.sipc.mmtbackend.pojo.dto.result.superAdmin.MemberInfoResult;
 import com.sipc.mmtbackend.pojo.exceptions.DateBaseException;
+import com.sipc.mmtbackend.pojo.exceptions.ValidateException;
 import com.sipc.mmtbackend.service.AccountManageService;
 import com.sipc.mmtbackend.utils.CheckroleBUtil.pojo.PermissionEnum;
 import lombok.RequiredArgsConstructor;
@@ -81,7 +80,7 @@ public class AccountManageController {
      * @see ReviseMemberInfoParam
      */
     @PostMapping("/members/revise/info")
-    public CommonResult<String> reviseMemberInfo(@RequestBody ReviseMemberInfoParam reviseMemberInfoParam) throws DateBaseException {
+    public CommonResult<String> reviseMemberInfo(@RequestBody ReviseMemberInfoParam reviseMemberInfoParam) throws DateBaseException, ValidateException {
         return accountManageService.reviseMemberInfo(reviseMemberInfoParam);
     }
 
@@ -96,6 +95,31 @@ public class AccountManageController {
     @PostMapping("/members/revise/permission")
     public CommonResult<String> reviseMemberPasswd(@RequestBody ReviseMemberPasswdParam reviseMemberPasswdParam) throws DateBaseException {
         return accountManageService.reviseMemberPasswd(reviseMemberPasswdParam);
+    }
+
+    /**
+     * 修改社团成员所有信息接口（包含密码、权限、手机号）
+     * @param reviseMemberParam 修改社团成员所有信息接口的参数实体类
+     * @return 返回处理的结果
+     * @throws DateBaseException 自定义的数据库操作异常，抛出用于统一异常处理
+     * @see ReviseMemberParam
+     */
+    @PostMapping("/members/revise")
+    public CommonResult<String> reviseMember(@RequestBody ReviseMemberParam reviseMemberParam) throws DateBaseException, ValidateException {
+        return accountManageService.reviseMember(reviseMemberParam);
+    }
+
+    /**
+     * 超级管理创建社团成员接口
+     * @param addMemberParam 超级管理创建社团成员接口的参数实体类
+     * @return 返回处理的结果
+     * @throws ValidateException 自定义的参数校验异常，抛出用于统一异常处理
+     * @throws DateBaseException 自定义的数据库操作异常，抛出用于统一异常处理
+     * @see AddMemberParam
+     */
+    @PostMapping("/members/add")
+    public CommonResult<String> addMember(@RequestBody AddMemberParam addMemberParam) throws ValidateException, DateBaseException {
+        return accountManageService.addMember(addMemberParam);
     }
 
     /**

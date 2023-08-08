@@ -5,10 +5,10 @@ import lombok.Data;
 /**
  * @author tzih
  * @version v1.0
- * @since 2023.05.22
+ * @since 2023.08.08
  */
 @Data
-public class ReviseMemberInfoParam {
+public class ReviseMemberParam {
 
     private Integer id;
 
@@ -19,5 +19,7 @@ public class ReviseMemberInfoParam {
     private String phone;
 
     private String permission;
+
+    private String passwd;
 
 }

@@ -20,6 +20,15 @@
           AND role.is_deleted = 0
           AND urm.is_deleted = 0
     </update>
+    <update id="updateRoleByUserIdAndOrganizationId">
+        UPDATE user_role_merge AS urm
+            LEFT JOIN role on urm.role_id = role.id
+        SET urm.role_id = #{roleId}, urm.password = #{passwd,javaType=String}
+        WHERE urm.user_id = #{userId}
+          AND role.organization_id = #{organizationId}
+          AND role.is_deleted = 0
+          AND urm.is_deleted = 0
+    </update>
     <update id="logicDeleteByUserIdAndOrganizationId" parameterType="java.lang.Integer">
         UPDATE user_role_merge AS urm
             LEFT JOIN role on urm.role_id = role.id
