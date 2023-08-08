@@ -18,5 +18,7 @@ public interface UserRoleMergeMapper extends BaseMapper<UserRoleMerge> {
 
     int updatePasswdByUserIdAndOrganizationId(Integer userId, Integer organizationId, String passwd);
 
+    int updateRoleByUserIdAndOrganizationId(Integer userId, Integer organizationId, Integer roleId, String passwd);
+
     int logicDeleteByUserIdAndOrganizationId(Integer userId, Integer organizationId);
 }

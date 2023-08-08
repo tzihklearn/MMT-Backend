@@ -3,6 +3,7 @@ package com.sipc.mmtbackend.config;
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
 import com.sipc.mmtbackend.pojo.exceptions.DateBaseException;
 import com.sipc.mmtbackend.pojo.exceptions.RunException;
+import com.sipc.mmtbackend.pojo.exceptions.ValidateException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -14,7 +15,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler({DateBaseException.class, RunException.class})
+    @ExceptionHandler({DateBaseException.class, RunException.class, ValidateException.class})
     public CommonResult<String> DateAndRunExceptionHandler(Exception e) {
         e.printStackTrace();
 
