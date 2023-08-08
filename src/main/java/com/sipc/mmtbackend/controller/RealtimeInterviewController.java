@@ -2,6 +2,7 @@ package com.sipc.mmtbackend.controller;
 
 import com.sipc.mmtbackend.annotation.BPermission;
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
+import com.sipc.mmtbackend.pojo.dto.result.RealtimeIntreviewdResult.GetInterviewPlacesResult;
 import com.sipc.mmtbackend.pojo.dto.result.RealtimeIntreviewdResult.GetRealtimeProgressBarResult;
 import com.sipc.mmtbackend.service.RealtimeInterviewService;
 import com.sipc.mmtbackend.utils.CheckroleBUtil.pojo.PermissionEnum;
@@ -38,6 +39,16 @@ public class RealtimeInterviewController {
      */
     @GetMapping("/qrcode")
     CommonResult<String> getCheckInQRCode(){
+        return null;
+    }
+
+    /**
+     * 获取面试场地
+     *
+     * @return 所有面试场地
+     */
+    @GetMapping("/places")
+    CommonResult<GetInterviewPlacesResult> getINterviewPlaces(){
         return null;
     }
 }
