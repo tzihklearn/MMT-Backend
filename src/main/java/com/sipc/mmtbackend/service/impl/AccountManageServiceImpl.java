@@ -185,8 +185,8 @@ public class AccountManageServiceImpl implements AccountManageService {
         }
 
         int permissionId = -1;
-        if (reviseMemberInfoParam.getPermission().equals(PermissionEnum.NUMBER.getName())) {
-            permissionId = PermissionEnum.NUMBER.getId();
+        if (reviseMemberInfoParam.getPermission().equals(PermissionEnum.MEMBER.getName())) {
+            permissionId = PermissionEnum.MEMBER.getId();
         } else if (reviseMemberInfoParam.getPermission().equals(PermissionEnum.COMMITTEE.getName())){
             permissionId = PermissionEnum.COMMITTEE.getId();
         } else {
@@ -348,8 +348,8 @@ public class AccountManageServiceImpl implements AccountManageService {
         }
 
         int permissionId = -1;
-        if (reviseMemberParam.getPermission().equals(PermissionEnum.NUMBER.getName())) {
-            permissionId = PermissionEnum.NUMBER.getId();
+        if (reviseMemberParam.getPermission().equals(PermissionEnum.MEMBER.getName())) {
+            permissionId = PermissionEnum.MEMBER.getId();
         } else if (reviseMemberParam.getPermission().equals(PermissionEnum.COMMITTEE.getName())){
             permissionId = PermissionEnum.COMMITTEE.getId();
         } else {
@@ -490,8 +490,8 @@ public class AccountManageServiceImpl implements AccountManageService {
 
         int permissionId = -1;
 
-        if (addMemberParam.getPermission().equals(PermissionEnum.NUMBER.getName())) {
-            permissionId = PermissionEnum.NUMBER.getId();
+        if (addMemberParam.getPermission().equals(PermissionEnum.MEMBER.getName())) {
+            permissionId = PermissionEnum.MEMBER.getId();
         } else if (addMemberParam.getPermission().equals(PermissionEnum.COMMITTEE.getName())){
             permissionId = PermissionEnum.COMMITTEE.getId();
         } else {

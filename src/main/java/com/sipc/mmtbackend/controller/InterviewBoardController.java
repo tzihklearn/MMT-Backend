@@ -14,7 +14,7 @@ import javax.annotation.Resource;
 
 @RestController
 @RequestMapping("/b/interview")
-@BPermission(PermissionEnum.NUMBER)
+@BPermission(PermissionEnum.MEMBER)
 public class InterviewBoardController {
     @Resource
     InterviewBoardService interviewBoardService;

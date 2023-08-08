@@ -24,7 +24,6 @@ import com.sipc.mmtbackend.utils.ThreadLocalContextUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.jsqlparser.util.validation.metadata.DatabaseException;
-import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -75,7 +74,7 @@ public class UserBBServiceImpl implements UserBService {
             return CommonResult.fail("注册失败：学号重复");
         }
         // 初始化一个新组织的新角色
-        Role role = roleMapper.selectOne(new QueryWrapper<Role>().eq("organization_id", orgId).eq("permission_id", PermissionEnum.NUMBER.getId()));
+        Role role = roleMapper.selectOne(new QueryWrapper<Role>().eq("organization_id", orgId).eq("permission_id", PermissionEnum.MEMBER.getId()));
         if (role == null) {
             role = new Role();
             role.setOrganizationId(orgId);
@@ -292,7 +291,7 @@ public class UserBBServiceImpl implements UserBService {
     @Transactional(rollbackFor = Exception.class)
     public CommonResult<String> addNewOrganization(AddNewOrgParam param) throws DatabaseException {
         BTokenSwapPo context = ThreadLocalContextUtil.getContext();
-        if (context.getPermissionId() < PermissionEnum.NUMBER.getId())
+        if (context.getPermissionId() < PermissionEnum.MEMBER.getId())
             return CommonResult.fail("Super Admin 不允许加入其他组织");
         Integer orgId = iCodeUtil.verifyICode(param.getKey());
         if (orgId == null)
