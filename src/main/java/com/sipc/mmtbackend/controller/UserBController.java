@@ -15,7 +15,7 @@ import javax.annotation.Resource;
 
 @RestController
 @RequestMapping("/b/user")
-@BPermission(PermissionEnum.NUMBER)
+@BPermission(PermissionEnum.MEMBER)
 public class UserBController {
     @Resource
     UserBService userBService;

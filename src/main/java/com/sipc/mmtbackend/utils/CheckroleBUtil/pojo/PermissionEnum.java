@@ -13,7 +13,7 @@ import lombok.ToString;
 public enum PermissionEnum {
     SUPER_ADMIN(1, "SuperAdmin"),
     COMMITTEE(2, "Committee"),
-    NUMBER(3, "Number");
+    MEMBER(3, "Member");
 
     private final Integer id;
     private final String name;
