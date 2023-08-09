@@ -6,7 +6,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class GetRealtimeProgressBarResult {
+public class GetInterviewProgressBarResult {
     // 分组数量
     private Integer groupNum;
     // 每个分组的数据
