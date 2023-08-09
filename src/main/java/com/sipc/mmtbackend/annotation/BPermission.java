@@ -1,7 +1,6 @@
 package com.sipc.mmtbackend.annotation;
 
 import com.sipc.mmtbackend.utils.CheckroleBUtil.pojo.PermissionEnum;
-import org.springframework.core.annotation.AliasFor;
 
 import java.lang.annotation.*;
 
