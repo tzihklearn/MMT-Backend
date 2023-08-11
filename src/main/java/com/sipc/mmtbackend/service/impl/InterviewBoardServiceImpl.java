@@ -161,10 +161,10 @@ public class InterviewBoardServiceImpl implements InterviewBoardService {
     }
 
     /**
-     * 获取指定组织不同志愿人数
+     * 获取指定部门不同志愿人数
      *
-     * @param departmentId 组织 ID
-     * @return 指定组织不同志愿人数
+     * @param departmentId 部门 ID
+     * @return 指定部门不同志愿人数
      */
     @Override
     public CommonResult<GetNumberGroupByOrderResult> getNumberGroupByOrder(Integer departmentId) {
@@ -201,9 +201,9 @@ public class InterviewBoardServiceImpl implements InterviewBoardService {
     }
 
     /**
-     * 获取指定组织不同志愿人数随时间变化情况
+     * 获取指定部门不同志愿人数随时间变化情况
      *
-     * @param departmentId 组织 ID
+     * @param departmentId 部门 ID
      * @return 不同志愿人数随时间变化情况
      */
     @Override
