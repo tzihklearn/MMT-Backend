@@ -12,11 +12,10 @@ import com.sipc.mmtbackend.pojo.domain.po.InterviewBoardPo.PersonNumGroupByOrder
 import com.sipc.mmtbackend.pojo.domain.po.InterviewBoardPo.TotalNumPo;
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
 import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardBeforeResult.*;
-import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardBeforeResult.po.GetDepartmentPo;
 import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardBeforeResult.po.GetNumberGroupByDepartmentPo;
 import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardBeforeResult.po.GetNumberGroupByOrderPo;
 import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardBeforeResult.po.LineChartLineDataPo;
-import com.sipc.mmtbackend.service.InterviewBoardBeforedService;
+import com.sipc.mmtbackend.service.InterviewBoardBeforeService;
 import com.sipc.mmtbackend.utils.CheckroleBUtil.pojo.BTokenSwapPo;
 import com.sipc.mmtbackend.utils.ThreadLocalContextUtil;
 import lombok.RequiredArgsConstructor;
@@ -29,34 +28,10 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor(onConstructor_ = {@Autowired})
 @Slf4j
-public class InterviewBoardBeforedServiceImpl implements InterviewBoardBeforedService {
+public class InterviewBoardBeforeServiceImpl implements InterviewBoardBeforeService {
     private final DepartmentMapper departmentMapper;
     private final AdmissionMapper admissionMapper;
     private final InterviewBoardDataMapper interviewBoardDataMapper;
-
-    /**
-     * 获取当前登录组织的部门列表
-     *
-     * @return 当前登录组织的部门列表
-     */
-    @Override
-    public CommonResult<GetDepartmentsResult> getDepartments() {
-        BTokenSwapPo context = ThreadLocalContextUtil.getContext();
-        List<Department> departmentList = departmentMapper.selectList(
-                new QueryWrapper<Department>()
-                        .eq("organization_id", context.getOrganizationId()));
-        GetDepartmentsResult result = new GetDepartmentsResult();
-        List<GetDepartmentPo> departments = new LinkedList<>();
-        for (Department department : departmentList) {
-            GetDepartmentPo gdp = new GetDepartmentPo();
-            gdp.setDepartmentId(department.getId());
-            gdp.setDepartmentName(department.getName());
-            departments.add(gdp);
-        }
-        result.setNum(departments.size());
-        result.setDepartments(departments);
-        return CommonResult.success(result);
-    }
 
     /**
      * 查询当前登录组织各个部门已报名人数、第一志愿人数

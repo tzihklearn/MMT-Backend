@@ -3,13 +3,7 @@ package com.sipc.mmtbackend.service;
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
 import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardBeforeResult.*;
 
-public interface InterviewBoardBeforedService {
-    /**
-     * 获取当前登录组织的部门列表
-     *
-     * @return 当前登录组织的部门列表
-     */
-    CommonResult<GetDepartmentsResult> getDepartments();
+public interface InterviewBoardBeforeService {
 
     /**
      * 查询当前登录组织各个部门已报名人数、第一志愿人数
