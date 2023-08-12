@@ -11,12 +11,12 @@ import com.sipc.mmtbackend.pojo.domain.po.InterviewBoardPo.PersonNumGroupByDepar
 import com.sipc.mmtbackend.pojo.domain.po.InterviewBoardPo.PersonNumGroupByOrderPo;
 import com.sipc.mmtbackend.pojo.domain.po.InterviewBoardPo.TotalNumPo;
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
-import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResult.*;
-import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResult.po.GetDepartmentPo;
-import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResult.po.GetNumberGroupByDepartmentPo;
-import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResult.po.GetNumberGroupByOrderPo;
-import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResult.po.LineChartLineDataPo;
-import com.sipc.mmtbackend.service.InterviewBoardService;
+import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardBeforeResult.*;
+import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardBeforeResult.po.GetDepartmentPo;
+import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardBeforeResult.po.GetNumberGroupByDepartmentPo;
+import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardBeforeResult.po.GetNumberGroupByOrderPo;
+import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardBeforeResult.po.LineChartLineDataPo;
+import com.sipc.mmtbackend.service.InterviewBoardBeforedService;
 import com.sipc.mmtbackend.utils.CheckroleBUtil.pojo.BTokenSwapPo;
 import com.sipc.mmtbackend.utils.ThreadLocalContextUtil;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +29,7 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor(onConstructor_ = {@Autowired})
 @Slf4j
-public class InterviewBoardServiceImpl implements InterviewBoardService {
+public class InterviewBoardBeforedServiceImpl implements InterviewBoardBeforedService {
     private final DepartmentMapper departmentMapper;
     private final AdmissionMapper admissionMapper;
     private final InterviewBoardDataMapper interviewBoardDataMapper;
@@ -161,10 +161,10 @@ public class InterviewBoardServiceImpl implements InterviewBoardService {
     }
 
     /**
-     * 获取指定组织不同志愿人数
+     * 获取指定部门不同志愿人数
      *
-     * @param departmentId 组织 ID
-     * @return 指定组织不同志愿人数
+     * @param departmentId 部门 ID
+     * @return 指定部门不同志愿人数
      */
     @Override
     public CommonResult<GetNumberGroupByOrderResult> getNumberGroupByOrder(Integer departmentId) {
@@ -201,9 +201,9 @@ public class InterviewBoardServiceImpl implements InterviewBoardService {
     }
 
     /**
-     * 获取指定组织不同志愿人数随时间变化情况
+     * 获取指定部门不同志愿人数随时间变化情况
      *
-     * @param departmentId 组织 ID
+     * @param departmentId 部门 ID
      * @return 不同志愿人数随时间变化情况
      */
     @Override

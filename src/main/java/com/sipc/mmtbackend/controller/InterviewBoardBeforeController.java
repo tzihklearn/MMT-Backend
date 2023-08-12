@@ -2,8 +2,8 @@ package com.sipc.mmtbackend.controller;
 
 import com.sipc.mmtbackend.annotation.BPermission;
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
-import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResult.*;
-import com.sipc.mmtbackend.service.InterviewBoardService;
+import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardBeforeResult.*;
+import com.sipc.mmtbackend.service.InterviewBoardBeforedService;
 import com.sipc.mmtbackend.utils.CheckroleBUtil.pojo.PermissionEnum;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,11 +13,11 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.annotation.Resource;
 
 @RestController
-@RequestMapping("/b/interview")
+@RequestMapping("/b/interview/before")
 @BPermission(PermissionEnum.MEMBER)
-public class InterviewBoardController {
+public class InterviewBoardBeforeController {
     @Resource
-    InterviewBoardService interviewBoardService;
+    InterviewBoardBeforedService interviewBoardBeforedService;
 
     /**
      * 获取当前登录组织的部门列表
@@ -26,7 +26,7 @@ public class InterviewBoardController {
      */
     @GetMapping("/departments")
     public CommonResult<GetDepartmentsResult> getDepartments() {
-        return interviewBoardService.getDepartments();
+        return interviewBoardBeforedService.getDepartments();
     }
 
     /**
@@ -36,7 +36,7 @@ public class InterviewBoardController {
      */
     @GetMapping("/orgPieChart")
     public CommonResult<GetNumberGroupByDepartmentResult> getNumberGroupByDepartment() {
-        return interviewBoardService.getNumberGroupByDepartment();
+        return interviewBoardBeforedService.getNumberGroupByDepartment();
     }
 
     /**
@@ -47,7 +47,7 @@ public class InterviewBoardController {
      */
     @GetMapping("/numData")
     public CommonResult<GetSignUpNumResult> getDeptSignupNum(@RequestParam(value = "departmentId", required = false) Integer departmentId) {
-        return interviewBoardService.getDeptSignupNum(departmentId);
+        return interviewBoardBeforedService.getDeptSignupNum(departmentId);
     }
 
     /**
@@ -57,7 +57,7 @@ public class InterviewBoardController {
      */
     @GetMapping("/orgLineChart")
     public CommonResult<GetNumberGroupByTimeAndDepartmentResult> getNumberGroupByByTimeAndDepartment() {
-        return interviewBoardService.getNumberGroupByByTimeAndDepartment();
+        return interviewBoardBeforedService.getNumberGroupByByTimeAndDepartment();
     }
 
     /**
@@ -68,7 +68,7 @@ public class InterviewBoardController {
      */
     @GetMapping("/depPieChart")
     public CommonResult<GetNumberGroupByOrderResult> getNumberGroupByChoise(@RequestParam(value = "departmentId") Integer departmentId) {
-        return interviewBoardService.getNumberGroupByOrder(departmentId);
+        return interviewBoardBeforedService.getNumberGroupByOrder(departmentId);
     }
 
     /**
@@ -79,6 +79,6 @@ public class InterviewBoardController {
      */
     @GetMapping("/depLineChart")
     public CommonResult<GetNumberGroupByTimeAndOrderResult> getNumberGroupByTimeAndOrder(@RequestParam(value = "departmentId") Integer departmentId){
-        return interviewBoardService.getNumberGroupByTimeAndOrder(departmentId);
+        return interviewBoardBeforedService.getNumberGroupByTimeAndOrder(departmentId);
     }
 }

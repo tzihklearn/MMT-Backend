@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.ToString;
 
 /**
- * 各种默认头像的 PicrtureId
+ * 各种默认头像的 PictureId
  *
  * @author DoudiNCer
  */
