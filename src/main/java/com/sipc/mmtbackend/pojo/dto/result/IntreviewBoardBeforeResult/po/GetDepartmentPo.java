@@ -1,4 +1,4 @@
-package com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResult.po;
+package com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardBeforeResult.po;
 
 import lombok.Data;
 

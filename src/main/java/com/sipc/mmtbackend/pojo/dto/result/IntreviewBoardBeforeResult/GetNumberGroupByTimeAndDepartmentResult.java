@@ -1,6 +1,6 @@
-package com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResult;
+package com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardBeforeResult;
 
-import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResult.po.LineChartLineDataPo;
+import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardBeforeResult.po.LineChartLineDataPo;
 import lombok.Data;
 
 import java.util.List;

@@ -11,12 +11,12 @@ import com.sipc.mmtbackend.pojo.domain.po.InterviewBoardPo.PersonNumGroupByDepar
 import com.sipc.mmtbackend.pojo.domain.po.InterviewBoardPo.PersonNumGroupByOrderPo;
 import com.sipc.mmtbackend.pojo.domain.po.InterviewBoardPo.TotalNumPo;
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
-import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResult.*;
-import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResult.po.GetDepartmentPo;
-import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResult.po.GetNumberGroupByDepartmentPo;
-import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResult.po.GetNumberGroupByOrderPo;
-import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResult.po.LineChartLineDataPo;
-import com.sipc.mmtbackend.service.InterviewBoardService;
+import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardBeforeResult.*;
+import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardBeforeResult.po.GetDepartmentPo;
+import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardBeforeResult.po.GetNumberGroupByDepartmentPo;
+import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardBeforeResult.po.GetNumberGroupByOrderPo;
+import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardBeforeResult.po.LineChartLineDataPo;
+import com.sipc.mmtbackend.service.InterviewBoardBeforedService;
 import com.sipc.mmtbackend.utils.CheckroleBUtil.pojo.BTokenSwapPo;
 import com.sipc.mmtbackend.utils.ThreadLocalContextUtil;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +29,7 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor(onConstructor_ = {@Autowired})
 @Slf4j
-public class InterviewBoardServiceImpl implements InterviewBoardService {
+public class InterviewBoardBeforedServiceImpl implements InterviewBoardBeforedService {
     private final DepartmentMapper departmentMapper;
     private final AdmissionMapper admissionMapper;
     private final InterviewBoardDataMapper interviewBoardDataMapper;

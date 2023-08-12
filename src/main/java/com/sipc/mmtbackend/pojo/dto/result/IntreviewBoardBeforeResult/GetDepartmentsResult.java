@@ -1,6 +1,6 @@
-package com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResult;
+package com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardBeforeResult;
 
-import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResult.po.GetDepartmentPo;
+import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardBeforeResult.po.GetDepartmentPo;
 import lombok.Data;
 
 import java.util.List;
