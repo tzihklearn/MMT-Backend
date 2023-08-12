@@ -39,7 +39,7 @@ public class RealtimeInterviewController {
      */
     @GetMapping("/qrcode")
     public CommonResult<String> getCheckInQRCode(){
-        return null;
+        return realtimeInterviewService.getCheckInQRCode();
     }
 
     /**
