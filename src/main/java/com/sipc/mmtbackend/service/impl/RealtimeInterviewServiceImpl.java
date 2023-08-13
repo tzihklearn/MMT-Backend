@@ -36,8 +36,9 @@ public class RealtimeInterviewServiceImpl implements RealtimeInterviewService {
             log.warn("用户 " + context + " 尝试在无活动的纳新时生成签到二维码");
             return CommonResult.fail("生成失败：未开始纳新或纳新已结束");
         }
-        String qrcode = checkInQRCodeUtil.getCheckinQRCode(context.getOrganizationId());
+        String qrcode = checkInQRCodeUtil.getCheckinQRCode(context.getOrganizationId(), context.getUserId());
         if (qrcode == null){
+            log.warn("User: " + context + " Create Checkin QR Code Error\n");
             return CommonResult.serverError();
         }
         CommonResult<String> result = CommonResult.success();
