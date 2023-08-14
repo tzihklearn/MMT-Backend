@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sipc.mmtbackend.mapper.PictureMapper;
 import com.sipc.mmtbackend.pojo.domain.Picture;
 import com.sipc.mmtbackend.utils.PictureUtil.pojo.PictureUsage;
-import io.minio.MinioClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,10 +22,6 @@ import org.springframework.web.multipart.MultipartFile;
 @Slf4j
 @RequiredArgsConstructor(onConstructor_ = {@Autowired})
 public class PictureUtil {
-    // 图片扩展名
-    private static final String PictureURLEndStr = ".png";
-    private final MinioClient minioClient;
-    private final MinioConfig minioConfig;
     private final PictureMapper pictureMapper;
     private final MinioUtil minioUtil;
 
