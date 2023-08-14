@@ -324,6 +324,9 @@ public class OrganizationServiceImpl implements OrganizationService {
 
                     //更新纳新部门信息
                     updateNum = departmentMapper.updateById(department);
+                    if (updateNum == 0) {
+                        log.warn("更新社团宣传信息接口警告，更新纳新部门信息数出错，改部门不存在，更新纳新部门id：{}", departmentData.getId());
+                    }
                     if (updateNum != 1) {
                         log.error("更新社团宣传信息接口异常，更新纳新部门信息数出错，更新纳新部门信息数：{}，更新纳新部门id：{}",
                                 updateNum, departmentData.getId());
@@ -401,9 +404,11 @@ public class OrganizationServiceImpl implements OrganizationService {
         /*
           获取社团宣传信息表中对应的实体类对象
          */
-        OrganizationRecruit organizationRecruit = organizationRecruitMapper.selectById(organizationId);
+        OrganizationRecruit organizationRecruit = organizationRecruitMapper.selectOne(
+                new QueryWrapper<OrganizationRecruit>().eq("organization_id", organizationId).last("limit 1")
+        );
         if (organizationRecruit == null) {
-            return CommonResult.fail("社团组织id不存在");
+            return CommonResult.fail("社团组织宣传信息id不存在");
         }
 
         /*
