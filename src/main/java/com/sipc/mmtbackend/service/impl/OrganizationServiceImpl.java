@@ -529,7 +529,7 @@ public class OrganizationServiceImpl implements OrganizationService {
         organization.setAvatarId(pictureId);
 
         int updateNum = organizationMapper.updateById(organization);
-        if (updateNum != 0) {
+        if (updateNum != 1) {
             log.error("上传头像接口异常，更新社团信息数出错，更新数：{}，更新社团id：{}，更新头像id：{}",
                     updateNum, organizationId, pictureId);
             throw new DateBaseException("数据库更新更新操作异常");
