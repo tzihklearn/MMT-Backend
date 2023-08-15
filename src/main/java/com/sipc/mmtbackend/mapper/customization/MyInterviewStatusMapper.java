@@ -20,7 +20,7 @@ public interface MyInterviewStatusMapper extends InterviewStatusMapper {
 
     List<InterviewStatus> selectByAdmissionId(Integer admissionId);
 
-    List<InterviewStatus> selectByAdmissionIdAndLimit(Integer admissionId, Integer page, Integer pageNum);
+//    List<InterviewStatus> selectByAdmissionIdAndLimit(Integer admissionId, Integer page, Integer pageNum);
 
     List<GroupIntCountPo> selectOrganizationOrderCountByAdmissionId(Integer admissionId);
 
