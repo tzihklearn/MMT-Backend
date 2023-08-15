@@ -1,4 +1,4 @@
-package com.sipc.mmtbackend.pojo.dto.result.RealtimeIntreviewdResult.po;
+package com.sipc.mmtbackend.pojo.dto.result;
 
 import lombok.Data;
 
