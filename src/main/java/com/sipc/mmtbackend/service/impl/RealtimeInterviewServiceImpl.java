@@ -5,7 +5,7 @@ import com.sipc.mmtbackend.mapper.AdmissionMapper;
 import com.sipc.mmtbackend.pojo.domain.Admission;
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
 import com.sipc.mmtbackend.service.RealtimeInterviewService;
-import com.sipc.mmtbackend.utils.CheckinQRCodeUtil.CheckInQRCodeUtil;
+import com.sipc.mmtbackend.utils.CheckinQRCodeUtil.CheckinQRCodeUtil;
 import com.sipc.mmtbackend.utils.CheckroleBUtil.pojo.BTokenSwapPo;
 import com.sipc.mmtbackend.utils.ThreadLocalContextUtil;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +18,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class RealtimeInterviewServiceImpl implements RealtimeInterviewService {
     private final AdmissionMapper admissionMapper;
-    private final CheckInQRCodeUtil checkInQRCodeUtil;
+    private final CheckinQRCodeUtil checkinQRCodeUtil;
 
     /**
      * 获取签到二维码
@@ -26,7 +26,7 @@ public class RealtimeInterviewServiceImpl implements RealtimeInterviewService {
      * @return 签到二维码的 Base64 编码
      */
     @Override
-    public CommonResult<String> getCheckInQRCode() {
+    public CommonResult<String> getCheckinQRCode() {
         BTokenSwapPo context = ThreadLocalContextUtil.getContext();
         Admission admission = admissionMapper.selectOne(
                 new QueryWrapper<Admission>()
@@ -36,7 +36,7 @@ public class RealtimeInterviewServiceImpl implements RealtimeInterviewService {
             log.warn("用户 " + context + " 尝试在无活动的纳新时生成签到二维码");
             return CommonResult.fail("生成失败：未开始纳新或纳新已结束");
         }
-        String qrcode = checkInQRCodeUtil.getCheckinQRCode(context.getOrganizationId(), context.getUserId());
+        String qrcode = checkinQRCodeUtil.getCheckinQRCode(context.getOrganizationId(), context.getUserId());
         if (qrcode == null){
             log.warn("User: " + context + " Create Checkin QR Code Error\n");
             return CommonResult.serverError();

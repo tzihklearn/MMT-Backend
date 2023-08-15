@@ -38,8 +38,8 @@ public class RealtimeInterviewController {
      * @return 签到二维码的 Base64 编码
      */
     @GetMapping("/qrcode")
-    public CommonResult<String> getCheckInQRCode(){
-        return realtimeInterviewService.getCheckInQRCode();
+    public CommonResult<String> getCheckinQRCode(){
+        return realtimeInterviewService.getCheckinQRCode();
     }
 
     /**

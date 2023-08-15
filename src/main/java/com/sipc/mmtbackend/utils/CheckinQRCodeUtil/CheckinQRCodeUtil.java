@@ -34,7 +34,7 @@ import java.util.concurrent.TimeUnit;
 @Component
 @Slf4j
 @RequiredArgsConstructor(onConstructor_ = {@Autowired})
-public class CheckInQRCodeUtil {
+public class CheckinQRCodeUtil {
     private final RedisUtil redisUtil;
     private static final String QRRedisKeyStart = "qrstart";
     private static final String QRRedisKeyEnd = "qre";
