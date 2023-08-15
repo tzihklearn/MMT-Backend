@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author tzih
@@ -190,7 +191,7 @@ public class DataDashboardServiceImpl implements DataDashboardService {
             siftBarPo.setNextPlaceBar(nextPlaceBar);
 
 
-            redisUtil.setString("siftBar+" + admissionId, siftBarPo);
+            redisUtil.setString("siftBar+" + admissionId, siftBarPo, 5, TimeUnit.MINUTES);
 
         }
 
@@ -424,7 +425,7 @@ public class DataDashboardServiceImpl implements DataDashboardService {
             siftBarPo.setNextPlaceBar(nextPlaceBar);
 
 
-            redisUtil.setString("siftBar+" + admissionId, siftBarPo);
+            redisUtil.setString("siftBar+" + admissionId, siftBarPo, 5, TimeUnit.MINUTES);
 
         }
 
