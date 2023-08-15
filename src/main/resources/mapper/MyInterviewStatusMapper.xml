@@ -81,16 +81,23 @@
                     </foreach>
             </if>
             <if test="siftParam.nextTimeSift != null">
-                and start_time in
+                and ( start_time is null
+                          or
+                    start_time in
                     <foreach collection="siftParam.nextTimeSift" item="item" open="(" separator="," close=")">
                         #{item}
                     </foreach>
+                )
             </if>
             <if test="siftParam.nextPlaceSift != null">
-                and admission_address_id in
+                and ( admission_address_id is null
+                    or
+                    admission_address_id in
                     <foreach collection="siftParam.nextPlaceSift" item="item" open="(" separator="," close=")">
                         #{item}
                     </foreach>
+                )
+
             </if>
             <if test="siftParam.sort != null">
 
