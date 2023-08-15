@@ -173,8 +173,10 @@ public class DataDashboardServiceImpl implements DataDashboardService {
                 SiftInfoPo siftInfoPo = new SiftInfoPo();
                 siftInfoPo.setInfo(PlaceGroupCountPo.getId());
                 if (PlaceGroupCountPo.getId() == null) {
+                    siftInfoPo.setInfo(0);
                     siftInfoPo.setSiftName("--");
                 } else {
+                    siftInfoPo.setInfo(PlaceGroupCountPo.getId());
                     siftInfoPo.setSiftName(addressMap.get(PlaceGroupCountPo.getId()));
                 }
                 siftInfoPo.setNumber(PlaceGroupCountPo.getCount());
@@ -426,6 +428,55 @@ public class DataDashboardServiceImpl implements DataDashboardService {
 
         }
 
+        if (siftParam.getInterviewStatusSift() != null) {
+            List<Integer> interviewStatusSift = new ArrayList<>();
+            for (Integer t : siftParam.getInterviewStatusSift()) {
+                if (t == 1) {
+                    interviewStatusSift.add(0);
+                    interviewStatusSift.add(1);
+                    interviewStatusSift.add(2);
+                    interviewStatusSift.add(3);
+                    interviewStatusSift.add(4);
+                    interviewStatusSift.add(5);
+                } else if (t == 2) {
+                    interviewStatusSift.add(6);
+                    interviewStatusSift.add(7);
+                } else if (t == 3) {
+                    interviewStatusSift.add(8);
+                } else if (t ==4) {
+                    interviewStatusSift.add(9);
+                } else {
+                    return CommonResult.fail("错误的面试状态参数");
+                }
+            }
+            siftParam.setInterviewStatusSift(interviewStatusSift);
+        }
+
+        int placeFlag = 0;
+
+        if (siftParam.getNextPlaceSift() != null) {
+            for (Integer t : siftParam.getNextPlaceSift()) {
+                if (t == 0) {
+                    placeFlag = 1;
+                    break;
+                }
+            }
+        } else {
+            placeFlag = 1;
+        }
+
+        int timeFlag = 0;
+        if (siftParam.getNextTimeSift() != null) {
+            for (String str : siftParam.getNextTimeSift()) {
+                if (str.equals("--")) {
+                    timeFlag = 1;
+                    break;
+                }
+            }
+        } else {
+            timeFlag = 1;
+        }
+
         int i = 0;
 
         int start = (page -1) * pageNum + 1;
@@ -455,6 +506,14 @@ public class DataDashboardServiceImpl implements DataDashboardService {
                         )
                         )
                 ) {
+                    continue;
+                }
+
+                if (placeFlag == 0 && interviewStatus.getAdmissionAddressId() == null) {
+                    continue;
+                }
+
+                if (timeFlag == 0 && interviewStatus.getStartTime() == null) {
                     continue;
                 }
 
