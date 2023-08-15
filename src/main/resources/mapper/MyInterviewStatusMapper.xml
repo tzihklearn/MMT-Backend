@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sipc.mmtbackend.mapper.customization.MyInterviewStatusMapper">
+    <select id="selectByAdmissionId" resultType="com.sipc.mmtbackend.pojo.domain.InterviewStatus">
+        select *
+        from interview_status
+        where admission_id = #{admissionId, jdbcType=INTEGER}
+    </select>
+
+    <select id="selectOrganizationOrderCountByAdmissionId" resultType="com.sipc.mmtbackend.pojo.domain.po.GroupIntCountPo">
+        select organization_order as id, COUNT(id) as count
+        from interview_status
+        where admission_id = #{admissionId, jdbcType=INTEGER}
+        group by organization_order
+        order by organization_order
+    </select>
+
+    <select id="selectDepartmentOrderCountByAdmissionId" resultType="com.sipc.mmtbackend.pojo.domain.po.GroupIntCountPo">
+        select department_order as id, COUNT(id) as count
+        from interview_status
+        where admission_id = #{admissionId, jdbcType=INTEGER}
+        group by department_order
+        order by department_order
+    </select>
+
+    <select id="selectDepartmentCountByAdmissionId" resultType="com.sipc.mmtbackend.pojo.domain.po.GroupIntCountPo">
+        select department_id as id, COUNT(id) as count
+        from interview_status
+        where admission_id = #{admissionId, jdbcType=INTEGER}
+        group by department_id
+        order by department_id
+    </select>
+
+    <select id="selectNextTimeCountByAdmissionId" resultType="com.sipc.mmtbackend.pojo.domain.po.GroupLocalTimeCountPo">
+        select start_time as id, COUNT(id) as count
+        from interview_status
+        where admission_id = #{admissionId, jdbcType=INTEGER}
+        group by start_time
+        order by start_time
+    </select>
+
+    <select id="selectAddressCountByAdmissionId" resultType="com.sipc.mmtbackend.pojo.domain.po.GroupIntCountPo">
+        select admission_address_id as id, COUNT(id) as count
+        from interview_status
+        where admission_id = #{admissionId, jdbcType=INTEGER}
+        group by admission_address_id
+        order by admission_address_id
+    </select>
+    <select id="selectByAdmissionIdAndSift" parameterType="com.sipc.mmtbackend.pojo.dto.param.dataDashboard.SiftParam" resultType="com.sipc.mmtbackend.pojo.domain.InterviewStatus">
+        select *
+        from interview_status
+        where admission_id = #{admissionId, jdbcType=INTEGER}
+            <if test="siftParam.interviewRoundSift != null">
+                and round in
+                    <foreach collection="siftParam.interviewRoundSift" item="item" open="(" separator="," close=")">
+                        #{item}
+                    </foreach>
+            </if>
+            <if test="siftParam.interviewStatusSift != null">
+                and state in
+                    <foreach collection="siftParam.interviewStatusSift" item="item" open="(" separator="," close=")">
+                        #{item}
+                    </foreach>
+            </if>
+            <if test="siftParam.organizationOrderSift != null">
+                and organization_order in
+                    <foreach collection="siftParam.organizationOrderSift" item="item" open="(" separator="," close=")">
+                        #{item}
+                    </foreach>
+            </if>
+            <if test="siftParam.departmentOrderSift != null">
+                and department_order in
+                    <foreach collection="siftParam.departmentOrderSift" item="item" open="(" separator="," close=")">
+                        #{item}
+                    </foreach>
+            </if>
+            <if test="siftParam.nowDepartmentSift != null">
+                and department_id in
+                    <foreach collection="siftParam.nowDepartmentSift" item="item" open="(" separator="," close=")">
+                        #{item}
+                    </foreach>
+            </if>
+            <if test="siftParam.nextTimeSift != null">
+                and start_time in
+                    <foreach collection="siftParam.nextTimeSift" item="item" open="(" separator="," close=")">
+                        #{item}
+                    </foreach>
+            </if>
+            <if test="siftParam.nextPlaceSift != null">
+                and admission_address_id in
+                    <foreach collection="siftParam.nextPlaceSift" item="item" open="(" separator="," close=")">
+                        #{item}
+                    </foreach>
+            </if>
+            <if test="siftParam.sort != null">
+
+                <choose>
+                    <when test="siftParam.sort.sortId == 3">
+                        ORDER BY start_time
+                        <if test="siftParam.sort.sortBy == 2">DESC</if>
+                    </when>
+                    <when test="siftParam.sort.sortId == 4">
+                        ORDER BY admission_address_id
+                        <if test="siftParam.sort.sortBy == 2">DESC</if>
+                    </when>
+
+                    <!-- Add more cases for other sorting options -->
+                    <!-- ... -->
+                </choose>
+
+            </if>
+    </select>
+</mapper>
