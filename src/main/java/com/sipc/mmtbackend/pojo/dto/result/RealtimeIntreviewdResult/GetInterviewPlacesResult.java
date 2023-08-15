@@ -1,6 +1,6 @@
 package com.sipc.mmtbackend.pojo.dto.result.RealtimeIntreviewdResult;
 
-import com.sipc.mmtbackend.pojo.dto.result.RealtimeIntreviewdResult.po.KVPo;
+import com.sipc.mmtbackend.pojo.dto.result.KVPo;
 import lombok.Data;
 
 import java.util.List;

@@ -8,5 +8,5 @@ public interface RealtimeInterviewService {
      *
      * @return 签到二维码的 Base64 编码
      */
-    CommonResult<String> getCheckInQRCode();
+    CommonResult<String> getCheckinQRCode();
 }
