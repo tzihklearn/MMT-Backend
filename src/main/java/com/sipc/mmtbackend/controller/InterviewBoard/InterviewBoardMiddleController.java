@@ -27,7 +27,7 @@ public class InterviewBoardMiddleController {
      *
      * @return 面试轮次
      */
-    @GetMapping("/roubds")
+    @GetMapping("/rounds")
     public CommonResult<GetInterviewRoundsResult> getInterviewRounds(){
         return null;
     }
