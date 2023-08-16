@@ -50,37 +50,37 @@
         select *
         from interview_status
         where admission_id = #{admissionId, jdbcType=INTEGER}
-            <if test="siftParam.interviewRoundSift != null">
+            <if test="siftParam.interviewRoundSift.size() != 0">
                 and round in
                     <foreach collection="siftParam.interviewRoundSift" item="item" open="(" separator="," close=")">
                         #{item}
                     </foreach>
             </if>
-            <if test="siftParam.interviewStatusSift != null">
+            <if test="siftParam.interviewStatusSift.size() != 0">
                 and state in
                     <foreach collection="siftParam.interviewStatusSift" item="item" open="(" separator="," close=")">
                         #{item}
                     </foreach>
             </if>
-            <if test="siftParam.organizationOrderSift != null">
+            <if test="siftParam.organizationOrderSift.size() != 0">
                 and organization_order in
                     <foreach collection="siftParam.organizationOrderSift" item="item" open="(" separator="," close=")">
                         #{item}
                     </foreach>
             </if>
-            <if test="siftParam.departmentOrderSift != null">
+            <if test="siftParam.departmentOrderSift.size() != 0">
                 and department_order in
                     <foreach collection="siftParam.departmentOrderSift" item="item" open="(" separator="," close=")">
                         #{item}
                     </foreach>
             </if>
-            <if test="siftParam.nowDepartmentSift != null">
+            <if test="siftParam.nowDepartmentSift.size() != 0">
                 and department_id in
                     <foreach collection="siftParam.nowDepartmentSift" item="item" open="(" separator="," close=")">
                         #{item}
                     </foreach>
             </if>
-            <if test="siftParam.nextTimeSift != null">
+            <if test="siftParam.nextTimeSift.size() != 0">
                 and ( start_time is null
                           or
                     start_time in
@@ -89,7 +89,7 @@
                     </foreach>
                 )
             </if>
-            <if test="siftParam.nextPlaceSift != null">
+            <if test="siftParam.nextPlaceSift.size() != 0">
                 and ( admission_address_id is null
                     or
                     admission_address_id in
