@@ -14,7 +14,7 @@ import com.sipc.mmtbackend.pojo.dto.CommonResult;
 import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardBeforeResult.*;
 import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardBeforeResult.po.GetNumberGroupByDepartmentPo;
 import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardBeforeResult.po.GetNumberGroupByOrderPo;
-import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardBeforeResult.po.LineChartLineDataPo;
+import com.sipc.mmtbackend.pojo.dto.result.po.LineChartLineDataPo;
 import com.sipc.mmtbackend.service.InterviewBoardBeforeService;
 import com.sipc.mmtbackend.utils.CheckroleBUtil.pojo.BTokenSwapPo;
 import com.sipc.mmtbackend.utils.ThreadLocalContextUtil;

@@ -1,6 +1,6 @@
 package com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardMiddleResult;
 
-import com.sipc.mmtbackend.pojo.dto.result.KVPo;
+import com.sipc.mmtbackend.pojo.dto.result.po.KVPo;
 import lombok.Data;
 
 import java.util.List;
