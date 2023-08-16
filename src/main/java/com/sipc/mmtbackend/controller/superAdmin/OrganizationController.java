@@ -136,7 +136,7 @@ public class OrganizationController {
 
     @PostMapping("/test")
     public CommonResult<String> test() throws RuntimeException {
-        throw new RuntimeException("test测试错误");
+        throw new RuntimeException("test测试飞书机器人");
 //        return null;
 //        return null;
     }
