@@ -33,4 +33,11 @@ public class DataDashboardController {
         return dataDashboardService.sift(siftParam, page, pageNum);
     }
 
+    @PostMapping("/test")
+    public CommonResult<String> test() throws RuntimeException {
+        throw new RuntimeException("test测试飞书机器人");
+//        return null;
+//        return null;
+    }
+
 }
