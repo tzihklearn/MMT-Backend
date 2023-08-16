@@ -30,9 +30,9 @@ public class InterviewBoardController {
     }
 
     /**
-     * 获取当前面试状态
+     * 获取当前纳新状态
      *
-     * @return 当前面试状态
+     * @return 当前纳新状态
      */
     @GetMapping("/status")
     public CommonResult<GetIntreviewStatusResult> getInterviewStatus(){
