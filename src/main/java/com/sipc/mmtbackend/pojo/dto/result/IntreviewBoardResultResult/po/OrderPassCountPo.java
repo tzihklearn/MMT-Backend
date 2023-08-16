@@ -1,5 +1,8 @@
 package com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResultResult.po;
 
+import lombok.Data;
+
+@Data
 public class OrderPassCountPo {
     // 志愿ID
     private Integer id;
