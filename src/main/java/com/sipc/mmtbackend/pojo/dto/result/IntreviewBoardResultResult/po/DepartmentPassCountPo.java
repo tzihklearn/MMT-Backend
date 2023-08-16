@@ -1,7 +1,6 @@
 package com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResultResult.po;
 
 import lombok.Data;
-import org.omg.CosNaming.IstringHelper;
 
 @Data
 public class DepartmentPassCountPo {
