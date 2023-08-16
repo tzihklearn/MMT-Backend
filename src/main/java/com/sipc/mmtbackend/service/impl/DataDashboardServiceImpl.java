@@ -3,12 +3,15 @@ package com.sipc.mmtbackend.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.sipc.mmtbackend.mapper.*;
 import com.sipc.mmtbackend.mapper.customization.MyInterviewStatusMapper;
+import com.sipc.mmtbackend.mapper.customization.MyMajorClassMapper;
 import com.sipc.mmtbackend.pojo.domain.Admission;
 import com.sipc.mmtbackend.pojo.domain.AdmissionAddress;
 import com.sipc.mmtbackend.pojo.domain.Department;
 import com.sipc.mmtbackend.pojo.domain.InterviewStatus;
 import com.sipc.mmtbackend.pojo.domain.po.GroupIntCountPo;
 import com.sipc.mmtbackend.pojo.domain.po.GroupLocalTimeCountPo;
+import com.sipc.mmtbackend.pojo.domain.po.MajorClassPo;
+import com.sipc.mmtbackend.pojo.domain.po.MyInterviewStatusPo;
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
 import com.sipc.mmtbackend.pojo.dto.param.dataDashboard.SiftParam;
 import com.sipc.mmtbackend.pojo.dto.result.DataDashboardExportResult;
@@ -51,11 +54,19 @@ public class DataDashboardServiceImpl implements DataDashboardService {
 
     private final AdmissionAddressMapper admissionAddressMapper;
 
+    private final AcaMajorMapper acaMajorMapper;
+
+    private final MajorClassMapper majorClassMapper;
+
+    private final MyMajorClassMapper myMajorClassMapper;
+
     private final RedisUtil redisUtil;
 
     private final Map<Integer, String> departmentMap = new HashMap<>();
 
     private final Map<Integer, String> addressMap = new HashMap<>();
+
+    private final Map<Integer, String> classMap = new HashMap<>();
 
     @Override
     public CommonResult<DataDashboardInfoResult> all(Integer page, Integer pageNum) {
@@ -96,6 +107,13 @@ public class DataDashboardServiceImpl implements DataDashboardService {
             for (AdmissionAddress admissionAddress : admissionAddressMapper.selectList(new QueryWrapper<>())) {
                 addressMap.putIfAbsent(admissionAddress.getId(), admissionAddress.getName());
             }
+        }
+
+        if (classMap.isEmpty()) {
+            for (MajorClassPo majorClassPo : myMajorClassMapper.selectAllAndAcaMajor()) {
+                classMap.put(majorClassPo.getId(), majorClassPo.getName());
+            }
+
         }
 
         List<DataDashboardInfoPo> interviewerInfoList = new ArrayList<>();
@@ -200,13 +218,13 @@ public class DataDashboardServiceImpl implements DataDashboardService {
 
         int i = 0;
 
-        int start = (page - 1) * pageNum + 1;
+        int start = (page - 1) * pageNum;
         int end = page * pageNum;
 
 
         i = start;
 
-        for (InterviewStatus interviewStatus : interviewStatusMapper.selectList(new QueryWrapper<InterviewStatus>().eq("admission_id", admissionId).last("limit " + start + " , " + end))) {
+        for (MyInterviewStatusPo interviewStatus : myInterviewStatusMapper.selectAllAndUserInfoByAdmissionIdLimit(admissionId, start, end)) {
 
 //                admissionOrderBarMap.merge(interviewStatus.getOrganizationOrder(), 1, Integer::sum);
 //                departmentOrderBarMap.merge(interviewStatus.getDepartmentOrder(), 1, Integer::sum);
@@ -214,15 +232,13 @@ public class DataDashboardServiceImpl implements DataDashboardService {
 //                nextTimeBarMap.merge(interviewStatus.getStartTime().toString(), 1, Integer::sum);
 //                nextPlaceBarMap.merge(interviewStatus.getAdmissionAddressId(), 1, Integer::sum);
 
-            ++i;
 
-            if (i <= end && i >= start) {
                 DataDashboardInfoPo dataDashboardInfoPo = new DataDashboardInfoPo();
                 dataDashboardInfoPo.setId(interviewStatus.getId());
-                dataDashboardInfoPo.setStudentId(Integer.valueOf(20230000 + i).toString());
-                dataDashboardInfoPo.setName("测试用户" + i);
-                dataDashboardInfoPo.setClassName("测试班级" + i % 5);
-                dataDashboardInfoPo.setPhone(Integer.valueOf(1000011000 + i).toString());
+                dataDashboardInfoPo.setStudentId(interviewStatus.getStudentId());
+                dataDashboardInfoPo.setName(interviewStatus.getName());
+                dataDashboardInfoPo.setClassName(classMap.get(interviewStatus.getMajorClassId()));
+                dataDashboardInfoPo.setPhone(interviewStatus.getPhone());
 
                 if (interviewStatus.getOrganizationOrder() == 1) {
                     dataDashboardInfoPo.setOrganizationOrder("第一志愿");
@@ -281,14 +297,21 @@ public class DataDashboardServiceImpl implements DataDashboardService {
 
             }
 
-        }
+
 
         DataDashboardInfoResult result = new DataDashboardInfoResult();
 
         result.setInterviewerInfoList(interviewerInfoList);
         result.setSiftBar(siftBarPo);
         result.setPageNow(page);
-        result.setPageNum(interviewStatusMapper.selectCount(new QueryWrapper<InterviewStatus>().select("id")).intValue() / pageNum + 1);
+
+        int count = interviewStatusMapper.selectCount(new QueryWrapper<InterviewStatus>().select("id").eq("admission_id", admissionId)).intValue();
+
+        if (count % pageNum != 0) {
+            result.setPageNum( count / pageNum + 1);
+        } else {
+            result.setPageNum(count / pageNum);
+        }
 
         return CommonResult.success(result);
     }
@@ -332,6 +355,13 @@ public class DataDashboardServiceImpl implements DataDashboardService {
             for (AdmissionAddress admissionAddress : admissionAddressMapper.selectList(new QueryWrapper<>())) {
                 addressMap.putIfAbsent(admissionAddress.getId(), admissionAddress.getName());
             }
+        }
+
+        if (classMap.isEmpty()) {
+            for (MajorClassPo majorClassPo : myMajorClassMapper.selectAllAndAcaMajor()) {
+                classMap.put(majorClassPo.getId(), majorClassPo.getName());
+            }
+
         }
 
         List<DataDashboardInfoPo> interviewerInfoList = new ArrayList<>();
@@ -483,14 +513,17 @@ public class DataDashboardServiceImpl implements DataDashboardService {
 
         int i = 0;
 
-        int start = (page - 1) * pageNum + 1;
+        int start = (page - 1) * pageNum;
         int end = page * pageNum;
 
 
         i = start;
-        List<InterviewStatus> interviewStatuses = myInterviewStatusMapper.selectByAdmissionIdAndSift(siftParam, admissionId);
 
-        for (InterviewStatus interviewStatus : interviewStatuses) {
+        int num = 0;
+
+        List<MyInterviewStatusPo> interviewStatuses = myInterviewStatusMapper.selectByAdmissionIdAndSift(siftParam, admissionId);
+
+        for (MyInterviewStatusPo interviewStatus : interviewStatuses) {
 
 //                admissionOrderBarMap.merge(interviewStatus.getOrganizationOrder(), 1, Integer::sum);
 //                departmentOrderBarMap.merge(interviewStatus.getDepartmentOrder(), 1, Integer::sum);
@@ -498,20 +531,25 @@ public class DataDashboardServiceImpl implements DataDashboardService {
 //                nextTimeBarMap.merge(interviewStatus.getStartTime().toString(), 1, Integer::sum);
 //                nextPlaceBarMap.merge(interviewStatus.getAdmissionAddressId(), 1, Integer::sum);
 
+            String className = classMap.get(interviewStatus.getMajorClassId());
+
+            if (
+                    (siftParam.getSearch() != null &&
+                            !(
+                                    interviewStatus.getName().contains(siftParam.getSearch()) ||
+                                    interviewStatus.getStudentId().contains(siftParam.getSearch()) ||
+                                    className.contains(siftParam.getSearch()) ||
+                                    interviewStatus.getPhone().contains(siftParam.getSearch())
+                            )
+                    )
+            ) {
+                ++num;
+                continue;
+            }
 
             if (i < end && i >= start) {
 
-                if (
-                        !(siftParam.getSearch() != null &&
-                                (Integer.valueOf(20230000 + i).toString().contains(siftParam.getSearch())
-                                        || ("测试用户" + i).contains(siftParam.getSearch())
-                                        || ("测试班级" + i % 5).contains(siftParam.getSearch())
-                                        || (Integer.valueOf(1000011000 + i).toString()).contains(siftParam.getSearch())
-                                )
-                        )
-                ) {
-                    continue;
-                }
+
 
                 if (placeFlag == 0 && interviewStatus.getAdmissionAddressId() == null) {
                     continue;
@@ -523,10 +561,10 @@ public class DataDashboardServiceImpl implements DataDashboardService {
 
                 DataDashboardInfoPo dataDashboardInfoPo = new DataDashboardInfoPo();
                 dataDashboardInfoPo.setId(interviewStatus.getId());
-                dataDashboardInfoPo.setStudentId(Integer.valueOf(20230000 + i).toString());
-                dataDashboardInfoPo.setName("测试用户" + i);
-                dataDashboardInfoPo.setClassName("测试班级" + i % 5);
-                dataDashboardInfoPo.setPhone(Integer.valueOf(1000011000 + i).toString());
+                dataDashboardInfoPo.setStudentId(interviewStatus.getStudentId());
+                dataDashboardInfoPo.setName(interviewStatus.getName());
+                dataDashboardInfoPo.setClassName(className);
+                dataDashboardInfoPo.setPhone(interviewStatus.getPhone());
 
                 if (interviewStatus.getOrganizationOrder() == 1) {
                     dataDashboardInfoPo.setOrganizationOrder("第一志愿");
@@ -588,28 +626,34 @@ public class DataDashboardServiceImpl implements DataDashboardService {
 
         }
 
-        if (siftParam.getSort() != null) {
-            if (siftParam.getSort().getSortId() == 1) {
-                if (siftParam.getSort().getSortBy() == 1) {
-                    interviewerInfoList.sort(Comparator.comparing(DataDashboardInfoPo::getStudentId));
-                } else {
-                    interviewerInfoList.sort(Comparator.comparing(DataDashboardInfoPo::getStudentId).reversed());
-                }
-            } else if (siftParam.getSort().getSortId() == 2) {
-                if (siftParam.getSort().getSortBy() == 1) {
-                    interviewerInfoList.sort(Comparator.comparing(DataDashboardInfoPo::getName));
-                } else {
-                    interviewerInfoList.sort(Comparator.comparing(DataDashboardInfoPo::getName).reversed());
-                }
-            }
-        }
+//        if (siftParam.getSort() != null) {
+//            if (siftParam.getSort().getSortId() == 1) {
+//                if (siftParam.getSort().getSortBy() == 1) {
+//                    interviewerInfoList.sort(Comparator.comparing(DataDashboardInfoPo::getStudentId));
+//                } else {
+//                    interviewerInfoList.sort(Comparator.comparing(DataDashboardInfoPo::getStudentId).reversed());
+//                }
+//            } else if (siftParam.getSort().getSortId() == 2) {
+//                if (siftParam.getSort().getSortBy() == 1) {
+//                    interviewerInfoList.sort(Comparator.comparing(DataDashboardInfoPo::getName));
+//                } else {
+//                    interviewerInfoList.sort(Comparator.comparing(DataDashboardInfoPo::getName).reversed());
+//                }
+//            }
+//        }
 
         DataDashboardInfoResult result = new DataDashboardInfoResult();
 
         result.setInterviewerInfoList(interviewerInfoList);
         result.setSiftBar(siftBarPo);
         result.setPageNow(page);
-        result.setPageNum(interviewStatuses.size() / pageNum + 1);
+
+        int count = interviewStatuses.size() - num;
+        if (count % pageNum != 0) {
+            result.setPageNum( count / pageNum + 1);
+        } else {
+            result.setPageNum(count / pageNum);
+        }
 
         return CommonResult.success(result);
     }
@@ -653,15 +697,21 @@ public class DataDashboardServiceImpl implements DataDashboardService {
             }
         }
 
+        if (classMap.isEmpty()) {
+            for (MajorClassPo majorClassPo : myMajorClassMapper.selectAllAndAcaMajor()) {
+                classMap.put(majorClassPo.getId(), majorClassPo.getName());
+            }
+
+        }
 
         List<DataDashboardInfoPo> interviewerInfoList = new ArrayList<>();
 
         int placeFlag = 0;
         int timeFlag = 0;
 
-        List<InterviewStatus> interviewStatuses;
+        List<MyInterviewStatusPo> interviewStatuses;
         if (siftParam == null) {
-            interviewStatuses = Collections.unmodifiableList(interviewStatusMapper.selectList(new QueryWrapper<InterviewStatus>().eq("admission_id", admissionId)));
+            interviewStatuses = myInterviewStatusMapper.selectByAdmissionIdAndUserInfo(admissionId);
         }
         else {
             if (siftParam.getInterviewStatusSift() != null) {
@@ -687,8 +737,6 @@ public class DataDashboardServiceImpl implements DataDashboardService {
                 }
                 siftParam.setInterviewStatusSift(interviewStatusSift);
             }
-
-
 
             if (siftParam.getNextPlaceSift() != null) {
                 for (Integer t : siftParam.getNextPlaceSift()) {
@@ -718,9 +766,9 @@ public class DataDashboardServiceImpl implements DataDashboardService {
             interviewStatuses = myInterviewStatusMapper.selectByAdmissionIdAndSift(siftParam, admissionId);
         }
 
-        int i = 1;
+//        int i = 0;
 
-        for (InterviewStatus interviewStatus : interviewStatuses) {
+        for (MyInterviewStatusPo interviewStatus : interviewStatuses) {
 
 //                admissionOrderBarMap.merge(interviewStatus.getOrganizationOrder(), 1, Integer::sum);
 //                departmentOrderBarMap.merge(interviewStatus.getDepartmentOrder(), 1, Integer::sum);
@@ -728,14 +776,21 @@ public class DataDashboardServiceImpl implements DataDashboardService {
 //                nextTimeBarMap.merge(interviewStatus.getStartTime().toString(), 1, Integer::sum);
 //                nextPlaceBarMap.merge(interviewStatus.getAdmissionAddressId(), 1, Integer::sum);
 
+            String className = classMap.get(interviewStatus.getMajorClassId());
+//            if (
+//                    siftParam != null && !(siftParam.getSearch() != null &&
+//                            (className.contains(siftParam.getSearch()))
+//                    )
+//            )
             if (
-                    siftParam != null && !(siftParam.getSearch() != null &&
-                            (Integer.valueOf(20230000 + i).toString().contains(siftParam.getSearch())
-                                    || ("测试用户" + i).contains(siftParam.getSearch())
-                                    || ("测试班级" + i % 5).contains(siftParam.getSearch())
-                                    || (Integer.valueOf(1000011000 + i).toString()).contains(siftParam.getSearch())
-                            )
-                    )
+                       siftParam!= null && (siftParam.getSearch() != null &&
+                                !(
+                                        interviewStatus.getName().contains(siftParam.getSearch()) ||
+                                                interviewStatus.getStudentId().contains(siftParam.getSearch()) ||
+                                                className.contains(siftParam.getSearch()) ||
+                                                interviewStatus.getPhone().contains(siftParam.getSearch())
+                                )
+                        )
             ) {
                 continue;
             }
@@ -750,10 +805,10 @@ public class DataDashboardServiceImpl implements DataDashboardService {
 
             DataDashboardInfoPo dataDashboardInfoPo = new DataDashboardInfoPo();
             dataDashboardInfoPo.setId(interviewStatus.getId());
-            dataDashboardInfoPo.setStudentId(Integer.valueOf(20230000 + i).toString());
-            dataDashboardInfoPo.setName("测试用户" + i);
-            dataDashboardInfoPo.setClassName("测试班级" + i % 5);
-            dataDashboardInfoPo.setPhone(Integer.valueOf(1000011000 + i).toString());
+            dataDashboardInfoPo.setStudentId(interviewStatus.getStudentId());
+            dataDashboardInfoPo.setName(interviewStatus.getName());
+            dataDashboardInfoPo.setClassName(className);
+            dataDashboardInfoPo.setPhone(interviewStatus.getPhone());
 
             if (interviewStatus.getOrganizationOrder() == 1) {
                 dataDashboardInfoPo.setOrganizationOrder("第一志愿");
@@ -810,26 +865,26 @@ public class DataDashboardServiceImpl implements DataDashboardService {
             }
             interviewerInfoList.add(dataDashboardInfoPo);
 
-            ++i;
+//            ++i;
 
 
         }
 
-        if (siftParam != null && siftParam.getSort() != null) {
-            if (siftParam.getSort().getSortId() == 1) {
-                if (siftParam.getSort().getSortBy() == 1) {
-                    interviewerInfoList.sort(Comparator.comparing(DataDashboardInfoPo::getStudentId));
-                } else {
-                    interviewerInfoList.sort(Comparator.comparing(DataDashboardInfoPo::getStudentId).reversed());
-                }
-            } else if (siftParam.getSort().getSortId() == 2) {
-                if (siftParam.getSort().getSortBy() == 1) {
-                    interviewerInfoList.sort(Comparator.comparing(DataDashboardInfoPo::getName));
-                } else {
-                    interviewerInfoList.sort(Comparator.comparing(DataDashboardInfoPo::getName).reversed());
-                }
-            }
-        }
+//        if (siftParam != null && siftParam.getSort() != null) {
+//            if (siftParam.getSort().getSortId() == 1) {
+//                if (siftParam.getSort().getSortBy() == 1) {
+//                    interviewerInfoList.sort(Comparator.comparing(DataDashboardInfoPo::getStudentId));
+//                } else {
+//                    interviewerInfoList.sort(Comparator.comparing(DataDashboardInfoPo::getStudentId).reversed());
+//                }
+//            } else if (siftParam.getSort().getSortId() == 2) {
+//                if (siftParam.getSort().getSortBy() == 1) {
+//                    interviewerInfoList.sort(Comparator.comparing(DataDashboardInfoPo::getName));
+//                } else {
+//                    interviewerInfoList.sort(Comparator.comparing(DataDashboardInfoPo::getName).reversed());
+//                }
+//            }
+//        }
 
         DataDashboardExportResult result = new DataDashboardExportResult();
 
