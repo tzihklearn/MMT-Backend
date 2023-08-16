@@ -1,4 +1,4 @@
-package com.sipc.mmtbackend.pojo.dto.result;
+package com.sipc.mmtbackend.pojo.dto.result.po;
 
 import lombok.Data;
 

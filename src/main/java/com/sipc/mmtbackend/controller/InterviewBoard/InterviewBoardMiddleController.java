@@ -1,4 +1,4 @@
-package com.sipc.mmtbackend.controller;
+package com.sipc.mmtbackend.controller.InterviewBoard;
 
 import com.sipc.mmtbackend.annotation.BPermission;
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
@@ -27,7 +27,7 @@ public class InterviewBoardMiddleController {
      *
      * @return 面试轮次
      */
-    @GetMapping("/roubds")
+    @GetMapping("/rounds")
     public CommonResult<GetInterviewRoundsResult> getInterviewRounds(){
         return null;
     }

@@ -33,7 +33,7 @@ public class PictureUtil {
      * @author DoudiNCer
      */
     public String getPictureURL(String pictureId, boolean is_default_id) {
-        if (! is_default_id) {
+        if (!is_default_id) {
             Picture picture = pictureMapper.selectOne(new QueryWrapper<Picture>().eq("pic_id", pictureId));
             if (picture == null)
                 return null;

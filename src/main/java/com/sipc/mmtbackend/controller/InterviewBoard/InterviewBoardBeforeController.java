@@ -1,4 +1,4 @@
-package com.sipc.mmtbackend.controller;
+package com.sipc.mmtbackend.controller.InterviewBoard;
 
 import com.sipc.mmtbackend.annotation.BPermission;
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
