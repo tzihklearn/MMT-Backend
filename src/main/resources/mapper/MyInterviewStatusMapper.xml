@@ -46,9 +46,31 @@
         group by admission_address_id
         order by admission_address_id
     </select>
-    <select id="selectByAdmissionIdAndSift" parameterType="com.sipc.mmtbackend.pojo.dto.param.dataDashboard.SiftParam" resultType="com.sipc.mmtbackend.pojo.domain.InterviewStatus">
-        select *
-        from interview_status
+    <select id="selectAllAndUserInfoByAdmissionIdLimit"
+            resultType="com.sipc.mmtbackend.pojo.domain.po.MyInterviewStatusPo">
+        select its.id, its.user_id, its.admission_address_id, its.start_time, its.end_time, its.state, its.sign_in_time,
+               its.organization_order, its.department_order, its.admission_id, its.department_id, its.round,
+               ui.student_id, ui.name, ui.major_class_id, ui.phone
+        from interview_status as its
+        left join user_info as ui on ui.id = its.user_id
+        where admission_id = #{admissionId, jdbcType=INTEGER}
+        limit #{start, jdbcType=INTEGER}, #{end, jdbcType=INTEGER}
+    </select>
+    <select id="selectByAdmissionIdAndUserInfo"
+            resultType="com.sipc.mmtbackend.pojo.domain.po.MyInterviewStatusPo">
+        select its.id, its.user_id, its.admission_address_id, its.start_time, its.end_time, its.state, its.sign_in_time,
+               its.organization_order, its.department_order, its.admission_id, its.department_id, its.round,
+               ui.student_id, ui.name, ui.major_class_id, ui.phone
+        from interview_status as its
+        left join user_info as ui on ui.id = its.user_id
+        where admission_id = #{admissionId, jdbcType=INTEGER}
+    </select>
+    <select id="selectByAdmissionIdAndSift" parameterType="com.sipc.mmtbackend.pojo.dto.param.dataDashboard.SiftParam" resultType="com.sipc.mmtbackend.pojo.domain.po.MyInterviewStatusPo">
+        select its.id, its.user_id, its.admission_address_id, its.start_time, its.end_time, its.state, its.sign_in_time,
+        its.organization_order, its.department_order, its.admission_id, its.department_id, its.round,
+        ui.student_id, ui.name, ui.major_class_id, ui.phone
+        from interview_status as its
+        left join user_info as ui on ui.id = its.user_id
         where admission_id = #{admissionId, jdbcType=INTEGER}
             <if test="siftParam.interviewRoundSift.size() != 0">
                 and round in
@@ -99,9 +121,22 @@
                 )
 
             </if>
+<!--            <if test="siftParam.search != null">-->
+<!--                and ( ui.student_id like concat('%', #{siftParam.search}, '%')-->
+<!--                or ui.name like concat('%', #{siftParam.search}, '%')-->
+<!--                or ui.phone like concat('%', #{siftParam.search}, '%') )-->
+<!--            </if>-->
             <if test="siftParam.sort != null">
 
                 <choose>
+                    <when test="siftParam.sort.sortId == 1">
+                        ORDER BY ui.student_id
+                        <if test="siftParam.sort.sortBy == 2">DESC</if>
+                    </when>
+                    <when test="siftParam.sort.sortId == 2">
+                        ORDER BY ui.name
+                        <if test="siftParam.sort.sortBy == 2">DESC</if>
+                    </when>
                     <when test="siftParam.sort.sortId == 3">
                         ORDER BY start_time
                         <if test="siftParam.sort.sortBy == 2">DESC</if>
@@ -117,4 +152,5 @@
 
             </if>
     </select>
+
 </mapper>

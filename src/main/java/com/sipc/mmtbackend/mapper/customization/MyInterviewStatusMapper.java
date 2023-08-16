@@ -4,6 +4,7 @@ import com.sipc.mmtbackend.mapper.InterviewStatusMapper;
 import com.sipc.mmtbackend.pojo.domain.InterviewStatus;
 import com.sipc.mmtbackend.pojo.domain.po.GroupIntCountPo;
 import com.sipc.mmtbackend.pojo.domain.po.GroupLocalTimeCountPo;
+import com.sipc.mmtbackend.pojo.domain.po.MyInterviewStatusPo;
 import com.sipc.mmtbackend.pojo.dto.param.dataDashboard.SiftParam;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -32,7 +33,11 @@ public interface MyInterviewStatusMapper extends InterviewStatusMapper {
 
     List<GroupIntCountPo> selectAddressCountByAdmissionId(Integer admissionId);
 
-    List<InterviewStatus> selectByAdmissionIdAndSift(SiftParam siftParam, Integer admissionId);
+    List<MyInterviewStatusPo> selectAllAndUserInfoByAdmissionIdLimit(Integer admissionId, Integer start, Integer end);
+
+    List<MyInterviewStatusPo> selectByAdmissionIdAndUserInfo(Integer admissionId);
+
+    List<MyInterviewStatusPo> selectByAdmissionIdAndSift(SiftParam siftParam, Integer admissionId);
 
 
 }
