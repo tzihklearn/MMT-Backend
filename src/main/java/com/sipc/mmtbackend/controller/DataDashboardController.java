@@ -3,6 +3,7 @@ package com.sipc.mmtbackend.controller;
 import com.sipc.mmtbackend.annotation.BPermission;
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
 import com.sipc.mmtbackend.pojo.dto.param.dataDashboard.SiftParam;
+import com.sipc.mmtbackend.pojo.dto.result.DataDashboardExportResult;
 import com.sipc.mmtbackend.pojo.dto.result.dataDashboard.DataDashboardInfoResult;
 import com.sipc.mmtbackend.service.DataDashboardService;
 import com.sipc.mmtbackend.utils.CheckroleBUtil.pojo.PermissionEnum;
@@ -31,6 +32,11 @@ public class DataDashboardController {
     @PostMapping("/sift")
     public CommonResult<DataDashboardInfoResult> sift(@RequestBody SiftParam siftParam, @RequestParam Integer page, @RequestParam Integer pageNum) {
         return dataDashboardService.sift(siftParam, page, pageNum);
+    }
+
+    @PostMapping("/export")
+    public CommonResult<DataDashboardExportResult> export(@RequestBody(required = false) SiftParam siftParam) {
+        return dataDashboardService.export(siftParam);
     }
 
     @PostMapping("/test")
