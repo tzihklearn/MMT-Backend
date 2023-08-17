@@ -8,7 +8,6 @@ import com.sipc.mmtbackend.pojo.domain.po.MyInterviewStatusPo;
 import com.sipc.mmtbackend.pojo.dto.param.dataDashboard.SiftParam;
 import org.apache.ibatis.annotations.Mapper;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 /**

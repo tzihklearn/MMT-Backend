@@ -1,13 +1,8 @@
 package com.sipc.mmtbackend.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.sipc.mmtbackend.mapper.AdmissionMapper;
-import com.sipc.mmtbackend.mapper.DepartmentMapper;
 import com.sipc.mmtbackend.mapper.InterviewCheckMapper;
 import com.sipc.mmtbackend.pojo.domain.Admission;
 import com.sipc.mmtbackend.pojo.domain.AdmissionAddress;
-import com.sipc.mmtbackend.pojo.domain.Department;
-import com.sipc.mmtbackend.pojo.domain.Organization;
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
 import com.sipc.mmtbackend.pojo.dto.result.RealtimeIntreviewdResult.GetInterviewPlacesResult;
 import com.sipc.mmtbackend.pojo.dto.result.po.KVPo;
