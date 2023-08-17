@@ -3,7 +3,7 @@ package com.sipc.mmtbackend.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.sipc.mmtbackend.mapper.AdmissionMapper;
 import com.sipc.mmtbackend.mapper.DepartmentMapper;
-import com.sipc.mmtbackend.mapper.InterviewBoardDataMapper;
+import com.sipc.mmtbackend.mapper.InterviewBoardBDataMapper;
 import com.sipc.mmtbackend.pojo.domain.Admission;
 import com.sipc.mmtbackend.pojo.domain.Department;
 import com.sipc.mmtbackend.pojo.domain.po.InterviewBoardPo.LineChartLineDataDaoPo;
@@ -31,7 +31,7 @@ import java.util.*;
 public class InterviewBoardBeforeServiceImpl implements InterviewBoardBeforeService {
     private final DepartmentMapper departmentMapper;
     private final AdmissionMapper admissionMapper;
-    private final InterviewBoardDataMapper interviewBoardDataMapper;
+    private final InterviewBoardBDataMapper interviewBoardBDataMapper;
 
     /**
      * 查询当前登录组织各个部门已报名人数、第一志愿人数
@@ -50,7 +50,7 @@ public class InterviewBoardBeforeServiceImpl implements InterviewBoardBeforeServ
             return CommonResult.fail("查询失败：未开始纳新或纳新已结束");
         }
         List<PersonNumGroupByDepartmentPo> deps =
-                interviewBoardDataMapper.selectSignInPersonNumberGroupByDepartmentByAndAdmissionId(
+                interviewBoardBDataMapper.selectSignInPersonNumberGroupByDepartmentByAndAdmissionId(
                         admission.getId());
         GetNumberGroupByDepartmentResult result = new GetNumberGroupByDepartmentResult();
         result.setCNum(0);
@@ -91,7 +91,7 @@ public class InterviewBoardBeforeServiceImpl implements InterviewBoardBeforeServ
                 return CommonResult.fail("查询失败：部门不存在");
             }
         }
-        TotalNumPo totalNumPo = interviewBoardDataMapper.selectTotalNumByDepartmentIdAndAdmissionId(departmentId, admission.getId());
+        TotalNumPo totalNumPo = interviewBoardBDataMapper.selectTotalNumByDepartmentIdAndAdmissionId(departmentId, admission.getId());
         if (totalNumPo == null) {
             log.warn("用户" + context + "查询组织 " + departmentId + " 的报名人数时出现异常，数据库返回空");
             return CommonResult.serverError();
@@ -119,7 +119,7 @@ public class InterviewBoardBeforeServiceImpl implements InterviewBoardBeforeServ
             return CommonResult.fail("查询失败：未开始纳新或纳新已结束");
         }
         // 数据库查询到的数据
-        List<LineChartLineDataDaoPo> daoDatas = interviewBoardDataMapper.selectInterviewNumberLineChartGroupByDepartmentDataByOrganizationIdAndAdmissionId(
+        List<LineChartLineDataDaoPo> daoDatas = interviewBoardBDataMapper.selectInterviewNumberLineChartGroupByDepartmentDataByOrganizationIdAndAdmissionId(
                 context.getOrganizationId(), admission.getId());
         // 响应体数据
         GetNumberGroupByTimeAndDepartmentResult result = new GetNumberGroupByTimeAndDepartmentResult();
@@ -158,7 +158,7 @@ public class InterviewBoardBeforeServiceImpl implements InterviewBoardBeforeServ
             return CommonResult.fail("查询失败：部门不存在");
         }
         List<PersonNumGroupByOrderPo> depPos =
-                interviewBoardDataMapper.selectNumberGroupByOrderByAdmissionIdAndDepartmentId(
+                interviewBoardBDataMapper.selectNumberGroupByOrderByAdmissionIdAndDepartmentId(
                         admission.getId(), department.getId());
         GetNumberGroupByOrderResult result = new GetNumberGroupByOrderResult();
         result.setTotalNum(0);
@@ -198,7 +198,7 @@ public class InterviewBoardBeforeServiceImpl implements InterviewBoardBeforeServ
             return CommonResult.fail("查询失败：部门不存在");
         }
         // 数据库查询到的数据
-        List<LineChartLineDataDaoPo> daoDatas = interviewBoardDataMapper.selectInterviewNumberLineChartGroupByDataByDepartmentIdIdAndAdmissionId(
+        List<LineChartLineDataDaoPo> daoDatas = interviewBoardBDataMapper.selectInterviewNumberLineChartGroupByDataByDepartmentIdIdAndAdmissionId(
                 departmentId, admission.getId());
         GetNumberGroupByTimeAndOrderResult result = new GetNumberGroupByTimeAndOrderResult();
         result.setDate(daoDatas.get(0).getAbscissaData());
