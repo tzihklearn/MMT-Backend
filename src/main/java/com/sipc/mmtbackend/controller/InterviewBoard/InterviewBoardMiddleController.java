@@ -29,7 +29,7 @@ public class InterviewBoardMiddleController {
      */
     @GetMapping("/rounds")
     public CommonResult<GetInterviewRoundsResult> getInterviewRounds(){
-        return null;
+        return interviewBoardMiddleService.getInterviewRounds();
     }
 
     /**

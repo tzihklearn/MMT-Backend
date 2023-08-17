@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sipc.mmtbackend.mapper.InterviewCheckMapper">
+    <select id="selectOrganizationActivateAdmission" resultType="com.sipc.mmtbackend.pojo.domain.Admission">
+        SELECT
+            *
+        FROM
+            admission
+        WHERE
+            is_deleted != 1
+            AND organization_id = #{organizationId,jdbcType=INTEGER}
+        ORDER BY
+            id DESC
+            LIMIT 1
+    </select>
+
+    <select id="selectOrganizationActivateInterviewRound" resultType="java.lang.Integer">
+        SELECT
+            MAX( `as`.round ) `round`
+        FROM
+            admission_department_merge ad
+                LEFT JOIN admission_schedule `as` ON ad.id = `as`.admission_department_id
+        WHERE
+            ad.is_deleted != 1
+            AND `as`.is_deleted != 1
+            AND ad.admission_id = #{admissionId,jdbcType=INTEGER}
+    </select>
+    <select id="selectAvaliableInterviewAddress" resultType="com.sipc.mmtbackend.pojo.domain.AdmissionAddress">
+        SELECT
+            aa.*
+        FROM
+            admission a
+                LEFT JOIN admission_department_merge ad ON a.id = ad.admission_id
+                LEFT JOIN admission_schedule `as` ON ad.id = `as`.admission_department_id
+                LEFT JOIN admission_address aa ON `as`.id = aa.admission_schedule_id
+        WHERE
+            a.is_deleted != 1
+            AND ad.is_deleted != 1
+            AND `as`.is_deleted != 1
+            AND aa.is_deleted != 1
+            AND a.id = #{admissionId,jdbcType=INTEGER}
+            AND `as`.round = #{round,jdbcType=INTEGER}
+            <if test="departmentId != null and departmentId > 0">
+                AND ad.department_id = #{departmentId,jdbcType=INTEGER}
+            </if>
+    </select>
+</mapper>
