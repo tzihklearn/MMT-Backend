@@ -59,7 +59,7 @@ public class InterviewBoardMiddleController {
             @RequestParam(value = "round", defaultValue = "1") int round,
             @RequestParam(value = "department", defaultValue = "0") int departmentId
     ){
-        return null;
+        return interviewBoardMiddleService.getCheckinList(round, departmentId);
     }
 
     /**

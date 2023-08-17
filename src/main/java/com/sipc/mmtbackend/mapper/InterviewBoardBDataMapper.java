@@ -1,9 +1,9 @@
 package com.sipc.mmtbackend.mapper;
 
-import com.sipc.mmtbackend.pojo.domain.po.InterviewBoardPo.LineChartLineDataDaoPo;
-import com.sipc.mmtbackend.pojo.domain.po.InterviewBoardPo.PersonNumGroupByDepartmentPo;
-import com.sipc.mmtbackend.pojo.domain.po.InterviewBoardPo.PersonNumGroupByOrderPo;
-import com.sipc.mmtbackend.pojo.domain.po.InterviewBoardPo.TotalNumPo;
+import com.sipc.mmtbackend.pojo.domain.po.InterviewBoardBPo.LineChartLineDataDaoPo;
+import com.sipc.mmtbackend.pojo.domain.po.InterviewBoardBPo.PersonNumGroupByDepartmentPo;
+import com.sipc.mmtbackend.pojo.domain.po.InterviewBoardBPo.PersonNumGroupByOrderPo;
+import com.sipc.mmtbackend.pojo.domain.po.InterviewBoardBPo.TotalNumPo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
