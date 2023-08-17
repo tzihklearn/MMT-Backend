@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sipc.mmtbackend.mapper.InterviewCheckMapper">
+    <select id="selectOrganizationActivateAdmission" resultType="com.sipc.mmtbackend.pojo.domain.Admission">
+        SELECT
+            *
+        FROM
+            admission
+        WHERE
+            is_deleted != 1
+            AND organization_id = #{organizationId,jdbcType=INTEGER}
+        ORDER BY
+            id DESC
+            LIMIT 1
+    </select>
+
+    <select id="selectOrganizationActivateInterviewRound" resultType="java.lang.Integer">
+        SELECT
+            MAX( `as`.round ) `round`
+        FROM
+            admission_department_merge ad
+                LEFT JOIN admission_schedule `as` ON ad.id = `as`.admission_department_id
+        WHERE
+            ad.is_deleted != 1
+            AND `as`.is_deleted != 1
+            AND ad.admission_id = #{admissionId,jdbcType=INTEGER}
+    </select>
+</mapper>
