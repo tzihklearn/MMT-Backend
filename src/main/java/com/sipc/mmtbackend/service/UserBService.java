@@ -13,10 +13,9 @@ public interface UserBService {
      *
      * @param param 用户信息、邀请码
      * @return 注册结果
-     * @throws DatabaseException 数据库异常
      * @author DoudiNCer
      */
-    CommonResult<String> registUser(RegParam param) throws DateBaseException;
+    CommonResult<String> registUser(RegParam param);
 
     /**
      * B 端账号登陆
