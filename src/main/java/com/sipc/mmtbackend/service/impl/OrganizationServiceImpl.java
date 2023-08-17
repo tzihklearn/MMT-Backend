@@ -140,6 +140,10 @@ public class OrganizationServiceImpl implements OrganizationService {
                 }
             }
 
+            if (organizationInfoParam.getTagList().size() < 2 || organizationInfoParam.getTagList().size() > 4) {
+
+            }
+
             //遍历请求里的标签参数
             int typeI = 0;
             int typeJ = 2;
@@ -155,13 +159,27 @@ public class OrganizationServiceImpl implements OrganizationService {
                             .eq("type", 1)
                             .last("limit 1"));
 
+                    if (tag == null) {
+                        throw new RunException("系统标签不正确");
+                    }
+
                     OrganizationTagMerge organizationTagMerge = new OrganizationTagMerge();
                     organizationTagMerge.setOrganizationId(organizationId);
                     organizationTagMerge.setTagId(tag.getId());
                     organizationTagMerge.setTagType((byte) 1);
 
+//                    //没有社团标签数据
+//                    if (organizationTagMerge.getTagId() == null || typeI >= size) {
+//                        //插入社团标签数据
+//                        int insertNum = organizationTagMergeMapper.insert(organizationTagMerge);
+//                        if (insertNum != 1) {
+//                            log.error("更新社团宣传信息接口异常，插入社团的系统标签数出错，插入社团的系统标签数：{}，操作社团id：{}，操作标签id：{}",
+//                                    insertNum, organizationId, tag.getId());
+//                            throw new DateBaseException("数据库插入数据异常");
+//                        }
+//                    }
                     //没有社团标签数据
-                    if (organizationTagMerge.getTagId() == null || typeI >= size) {
+                    if (typeI >= size) {
                         //插入社团标签数据
                         int insertNum = organizationTagMergeMapper.insert(organizationTagMerge);
                         if (insertNum != 1) {

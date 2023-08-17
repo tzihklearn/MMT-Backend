@@ -15,11 +15,21 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler({DateBaseException.class, RunException.class, ValidateException.class})
-    public CommonResult<String> DateAndRunExceptionHandler(Exception e) {
+    @ExceptionHandler({DateBaseException.class, ValidateException.class})
+    public CommonResult<String> DateAndValExceptionHandler(Exception e) {
         e.printStackTrace();
 
         return CommonResult.serverError();
+    }
+
+    @ExceptionHandler({RunException.class})
+    public CommonResult<String> RunExceptionHandler(RunException e) {
+        e.printStackTrace();
+        if (e.getIsReturn()) {
+            return CommonResult.fail(e.getMessage());
+        } else {
+            return CommonResult.serverError();
+        }
     }
 
 }
