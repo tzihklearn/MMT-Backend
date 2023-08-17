@@ -8,11 +8,26 @@ package com.sipc.mmtbackend.pojo.exceptions;
  * @since 2023.04.23
  */
 public class RunException extends Exception {
+
+    private boolean isReturn;
+
     public RunException() {
         super();
     }
 
     public RunException(String message) {
         super(message);
+        isReturn = false;
     }
+
+    public RunException(String message, boolean isReturn) {
+        super(message);
+        this.isReturn = isReturn;
+    }
+
+    public boolean getIsReturn() {
+        return isReturn;
+    }
+
+
 }

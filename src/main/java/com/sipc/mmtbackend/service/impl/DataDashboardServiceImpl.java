@@ -516,9 +516,6 @@ public class DataDashboardServiceImpl implements DataDashboardService {
         int start = (page - 1) * pageNum;
         int end = page * pageNum;
 
-
-        i = start;
-
         int num = 0;
 
         List<MyInterviewStatusPo> interviewStatuses = myInterviewStatusMapper.selectByAdmissionIdAndSift(siftParam, admissionId);
@@ -548,8 +545,6 @@ public class DataDashboardServiceImpl implements DataDashboardService {
             }
 
             if (i < end && i >= start) {
-
-
 
                 if (placeFlag == 0 && interviewStatus.getAdmissionAddressId() == null) {
                     continue;
@@ -621,9 +616,9 @@ public class DataDashboardServiceImpl implements DataDashboardService {
                 }
                 interviewerInfoList.add(dataDashboardInfoPo);
 
-                ++i;
-            }
 
+            }
+            ++i;
         }
 
 //        if (siftParam.getSort() != null) {
