@@ -20,6 +20,7 @@
             <if test="departmentId != null and departmentId > 0">
                 AND i.department_id = #{departmentId,jdbcType=INTEGER}
             </if>
+            AND i.state >= 5
             AND i.admission_id = #{admissionId,jdbcType=INTEGER}
     </select>
 </mapper>
