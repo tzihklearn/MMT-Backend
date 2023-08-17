@@ -130,11 +130,11 @@
 
                 <choose>
                     <when test="siftParam.sort.sortId == 1">
-                        ORDER BY ui.student_id
+                        ORDER BY ui.name
                         <if test="siftParam.sort.sortBy == 2">DESC</if>
                     </when>
                     <when test="siftParam.sort.sortId == 2">
-                        ORDER BY ui.name
+                        ORDER BY ui.student_id
                         <if test="siftParam.sort.sortBy == 2">DESC</if>
                     </when>
                     <when test="siftParam.sort.sortId == 3">
