@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.sipc.mmtbackend.mapper.InterviewBoardMDataMapper">
+
+    <select id="selectCheckinInfo"
+            resultType="com.sipc.mmtbackend.pojo.domain.po.InterviewBoardMPo.CheckinInfoLPo">
+        SELECT
+            ui.student_id AS 'studentId',
+                ui.`name` AS 'name',
+                i.sign_in_time AS 'time',
+                aa.`name` AS 'room'
+        FROM
+            interview_status i
+                LEFT JOIN user_info ui ON i.user_id = ui.id
+                LEFT JOIN admission_address aa ON i.admission_address_id = aa.id
+        WHERE
+            i.is_deleted != 1
+            AND aa.is_deleted != 1
+            AND i.round = #{round,jdbcType=INTEGER}
+            <if test="departmentId != null and departmentId > 0">
+                AND i.department_id = #{departmentId,jdbcType=INTEGER}
+            </if>
+            AND i.admission_id = #{admissionId,jdbcType=INTEGER}
+    </select>
+</mapper>

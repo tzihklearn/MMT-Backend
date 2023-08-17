@@ -2,7 +2,6 @@ package com.sipc.mmtbackend.mapper;
 
 import com.sipc.mmtbackend.pojo.domain.Admission;
 import com.sipc.mmtbackend.pojo.domain.AdmissionAddress;
-import com.sipc.mmtbackend.pojo.domain.Department;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
