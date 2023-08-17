@@ -488,7 +488,7 @@ public class DataDashboardServiceImpl implements DataDashboardService {
 
         int placeFlag = 0;
 
-        if (siftParam.getNextPlaceSift() != null) {
+        if (!siftParam.getNextPlaceSift().isEmpty()) {
             for (Integer t : siftParam.getNextPlaceSift()) {
                 if (t == 0) {
                     placeFlag = 1;
@@ -500,7 +500,7 @@ public class DataDashboardServiceImpl implements DataDashboardService {
         }
 
         int timeFlag = 0;
-        if (siftParam.getNextTimeSift() != null) {
+        if (!siftParam.getNextTimeSift().isEmpty()) {
             for (String str : siftParam.getNextTimeSift()) {
                 if (str.equals("--")) {
                     timeFlag = 1;
@@ -733,7 +733,7 @@ public class DataDashboardServiceImpl implements DataDashboardService {
                 siftParam.setInterviewStatusSift(interviewStatusSift);
             }
 
-            if (siftParam.getNextPlaceSift() != null) {
+            if (!siftParam.getNextPlaceSift().isEmpty()) {
                 for (Integer t : siftParam.getNextPlaceSift()) {
                     if (t == 0) {
                         placeFlag = 1;
@@ -745,7 +745,7 @@ public class DataDashboardServiceImpl implements DataDashboardService {
             }
 
 
-            if (siftParam.getNextTimeSift() != null) {
+            if (!siftParam.getNextTimeSift().isEmpty()) {
                 for (String str : siftParam.getNextTimeSift()) {
                     if (str.equals("--")) {
                         timeFlag = 1;
