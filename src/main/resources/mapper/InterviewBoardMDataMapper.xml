@@ -23,4 +23,51 @@
             AND i.state >= 5
             AND i.admission_id = #{admissionId,jdbcType=INTEGER}
     </select>
+    <select id="selectInterviewProgress"
+            resultType="com.sipc.mmtbackend.pojo.domain.po.InterviewBoardMPo.InterviewProgressPo">
+        SELECT
+            zml.room AS "room",
+            zml.total AS "total",
+            ml.finished AS "finished"
+        FROM
+            (
+                SELECT
+                    COUNT( 1 ) AS "total",
+                    aa.`name` AS 'room'
+                FROM
+                    interview_status i
+                        LEFT JOIN user_info ui ON i.user_id = ui.id
+                        LEFT JOIN admission_address aa ON i.admission_address_id = aa.id
+                WHERE
+                    i.is_deleted != 1
+                    AND aa.is_deleted != 1
+                    AND i.round = #{round,jdbcType=INTEGER}
+                    <if test="departmentId != null and departmentId > 0">
+                        AND i.department_id = #{departmentId,jdbcType=INTEGER}
+                    </if>
+            		AND i.state >= 5
+                    AND i.admission_id = #{admissionId,jdbcType=INTEGER}
+                GROUP BY
+                    aa.`name`
+            ) AS `zml`
+                LEFT JOIN (
+                SELECT
+                    COUNT( 1 ) AS "finished",
+                    aa.`name` AS 'room'
+                FROM
+                    interview_status i
+                        LEFT JOIN user_info ui ON i.user_id = ui.id
+                        LEFT JOIN admission_address aa ON i.admission_address_id = aa.id
+                WHERE
+                    i.is_deleted != 1
+                    AND i.round = #{round,jdbcType=INTEGER}
+                    <if test="departmentId != null and departmentId > 0">
+                        AND i.department_id = #{departmentId,jdbcType=INTEGER}
+                    </if>
+                    AND i.state >= 6
+                    AND i.admission_id = #{admissionId,jdbcType=INTEGER}
+                GROUP BY
+                    aa.`name`
+            ) AS `ml` ON zml.room = ml.room
+    </select>
 </mapper>
