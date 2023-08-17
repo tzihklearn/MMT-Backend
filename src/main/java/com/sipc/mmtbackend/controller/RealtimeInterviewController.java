@@ -49,7 +49,7 @@ public class RealtimeInterviewController {
      */
     @GetMapping("/places")
     public CommonResult<GetInterviewPlacesResult> getInterviewPlaces(){
-        return null;
+        return realtimeInterviewService.getInterviewPlaces();
     }
 
     /**
