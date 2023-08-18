@@ -10,7 +10,7 @@ import org.apache.ibatis.annotations.Mapper;
  * </p>
  *
  * @author tzih
- * @since 2023-06-04
+ * @since 2023-08-17
  */
 @Mapper
 public interface QuestionDataMapper extends BaseMapper<QuestionData> {

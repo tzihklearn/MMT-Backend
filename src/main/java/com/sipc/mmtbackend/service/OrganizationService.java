@@ -2,9 +2,11 @@ package com.sipc.mmtbackend.service;
 
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
 import com.sipc.mmtbackend.pojo.dto.data.QuestionPoData;
+import com.sipc.mmtbackend.pojo.dto.param.superAdmin.InterviewFormParam;
 import com.sipc.mmtbackend.pojo.dto.param.superAdmin.OrganizationInfoParam;
 import com.sipc.mmtbackend.pojo.dto.param.superAdmin.AdmissionPublishParam;
 import com.sipc.mmtbackend.pojo.dto.param.superAdmin.RegistrationFormParam;
+import com.sipc.mmtbackend.pojo.dto.result.superAdmin.InterviewFromResult;
 import com.sipc.mmtbackend.pojo.dto.result.superAdmin.OrganizationInfoResult;
 import com.sipc.mmtbackend.pojo.dto.result.superAdmin.RegistrationFormResult;
 import com.sipc.mmtbackend.pojo.dto.result.superAdmin.UploadAvatarResult;
@@ -31,4 +33,8 @@ public interface OrganizationService {
     CommonResult<List<QuestionPoData>> getSystemQuestion() throws RunException;
 
     CommonResult<List<SelectTypePo>> getSelectType();
+
+    CommonResult<String> saveInterviewFrom(InterviewFormParam interviewFormParam) throws RunException, DateBaseException;
+
+    CommonResult<InterviewFromResult> getInterviewFrom() throws RunException;
 }

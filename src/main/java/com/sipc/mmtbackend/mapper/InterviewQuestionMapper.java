@@ -1,6 +1,6 @@
 package com.sipc.mmtbackend.mapper;
 
-import com.sipc.mmtbackend.pojo.domain.AdmissionQuestion;
+import com.sipc.mmtbackend.pojo.domain.InterviewQuestion;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -13,6 +13,6 @@ import org.apache.ibatis.annotations.Mapper;
  * @since 2023-08-17
  */
 @Mapper
-public interface AdmissionQuestionMapper extends BaseMapper<AdmissionQuestion> {
+public interface InterviewQuestionMapper extends BaseMapper<InterviewQuestion> {
 
 }

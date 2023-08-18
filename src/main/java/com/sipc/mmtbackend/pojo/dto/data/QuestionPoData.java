@@ -10,13 +10,19 @@ import lombok.Data;
 @Data
 public class QuestionPoData {
 
+    private Integer id;
+
     private Integer departmentId;
 
     private String name;
 
-    private Boolean type;
+    private Integer type;
 
     private Integer selectType;
+
+    private Integer num;
+
+    private String answer;
 
     private QuestionValueListData selectValue;
 
