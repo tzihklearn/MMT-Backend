@@ -1,11 +1,14 @@
 package com.sipc.mmtbackend.service.impl;
 
 import com.sipc.mmtbackend.mapper.InterviewCheckMapper;
+import com.sipc.mmtbackend.mapper.InterviewStatusMapper;
 import com.sipc.mmtbackend.mapper.RealtimeInterviewMapper;
 import com.sipc.mmtbackend.pojo.domain.Admission;
 import com.sipc.mmtbackend.pojo.domain.AdmissionAddress;
+import com.sipc.mmtbackend.pojo.domain.InterviewStatus;
 import com.sipc.mmtbackend.pojo.domain.po.RealtimeInterviewPo.ProgressBarPo;
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
+import com.sipc.mmtbackend.pojo.dto.param.RealtimeInterview.FinishInterviewParam;
 import com.sipc.mmtbackend.pojo.dto.result.RealtimeIntreviewdResult.GetInterviewPlacesResult;
 import com.sipc.mmtbackend.pojo.dto.result.RealtimeIntreviewdResult.GetInterviewProgressBarResult;
 import com.sipc.mmtbackend.pojo.dto.result.RealtimeIntreviewdResult.po.ProgressBarDataPo;
@@ -21,6 +24,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.logging.Logger;
 
 @Service
 @RequiredArgsConstructor(onConstructor_ = {@Autowired})
@@ -29,6 +34,7 @@ public class RealtimeInterviewServiceImpl implements RealtimeInterviewService {
     private final InterviewCheckMapper interviewCheckMapper;
     private final RealtimeInterviewMapper realtimeInterviewMapper;
     private final CheckinQRCodeUtil checkinQRCodeUtil;
+    private final InterviewStatusMapper interviewStatusMapper;
 
     /**
      * 获取签到二维码
@@ -93,7 +99,7 @@ public class RealtimeInterviewServiceImpl implements RealtimeInterviewService {
         BTokenSwapPo context = ThreadLocalContextUtil.getContext();
         Admission admission = interviewCheckMapper.selectOrganizationActivateAdmission(context.getOrganizationId());
         if (admission == null) {
-            log.warn("用户 " + context + " 尝试在无活动的纳新时获取面试场地");
+            log.warn("用户 " + context + " 尝试在无活动的纳新时获取面试进度条");
             return CommonResult.fail("生成失败：未开始纳新或纳新已结束");
         }
         Integer maxRound = interviewCheckMapper.selectOrganizationActivateInterviewRound(admission.getId());
@@ -114,5 +120,49 @@ public class RealtimeInterviewServiceImpl implements RealtimeInterviewService {
         result.setBars(results);
         result.setGroupNum(results.size());
         return CommonResult.success(result);
+    }
+
+    /**
+     * 结束面试
+     *
+     * @param param 面试ID
+     * @return 处理结果
+     */
+    @Override
+    public CommonResult<String> finishInterview(FinishInterviewParam param) {
+        BTokenSwapPo context = ThreadLocalContextUtil.getContext();
+        Admission admission = interviewCheckMapper.selectOrganizationActivateAdmission(context.getOrganizationId());
+        if (admission == null) {
+            log.warn("用户 " + context + " 尝试在无活动的纳新时获取面试进度条");
+            return CommonResult.fail("生成失败：未开始纳新或纳新已结束");
+        }
+        Integer maxRound = interviewCheckMapper.selectOrganizationActivateInterviewRound(admission.getId());
+        if (maxRound == null){
+            log.warn("用户 " + context + " 在纳新 " + admission + " 中未查询到任何面试");
+            return CommonResult.fail("当前纳新未开启面试");
+        }
+        InterviewStatus interviewStatus = interviewStatusMapper.selectById(param.getInterviewId());
+        if (interviewStatus == null){
+            log.warn("用户 " + context + " 尝试结束不存在的面试 " + param + "\n");
+            return CommonResult.fail("面试不存在或不属于当前纳新");
+        } else if (!Objects.equals(interviewStatus.getAdmissionId(), admission.getId())){
+            log.warn("用户 " + context + " 尝试结束不属于当前纳新 " + admission + " 的面试 " + interviewStatus + "\n");
+            return CommonResult.fail("面试不存在或不属于当前纳新");
+        }
+        if (interviewStatus.getState() != 6){
+            log.warn("用户 " + context +" 尝试结束并非正在进行的面试 " + interviewStatus + "\n");
+            if (interviewStatus.getState() == 7){
+                return CommonResult.success("面试已结束，请勿重复请求");
+            } else {
+                return CommonResult.fail("面试未开始或已结束");
+            }
+        }
+        interviewStatus.setState(7);
+        int update = interviewStatusMapper.updateById(interviewStatus);
+        if (update != 1){
+            log.warn("结束面试失败: " + interviewStatus + " ,受影响的行数: " + update + "\n");
+            return CommonResult.serverError();
+        }
+        return CommonResult.success();
     }
 }

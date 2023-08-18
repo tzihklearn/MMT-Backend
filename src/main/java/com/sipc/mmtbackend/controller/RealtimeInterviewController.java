@@ -2,6 +2,7 @@ package com.sipc.mmtbackend.controller;
 
 import com.sipc.mmtbackend.annotation.BPermission;
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
+import com.sipc.mmtbackend.pojo.dto.param.RealtimeInterview.FinishInterviewParam;
 import com.sipc.mmtbackend.pojo.dto.param.RealtimeInterview.PostInterviewCommentParam;
 import com.sipc.mmtbackend.pojo.dto.result.RealtimeIntreviewdResult.GetInterviewCommentResult;
 import com.sipc.mmtbackend.pojo.dto.result.RealtimeIntreviewdResult.GetInterviewPlacesResult;
@@ -91,5 +92,18 @@ public class RealtimeInterviewController {
     @PutMapping("/comment")
     public CommonResult<String> postInterviewComment(@RequestBody PostInterviewCommentParam param){
         return null;
+    }
+
+    /**
+     * 结束面试
+     *
+     * @param param 面试ID
+     * @return 处理结果
+     */
+    @PostMapping("/finish")
+    public CommonResult<String> finishInterview(
+            @RequestBody FinishInterviewParam param
+    ){
+        return realtimeInterviewService.finishInterview(param);
     }
 }
