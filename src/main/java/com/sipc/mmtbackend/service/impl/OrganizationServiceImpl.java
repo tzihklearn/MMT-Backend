@@ -142,6 +142,13 @@ public class OrganizationServiceImpl implements OrganizationService {
                 size = organizationTagMerges.size();
                 if (size != 0 && (size > 4 || size < 2)) {
                     log.warn("社团标签数异常，当前社团标签数：{}", organizationTagMerges.size());
+                    for (OrganizationTagMerge organizationTagMerge : organizationTagMerges) {
+                        int deleteNum = organizationTagMergeMapper.deleteById(organizationTagMerge.getId());
+                        if (deleteNum != 1) {
+                            log.error("社团标签数删除异常，id：{}", organizationTagMerge.getId());
+                            throw new DateBaseException("数据库删除操作异常");
+                        }
+                    }
                     organizationTagMerges = null;
                     size = 0;
                 }
@@ -199,13 +206,15 @@ public class OrganizationServiceImpl implements OrganizationService {
                     else {
                         OrganizationTagMerge organizationTagMerge1 = organizationTagMerges.get(typeI);
                         //判断已有社团标签为系统标签
-                        if (organizationTagMerge1.getTagType() == 1 &&
+                        //organizationTagMerge1.getTagType() == 1 &&
+                        if (
                                 !organizationTagMerge.getTagId().equals(organizationTagMerge1.getTagId())) {
                             //更新社团标签
                             updateNum = organizationTagMergeMapper.update(organizationTagMerge,
                                     new QueryWrapper<OrganizationTagMerge>()
                                             .eq("id", organizationTagMerge1.getId())
                             );
+
                             if (updateNum != 1) {
                                 log.error("更新社团宣传信息接口异常，更新社团系统标签数出错，更新社团系统标签数：{}，操作社团id：{}，更新系统标签id：{}，被更换系统标签id：{}",
                                         updateNum, organizationId, tagData.getTag(), organizationTagMerge1.getTagId());
