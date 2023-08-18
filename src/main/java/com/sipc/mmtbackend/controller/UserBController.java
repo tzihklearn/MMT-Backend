@@ -28,11 +28,7 @@ public class UserBController {
      */
     @PostMapping("/reg")
     public CommonResult<String> registUser(@RequestBody RegParam param) {
-        try {
-            return userBService.registUser(param);
-        } catch (DateBaseException e) {
-            return CommonResult.fail(e.getMessage());
-        }
+        return userBService.registUser(param);
     }
 
     /**

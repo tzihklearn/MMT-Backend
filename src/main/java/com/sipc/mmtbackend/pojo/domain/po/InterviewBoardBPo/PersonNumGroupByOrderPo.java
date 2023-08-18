@@ -1,4 +1,4 @@
-package com.sipc.mmtbackend.pojo.domain.po.InterviewBoardPo;
+package com.sipc.mmtbackend.pojo.domain.po.InterviewBoardBPo;
 
 import lombok.Data;
 

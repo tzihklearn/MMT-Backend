@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.sipc.mmtbackend.mapper.InterviewBoardDataMapper">
-    <resultMap id="LineChartLineData" type="com.sipc.mmtbackend.pojo.domain.po.InterviewBoardPo.LineChartLineDataDaoPo">
+<mapper namespace="com.sipc.mmtbackend.mapper.InterviewBoardBDataMapper">
+    <resultMap id="LineChartLineData" type="com.sipc.mmtbackend.pojo.domain.po.InterviewBoardBPo.LineChartLineDataDaoPo">
         <result column="name" property="name" jdbcType="VARCHAR"/>
         <collection property="data"
-                    ofType="com.sipc.mmtbackend.pojo.domain.po.InterviewBoardPo.LineChartLineDataPDaoPo">
+                    ofType="com.sipc.mmtbackend.pojo.domain.po.InterviewBoardBPo.LineChartLineDataPDaoPo">
             <result column="date" property="date" jdbcType="VARCHAR"/>
             <result column="number" property="number" jdbcType="INTEGER"/>
         </collection>
     </resultMap>
 
     <select id="selectSignInPersonNumberGroupByDepartmentByAndAdmissionId"
-            resultType="com.sipc.mmtbackend.pojo.domain.po.InterviewBoardPo.PersonNumGroupByDepartmentPo">
+            resultType="com.sipc.mmtbackend.pojo.domain.po.InterviewBoardBPo.PersonNumGroupByDepartmentPo">
         SELECT `name` AS "departmentName",
                z      AS "number",
                x      AS "firstChoiceNum"
@@ -35,7 +35,7 @@
         WHERE department.is_deleted != 1
     </select>
     <select id="selectTotalNumByDepartmentIdAndAdmissionId"
-            resultType="com.sipc.mmtbackend.pojo.domain.po.InterviewBoardPo.TotalNumPo">
+            resultType="com.sipc.mmtbackend.pojo.domain.po.InterviewBoardBPo.TotalNumPo">
         SELECT
             uva.c AS "totalNum",
             uvb.c AS "firstChoiceNum"
@@ -111,7 +111,7 @@
                AND xq.id = zml.department_id
     </select>
     <select id="selectNumberGroupByOrderByAdmissionIdAndDepartmentId"
-            resultType="com.sipc.mmtbackend.pojo.domain.po.InterviewBoardPo.PersonNumGroupByOrderPo">
+            resultType="com.sipc.mmtbackend.pojo.domain.po.InterviewBoardBPo.PersonNumGroupByOrderPo">
         SELECT
             u.do AS "orderNum",
             COUNT( 1 ) AS "number"
