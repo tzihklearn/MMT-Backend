@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sipc.mmtbackend.mapper.RealtimeInterviewMapper">
+
+    <select id="selectInterviewProgress"
+            resultType="com.sipc.mmtbackend.pojo.domain.po.RealtimeInterviewPo.ProgressBarPo">
+        SELECT
+            zml.`hour` AS `hour`,
+            zml.total AS `total`,
+            ml.finished AS `finished`
+        FROM
+            (
+                SELECT
+                    COUNT( 1 ) AS `total`,
+                    z.`hour` AS `hour`
+                FROM
+                    (
+                        SELECT
+                            DATE_FORMAT( i.start_time, "%H" ) AS `hour`
+                        FROM
+                            interview_status i
+                                LEFT JOIN user_info ui ON i.user_id = ui.id
+                                LEFT JOIN admission_address aa ON i.admission_address_id = aa.id
+                        WHERE
+                            i.is_deleted != 1
+                            AND aa.is_deleted != 1
+                            AND DATE_FORMAT ( i.start_time, "%m-%d" ) = DATE_FORMAT ( NOW(), "%m-%d" )
+                            AND i.round = #{round,jdbcType=INTEGER}
+                            AND i.state >= 5
+                            AND i.admission_id = #{admissionId,jdbcType=INTEGER}
+                            AND i.admission_address_id = #{place,jdbcType=INTEGER}
+                    ) AS `z`
+                GROUP BY
+                    `hour`
+            ) AS `zml`
+                LEFT JOIN (
+                SELECT
+                    COUNT( 1 ) AS `finished`,
+                    z.`hour` AS `hour`
+                FROM
+                    (
+                        SELECT
+                            DATE_FORMAT( i.start_time, "%H" ) AS `hour`
+                        FROM
+                            interview_status i
+                                LEFT JOIN user_info ui ON i.user_id = ui.id
+                                LEFT JOIN admission_address aa ON i.admission_address_id = aa.id
+                        WHERE
+                            i.is_deleted != 1
+                            AND aa.is_deleted != 1
+                            AND DATE_FORMAT ( i.start_time, "%m-%d" ) = DATE_FORMAT ( NOW(), "%m-%d" )
+                            AND i.round = #{round,jdbcType=INTEGER}
+                            AND i.state >= 6
+                            AND i.admission_id = #{admissionId,jdbcType=INTEGER}
+                            AND i.admission_address_id = #{place,jdbcType=INTEGER}
+                    ) AS `z`
+                GROUP BY
+                    `hour`
+            ) AS `ml` ON zml.`hour` = ml.`hour`
+    </select>
+</mapper>

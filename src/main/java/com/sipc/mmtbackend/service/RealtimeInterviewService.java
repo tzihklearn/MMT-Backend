@@ -2,6 +2,7 @@ package com.sipc.mmtbackend.service;
 
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
 import com.sipc.mmtbackend.pojo.dto.result.RealtimeIntreviewdResult.GetInterviewPlacesResult;
+import com.sipc.mmtbackend.pojo.dto.result.RealtimeIntreviewdResult.GetInterviewProgressBarResult;
 
 public interface RealtimeInterviewService {
     /**
@@ -17,4 +18,12 @@ public interface RealtimeInterviewService {
      * @return 所有面试场地
      */
     CommonResult<GetInterviewPlacesResult> getInterviewPlaces();
+
+    /**
+     * 获取面试进度条
+     *
+     * @param placeId 面试场地 ID
+     * @return 面试进度条数据
+     */
+    CommonResult<GetInterviewProgressBarResult> getInterviewProgressBar(int placeId);
 }
