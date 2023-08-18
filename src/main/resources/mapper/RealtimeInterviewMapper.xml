@@ -58,4 +58,43 @@
                     `hour`
             ) AS `ml` ON zml.`hour` = ml.`hour`
     </select>
+
+    <select id="selectRealtimeInterviewData"
+            resultType="com.sipc.mmtbackend.pojo.domain.po.RealtimeInterviewPo.InterviewStatusPo">
+        SELECT
+            `is`.id AS "id",
+            `ui`.id AS "cId",
+            `ui`.student_id AS "studentId",
+            `ui`.`name` AS "name",
+            CONCAT( `am`.major, `mc`.class_num, "班" ) AS "className",
+            `de`.`name` AS "department",
+            DATE_FORMAT( `is`.start_time, "%c/%e %H:%I" ) AS "time",
+            `aa`.`name` AS "place",
+            `is`.state AS "state"
+        FROM
+            interview_status `is`
+                LEFT JOIN user_info `ui` ON `is`.user_id = `ui`.id
+                LEFT JOIN major_class `mc` ON `ui`.major_class_id = `mc`.id
+                LEFT JOIN aca_major `am` ON `mc`.major_id = `am`.id
+                LEFT JOIN department `de` ON `is`.department_id = `de`.id
+                LEFT JOIN admission_address `aa` ON `is`.admission_address_id = `aa`.id
+        WHERE
+            `is`.is_deleted != 1
+            AND `mc`.is_deleted != 1
+            AND `am`.is_deleted != 1
+            AND `de`.is_deleted != 1
+            AND `aa`.is_deleted != 1
+            AND DATE_FORMAT ( `is`.start_time, "%m-%d" ) = DATE_FORMAT ( NOW(), "%m-%d" )
+            AND `is`.state <= 7
+            AND `is`.state >= 3
+            AND `is`.admission_id = #{admissionId, jdbcType=INTEGER}
+            AND `is`.admission_address_id = #{place, jdbcType=INTEGER}
+            AND `is`.round = #{round,jdbcType=INTEGER}
+            AND (
+                `ui`.student_id LIKE concat('%',#{keyword,jdbcType=VARCHAR},'%')
+                OR `ui`.student_id LIKE concat('%',#{keyword,jdbcType=VARCHAR},'%') )
+        ORDER BY
+            `is`.state ASC,
+            `is`.state ASC
+    </select>
 </mapper>
