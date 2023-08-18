@@ -29,7 +29,7 @@ public class RealtimeInterviewController {
     @GetMapping("/progressBar")
     public CommonResult<GetInterviewProgressBarResult> getInterviewProgressBar(
             @RequestParam(value = "place", defaultValue = "0") int placeId){
-        return null;
+        return realtimeInterviewService.getInterviewProgressBar(placeId);
     }
 
     /**
