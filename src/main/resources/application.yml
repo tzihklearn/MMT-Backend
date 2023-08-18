@@ -6,6 +6,10 @@ spring:
     name: mmt-backend
   profiles:
     active: local
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
 
 mybatis-plus:
   mapper-locations: classpath:/mapper/*.xml
