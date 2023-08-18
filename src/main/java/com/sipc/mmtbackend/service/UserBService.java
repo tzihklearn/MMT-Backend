@@ -3,7 +3,6 @@ package com.sipc.mmtbackend.service;
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
 import com.sipc.mmtbackend.pojo.dto.param.UserBParam.*;
 import com.sipc.mmtbackend.pojo.dto.result.UserBResult.*;
-import com.sipc.mmtbackend.pojo.exceptions.DateBaseException;
 import net.sf.jsqlparser.util.validation.metadata.DatabaseException;
 import org.springframework.web.multipart.MultipartFile;
 

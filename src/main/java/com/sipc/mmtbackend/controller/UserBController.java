@@ -4,7 +4,6 @@ import com.sipc.mmtbackend.annotation.BPermission;
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
 import com.sipc.mmtbackend.pojo.dto.param.UserBParam.*;
 import com.sipc.mmtbackend.pojo.dto.result.UserBResult.*;
-import com.sipc.mmtbackend.pojo.exceptions.DateBaseException;
 import com.sipc.mmtbackend.service.UserBService;
 import com.sipc.mmtbackend.utils.CheckroleBUtil.pojo.PermissionEnum;
 import net.sf.jsqlparser.util.validation.metadata.DatabaseException;
