@@ -15,7 +15,7 @@ import lombok.Setter;
  * </p>
  *
  * @author tzih
- * @since 2023-06-04
+ * @since 2023-08-17
  */
 @Getter
 @Setter
@@ -34,12 +34,12 @@ public class QuestionData implements Serializable {
      * 类型，1为系统内置问题，0为自定义内型
      */
     @TableField("type")
-    private Byte type;
+    private Integer type;
 
     /**
-     * 选择类型，1单选，2多选，3下拉框，4输入框，5级联选择器
+     * 选择类型，1单选，2多选，3下拉框，4输入框，5级联选择器，6量表题
      */
-    @TableField("select_type_id")
+    @TableField("selectTypeId")
     private Integer selectTypeId;
 
     /**
@@ -59,6 +59,12 @@ public class QuestionData implements Serializable {
      */
     @TableField("num")
     private Integer num;
+
+    /**
+     * 面试问题的答案或提示
+     */
+    @TableField("answer")
+    private String answer;
 
     /**
      * 逻辑删除字段

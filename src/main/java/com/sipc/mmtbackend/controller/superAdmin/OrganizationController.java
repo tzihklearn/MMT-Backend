@@ -4,8 +4,10 @@ import com.sipc.mmtbackend.annotation.BPermission;
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
 import com.sipc.mmtbackend.pojo.dto.data.QuestionPoData;
 import com.sipc.mmtbackend.pojo.dto.param.superAdmin.AdmissionPublishParam;
+import com.sipc.mmtbackend.pojo.dto.param.superAdmin.InterviewFormParam;
 import com.sipc.mmtbackend.pojo.dto.param.superAdmin.OrganizationInfoParam;
 import com.sipc.mmtbackend.pojo.dto.param.superAdmin.RegistrationFormParam;
+import com.sipc.mmtbackend.pojo.dto.result.superAdmin.InterviewFromResult;
 import com.sipc.mmtbackend.pojo.dto.result.superAdmin.OrganizationInfoResult;
 import com.sipc.mmtbackend.pojo.dto.result.superAdmin.RegistrationFormResult;
 import com.sipc.mmtbackend.pojo.dto.result.superAdmin.UploadAvatarResult;
@@ -132,6 +134,20 @@ public class OrganizationController {
     @GetMapping("/registration/form/select/type")
     public CommonResult<List<SelectTypePo>> getSelectType() {
         return organizationService.getSelectType();
+    }
+
+    @PostMapping("/interview/from/save")
+    public CommonResult<String> saveInterviewFrom(@RequestBody InterviewFormParam interviewFormParam) throws RunException, DateBaseException {
+        return organizationService.saveInterviewFrom(interviewFormParam);
+    }
+
+    /**
+     * 获取社团面试问题列表接口，请求方法Get,请求路径/b/admin/organization/interview/from/info
+     * @return 返回社团面试问题列表
+     */
+    @GetMapping("/interview/from/info")
+    public CommonResult<InterviewFromResult> getInterviewFrom() throws RunException {
+        return organizationService.getInterviewFrom();
     }
 
     @PostMapping("/test")
