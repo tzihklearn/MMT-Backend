@@ -140,9 +140,10 @@ public class OrganizationServiceImpl implements OrganizationService {
             int size = 0;
             if (organizationTagMerges != null) {
                 size = organizationTagMerges.size();
-                if (size != 0 && (size > 3 || size < 2)) {
+                if (size != 0 && (size > 4 || size < 2)) {
                     log.warn("社团标签数异常，当前社团标签数：{}", organizationTagMerges.size());
                     organizationTagMerges = null;
+                    size = 0;
                 }
             }
 
@@ -493,7 +494,7 @@ public class OrganizationServiceImpl implements OrganizationService {
         OrganizationInfoResult organizationInfoResult = new OrganizationInfoResult();
         organizationInfoResult.setName(organization.getName());
         //设置社团头像信息，如果社团头像为空，则使用默认头像
-        if (organization.getAvatarId() == null || organization.getAvatarId().length() == 0) {
+        if (organization.getAvatarId() == null || organization.getAvatarId().isEmpty()) {
             organizationInfoResult.setAvatarUrl(
                     pictureUtil.getPictureURL(DefaultPictureIdEnum.ORG_AVATAR.getPictureId(), true));
         } else {
