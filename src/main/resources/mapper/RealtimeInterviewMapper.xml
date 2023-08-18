@@ -85,8 +85,8 @@
             AND `de`.is_deleted != 1
             AND `aa`.is_deleted != 1
             AND DATE_FORMAT ( `is`.start_time, "%m-%d" ) = DATE_FORMAT ( NOW(), "%m-%d" )
-            AND `is`.state <= 7
             AND `is`.state >= 3
+            AND `is`.state &lt;= 7
             AND `is`.admission_id = #{admissionId, jdbcType=INTEGER}
             AND `is`.admission_address_id = #{place, jdbcType=INTEGER}
             AND `is`.round = #{round,jdbcType=INTEGER}
