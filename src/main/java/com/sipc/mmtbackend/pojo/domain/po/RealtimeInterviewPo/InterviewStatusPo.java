@@ -1,9 +1,9 @@
-package com.sipc.mmtbackend.pojo.dto.result.RealtimeIntreviewdResult.po;
+package com.sipc.mmtbackend.pojo.domain.po.RealtimeInterviewPo;
 
 import lombok.Data;
 
 @Data
-public class IntervieweePo {
+public class InterviewStatusPo {
     // 面试ID
     private Integer id;
     // 面试用户ID
@@ -20,8 +20,6 @@ public class IntervieweePo {
     private String time;
     // 面试地点
     private String place;
-    // 是否签到
-    private boolean isSigned;
-    // 面试状态：0未开始，1正在面试，2已结束
-    private Integer status;
+    // 面试状态
+    private Integer state;
 }

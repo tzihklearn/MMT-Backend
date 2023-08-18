@@ -67,7 +67,7 @@ public class RealtimeInterviewController {
             @RequestParam(value = "keyword", defaultValue = "") String keyword,
             @RequestParam(value = "place", defaultValue = "0") int placeId
     ){
-        return null;
+        return realtimeInterviewService.getIntervieweeList(page, keyword, placeId);
     }
 
     /**
