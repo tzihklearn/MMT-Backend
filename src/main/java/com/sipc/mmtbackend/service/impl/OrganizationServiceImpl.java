@@ -569,7 +569,10 @@ public class OrganizationServiceImpl implements OrganizationService {
             throw new DateBaseException("数据库更新更新操作异常");
         }
 
-        return CommonResult.success("上传社团头像成功");
+        UploadAvatarResult result = new UploadAvatarResult();
+        result.setAvatarUrl(pictureUtil.getPictureURL(organization.getAvatarId(), false));
+
+        return CommonResult.success(result);
     }
 
     /**
