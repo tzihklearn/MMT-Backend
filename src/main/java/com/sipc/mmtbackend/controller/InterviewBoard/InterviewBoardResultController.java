@@ -41,7 +41,7 @@ public class InterviewBoardResultController {
      */
     @GetMapping("/depPass")
     public CommonResult<GetDepartmentPassCountResult> getDepartmentPassCount(){
-        return null;
+        return interviewBoardResultService.getDepartmentPassCount();
     }
 
     /**
