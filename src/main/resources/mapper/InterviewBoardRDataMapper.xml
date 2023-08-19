@@ -2,4 +2,67 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.sipc.mmtbackend.mapper.InterviewBoardRDataMapper">
 
+    <select id="selectInterviewResultData"
+            resultType="com.sipc.mmtbackend.pojo.domain.po.InterviewBoardRPo.InterviewResultData">
+        SELECT
+        	`sc`.c AS "signupCount",
+        	`lpc`.c AS "lastPassedCount",
+        	`cc`.c AS "checkinCount",
+        	`pc`.c AS "passedCount"
+        FROM
+        	(
+        		SELECT
+        			count( 1 ) AS `c`
+        		FROM
+        			interview_status `is`
+        		WHERE
+        			`is`.is_deleted != 1
+		    <if test="departmentId != null and departmentId > 0">
+			    AND `is`.department_id = #{departmentId,jdbcType=INTEGER}
+		    </if>
+        			AND `is`.admission_id = 2
+        			AND `is`.round = 1
+        	) AS `sc`,
+        	(
+        		SELECT
+        			count( 1 ) AS `c`
+        		FROM
+        			interview_status `is`
+        		WHERE
+        			`is`.is_deleted != 1
+		    <if test="departmentId != null and departmentId > 0">
+			    AND `is`.department_id = #{departmentId,jdbcType=INTEGER}
+		    </if>
+        			AND `is`.admission_id = 2
+        			AND `is`.round = 2
+        	) AS `lpc`,
+        	(
+        		SELECT
+        			count( 1 ) AS `c`
+        		FROM
+        			interview_status `is`
+        		WHERE
+        			`is`.is_deleted != 1
+		    <if test="departmentId != null and departmentId > 0">
+			    AND `is`.department_id = #{departmentId,jdbcType=INTEGER}
+		    </if>
+        			AND `is`.admission_id = 2
+        			AND `is`.state >= 5
+        			AND `is`.round = 1
+        	) AS `cc`,
+        	(
+        		SELECT
+        			count( 1 ) AS `c`
+        		FROM
+        		    interview_status `is`
+        		WHERE
+        			`is`.is_deleted != 1
+		    <if test="departmentId != null and departmentId > 0">
+			    AND `is`.department_id = #{departmentId,jdbcType=INTEGER}
+		    </if>
+        			AND `is`.admission_id = 2
+        			AND `is`.state = 9
+        			AND `is`.round = 1
+        	) AS `pc`
+    </select>
 </mapper>
