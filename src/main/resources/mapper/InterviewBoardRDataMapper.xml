@@ -1,7 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.sipc.mmtbackend.mapper.InterviewBoardRDataMapper">
-
+	<resultMap id="LineChartLineData" type="com.sipc.mmtbackend.pojo.domain.po.InterviewBoardBPo.LineChartLineDataDaoPo">
+		<result column="name" property="name" jdbcType="VARCHAR"/>
+		<collection property="data"
+					ofType="com.sipc.mmtbackend.pojo.domain.po.InterviewBoardRPo.LineChartLineDataPDaoPo">
+			<result column="round" property="round" jdbcType="INTEGER"/>
+			<result column="number" property="number" jdbcType="INTEGER"/>
+		</collection>
+	</resultMap>
     <select id="selectInterviewResultData"
             resultType="com.sipc.mmtbackend.pojo.domain.po.InterviewBoardRPo.InterviewResultData">
         SELECT
@@ -83,5 +90,37 @@
 		    AND i.admission_id = #{admissionId, jdbcType=INTEGER}
 		    AND i.round = #{round, jdbcType=INTEGER}
 		    GROUP BY i.department_id
+	</select>
+	<select id="selectPassedCountLineChartGroupByRoundByAdmissionId"
+			resultMap="LineChartLineData">
+		SELECT
+			d.`name` AS "name",
+			zml.number AS "number",
+			ml.round AS "round"
+		FROM
+			(
+				SELECT
+					*
+				FROM
+					( SELECT DISTINCT i.round AS "round" FROM interview_status `i` WHERE i.is_deleted != 1 AND i.admission_id = #{admissionId, jdbcType=INTEGER} ) AS `r`
+						INNER JOIN ( SELECT DISTINCT ad.department_id AS "department" FROM admission_department_merge `ad` WHERE ad.is_deleted != 1 AND ad.admission_id = #{admissionId, jdbcType=INTEGER} ) `d` ON 114 != 514
+			) `ml`
+				LEFT JOIN (
+				SELECT
+					i.department_id AS "department",
+					i.round AS "round",
+					COUNT( 1 ) AS "number"
+				FROM
+					interview_status `i`
+				WHERE
+					i.is_deleted != 1
+		AND i.admission_id = #{admissionId, jdbcType=INTEGER}
+				  AND i.state = 9
+				GROUP BY
+					i.department_id,
+					i.round
+			) `zml` ON ml.department = zml.department
+				AND ml.round = zml.round
+				LEFT JOIN department `d` ON ml.department = d.id
 	</select>
 </mapper>

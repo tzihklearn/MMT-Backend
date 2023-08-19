@@ -3,6 +3,7 @@ package com.sipc.mmtbackend.service;
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
 import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResultResult.GetDepartmentPassCountResult;
 import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResultResult.GetInterviewResultDataResult;
+import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResultResult.po.GetPassCountGroupByDepartmentResult;
 
 public interface InterviewBoardResultService {
     /**
@@ -19,4 +20,11 @@ public interface InterviewBoardResultService {
      * @return 各部门通过人数
      */
     CommonResult<GetDepartmentPassCountResult> getDepartmentPassCount();
+
+    /**
+     * 获取不同部门通过人数随时间变化折线图（组织折线图）
+     *
+     * @return 不同部门通过人数随时间变化折线图数据
+     */
+    CommonResult<GetPassCountGroupByDepartmentResult> getPassCountGroupByDepartmentLineChart();
 }
