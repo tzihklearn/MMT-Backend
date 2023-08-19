@@ -28,10 +28,10 @@ public class InterviewBoardResultController {
      * @return 面试最终数据
      */
     @GetMapping("/result")
-    public CommonResult<GetInterviewResultdataResult> getResultData(
+    public CommonResult<GetInterviewResultDataResult> getResultData(
             @RequestParam(value = "department", defaultValue = "0") int departmentId
     ){
-        return null;
+        return interviewBoardResultService.getResultData(departmentId);
     }
 
     /**
