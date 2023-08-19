@@ -8,16 +8,8 @@ import com.sipc.mmtbackend.mapper.*;
 import com.sipc.mmtbackend.pojo.domain.*;
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
 import com.sipc.mmtbackend.pojo.dto.data.*;
-import com.sipc.mmtbackend.pojo.dto.param.superAdmin.AdmissionPublishParam;
-import com.sipc.mmtbackend.pojo.dto.param.superAdmin.InterviewFormParam;
-import com.sipc.mmtbackend.pojo.dto.param.superAdmin.OrganizationInfoParam;
-import com.sipc.mmtbackend.pojo.dto.param.superAdmin.RegistrationFormParam;
-import com.sipc.mmtbackend.pojo.dto.result.superAdmin.InterviewFromResult;
-import com.sipc.mmtbackend.pojo.dto.result.superAdmin.OrganizationInfoResult;
-import com.sipc.mmtbackend.pojo.dto.result.superAdmin.RegistrationFormResult;
-import com.sipc.mmtbackend.pojo.dto.result.superAdmin.UploadAvatarResult;
-import com.sipc.mmtbackend.pojo.dto.result.superAdmin.po.InterviewFromPo;
-import com.sipc.mmtbackend.pojo.dto.result.superAdmin.po.InterviewQuestionPo;
+import com.sipc.mmtbackend.pojo.dto.param.superAdmin.*;
+import com.sipc.mmtbackend.pojo.dto.result.superAdmin.*;
 import com.sipc.mmtbackend.pojo.dto.result.superAdmin.po.SelectTypePo;
 import com.sipc.mmtbackend.pojo.exceptions.DateBaseException;
 import com.sipc.mmtbackend.pojo.exceptions.RunException;
@@ -76,6 +68,8 @@ public class OrganizationServiceImpl implements OrganizationService {
     private final SelectTypeMapper selectTypeMapper;
 
     private final InterviewQuestionMapper interviewQuestionMapper;
+
+    private final MessageTemplateMapper messageTemplateMapper;
 
     private final HttpServletRequest httpServletRequest;
 
@@ -788,7 +782,7 @@ public class OrganizationServiceImpl implements OrganizationService {
                 .orderByDesc("id")
                 .last("limit 1"));
 
-        if (admissionNow == null ) {
+        if (admissionNow == null) {
             return CommonResult.fail("社团没有开始纳新");
         }
 
@@ -853,6 +847,175 @@ public class OrganizationServiceImpl implements OrganizationService {
 
         return CommonResult.success(result);
 
+    }
+
+    /**
+     * 设置社团纳新消息通知模板的接口的业务实现方法
+     *
+     * @param messageTemplateParam 设置社团纳新消息通知模板接口的参数实体类
+     * @return 当前社团纳新消息通知模板
+     */
+    @Override
+    public CommonResult<MessageTemplateResult> setMessageTemplate(MessageTemplateParam messageTemplateParam) throws DateBaseException {
+
+        //获取操作用户信息，并获取其操作社团id
+        BTokenSwapPo context = ThreadLocalContextUtil.getContext();
+        Integer organizationId = context.getOrganizationId();
+
+        List<MessageTemplate> messageTemplates = messageTemplateMapper.selectList(
+                new QueryWrapper<MessageTemplate>().eq("organization_id", organizationId).orderByAsc("type")
+        );
+
+        if (messageTemplates != null && messageTemplates.size() > 3) {
+            messageTemplateMapper.delete(new QueryWrapper<MessageTemplate>().eq("organization_id", organizationId));
+            messageTemplates = null;
+        }
+
+        if (messageTemplates != null) {
+            Iterator<MessageTemplate> iterator = messageTemplates.iterator();
+            if (messageTemplateParam.getInterviewNotice() != null) {
+                if (iterator.hasNext()) {
+                    MessageTemplate next = iterator.next();
+                    next.setType(messageTemplateParam.getInterviewNotice().getType());
+                    next.setMessageTemplate(messageTemplateParam.getInterviewNotice().getMessageTemplate());
+                    int updateNum = messageTemplateMapper.updateById(next);
+                    if (updateNum != 1) {
+                        log.error("设置社团纳新消息通知模板的接口异常，更新社团消息模板数错误，受影响的行：{}，操作参数：{}",
+                                updateNum, next);
+                        throw new DateBaseException("数据更新操作异常");
+                    }
+                    iterator.remove();
+                }
+            }
+
+            if (messageTemplateParam.getResultSuccessNotice() != null) {
+                if (iterator.hasNext()) {
+                    MessageTemplate next = iterator.next();
+                    next.setType(messageTemplateParam.getResultFailNotice().getType());
+                    next.setMessageTemplate(messageTemplateParam.getResultSuccessNotice().getMessageTemplate());
+                    int updateNum = messageTemplateMapper.updateById(next);
+                    if (updateNum != 1) {
+                        log.error("设置社团纳新消息通知模板的接口异常，更新社团消息模板数错误，受影响的行：{}，操作参数：{}",
+                                updateNum, next);
+                        throw new DateBaseException("数据更新操作异常");
+                    }
+                    iterator.remove();
+                }
+            }
+
+            if (messageTemplateParam.getResultFailNotice() != null) {
+                if (iterator.hasNext()) {
+                    MessageTemplate next = iterator.next();
+                    next.setType(messageTemplateParam.getResultFailNotice().getType());
+                    next.setMessageTemplate(messageTemplateParam.getResultFailNotice().getMessageTemplate());
+                    int updateNum = messageTemplateMapper.updateById(next);
+                    if (updateNum != 1) {
+                        log.error("设置社团纳新消息通知模板的接口异常，更新社团消息模板数错误，受影响的行：{}，操作参数：{}",
+                                updateNum, next);
+                        throw new DateBaseException("数据更新操作异常");
+                    }
+                    iterator.remove();
+                }
+            }
+
+            while (iterator.hasNext()) {
+                MessageTemplate next = iterator.next();
+                int deleteNum = messageTemplateMapper.deleteById(next);
+                if (deleteNum != 1) {
+                    log.error("设置社团纳新消息通知模板的接口异常，更新社团消息模板数错误，受影响的行：{}，操作参数：{}",
+                            deleteNum, next);
+                    throw new DateBaseException("数据删除操作异常");
+                }
+            }
+        } else {
+            if (messageTemplateParam.getInterviewNotice() != null) {
+
+                MessageTemplate messageTemplate = new MessageTemplate();
+                messageTemplate.setOrganizationId(organizationId);
+                messageTemplate.setType(messageTemplateParam.getInterviewNotice().getType());
+                messageTemplate.setMessageTemplate(messageTemplateParam.getInterviewNotice().getMessageTemplate());
+                int insertNum = messageTemplateMapper.insert(messageTemplate);
+                if (insertNum != 1) {
+                    log.error("设置社团纳新消息通知模板的接口异常，更新社团消息模板数错误，受影响的行：{}，操作参数：{}",
+                            insertNum, messageTemplate);
+                    throw new DateBaseException("数据新增操作异常");
+                }
+
+            }
+
+            if (messageTemplateParam.getResultSuccessNotice() != null) {
+
+                MessageTemplate messageTemplate = new MessageTemplate();
+                messageTemplate.setOrganizationId(organizationId);
+                messageTemplate.setType(messageTemplateParam.getResultSuccessNotice().getType());
+                messageTemplate.setMessageTemplate(messageTemplateParam.getResultSuccessNotice().getMessageTemplate());
+                int insertNum = messageTemplateMapper.insert(messageTemplate);
+                if (insertNum != 1) {
+                    log.error("设置社团纳新消息通知模板的接口异常，更新社团消息模板数错误，受影响的行：{}，操作参数：{}",
+                            insertNum, messageTemplate);
+                    throw new DateBaseException("数据新增操作异常");
+                }
+
+            }
+
+            if (messageTemplateParam.getResultFailNotice() != null) {
+
+                MessageTemplate messageTemplate = new MessageTemplate();
+                messageTemplate.setOrganizationId(organizationId);
+                messageTemplate.setType(messageTemplateParam.getResultFailNotice().getType());
+                messageTemplate.setMessageTemplate(messageTemplateParam.getResultFailNotice().getMessageTemplate());
+                int insertNum = messageTemplateMapper.insert(messageTemplate);
+                if (insertNum != 1) {
+                    log.error("设置社团纳新消息通知模板的接口异常，更新社团消息模板数错误，受影响的行：{}，操作参数：{}",
+                            insertNum, messageTemplate);
+                    throw new DateBaseException("数据新增操作异常");
+                }
+
+            }
+        }
+
+
+
+        return getMessageTemplate();
+    }
+
+    @Override
+    public CommonResult<MessageTemplateResult> getMessageTemplate() {
+
+        //获取操作用户信息，并获取其操作社团id
+        BTokenSwapPo context = ThreadLocalContextUtil.getContext();
+        Integer organizationId = context.getOrganizationId();
+
+        MessageTemplateResult result = new MessageTemplateResult();
+
+        for (MessageTemplate messageTemplate : messageTemplateMapper.selectList(new QueryWrapper<MessageTemplate>().eq("organization_id", organizationId))) {
+            if (messageTemplate.getType() == 1) {
+                MessageTemplateData data = new MessageTemplateData();
+                data.setId(messageTemplate.getId());
+                data.setType(messageTemplate.getType());
+                data.setMessageTemplate(messageTemplate.getMessageTemplate());
+
+                result.setInterviewNotice(data);
+            }
+            else if (messageTemplate.getType() == 2) {
+                MessageTemplateData data = new MessageTemplateData();
+                data.setId(messageTemplate.getId());
+                data.setType(messageTemplate.getType());
+                data.setMessageTemplate(messageTemplate.getMessageTemplate());
+
+                result.setResultSuccessNotice(data);
+            }
+            else if (messageTemplate.getType() == 3) {
+                MessageTemplateData data = new MessageTemplateData();
+                data.setId(messageTemplate.getId());
+                data.setType(messageTemplate.getType());
+                data.setMessageTemplate(messageTemplate.getMessageTemplate());
+
+                result.setResultFailNotice(data);
+            }
+        }
+
+        return CommonResult.success(result);
     }
 
     /**

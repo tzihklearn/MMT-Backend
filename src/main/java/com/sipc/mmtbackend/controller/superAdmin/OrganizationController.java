@@ -3,14 +3,8 @@ package com.sipc.mmtbackend.controller.superAdmin;
 import com.sipc.mmtbackend.annotation.BPermission;
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
 import com.sipc.mmtbackend.pojo.dto.data.QuestionPoData;
-import com.sipc.mmtbackend.pojo.dto.param.superAdmin.AdmissionPublishParam;
-import com.sipc.mmtbackend.pojo.dto.param.superAdmin.InterviewFormParam;
-import com.sipc.mmtbackend.pojo.dto.param.superAdmin.OrganizationInfoParam;
-import com.sipc.mmtbackend.pojo.dto.param.superAdmin.RegistrationFormParam;
-import com.sipc.mmtbackend.pojo.dto.result.superAdmin.InterviewFromResult;
-import com.sipc.mmtbackend.pojo.dto.result.superAdmin.OrganizationInfoResult;
-import com.sipc.mmtbackend.pojo.dto.result.superAdmin.RegistrationFormResult;
-import com.sipc.mmtbackend.pojo.dto.result.superAdmin.UploadAvatarResult;
+import com.sipc.mmtbackend.pojo.dto.param.superAdmin.*;
+import com.sipc.mmtbackend.pojo.dto.result.superAdmin.*;
 import com.sipc.mmtbackend.pojo.dto.result.superAdmin.po.SelectTypePo;
 import com.sipc.mmtbackend.pojo.exceptions.DateBaseException;
 import com.sipc.mmtbackend.pojo.exceptions.RunException;
@@ -148,6 +142,16 @@ public class OrganizationController {
     @GetMapping("/interview/from/info")
     public CommonResult<InterviewFromResult> getInterviewFrom() throws RunException {
         return organizationService.getInterviewFrom();
+    }
+
+    @PostMapping("/message/template/set")
+    public CommonResult<MessageTemplateResult> setMessageTemplate(MessageTemplateParam messageTemplateParam) throws DateBaseException {
+        return organizationService.setMessageTemplate(messageTemplateParam);
+    }
+
+    @GetMapping("/message/template/info")
+    public CommonResult<MessageTemplateResult> getMessageTemplate() {
+        return organizationService.getMessageTemplate();
     }
 
     @PostMapping("/test")
