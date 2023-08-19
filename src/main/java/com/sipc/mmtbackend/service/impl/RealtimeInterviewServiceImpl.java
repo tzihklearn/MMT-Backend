@@ -81,7 +81,7 @@ public class RealtimeInterviewServiceImpl implements RealtimeInterviewService {
             log.warn("用户 " + context + " 在纳新 " + admission + " 中未查询到任何面试");
             return CommonResult.fail("当前纳新未开启面试");
         }
-        List<AdmissionAddress> addresses = interviewCheckMapper.selectAvaliableInterviewAddress(maxRound, admission.getId(), 0);
+        List<AdmissionAddress> addresses = interviewCheckMapper.selectAvailableInterviewAddress(maxRound, admission.getId(), 0);
         GetInterviewPlacesResult result = new GetInterviewPlacesResult();
         result.setCount(addresses.size());
         List<KVPo> results = new ArrayList<>();

@@ -43,7 +43,7 @@ public interface InterviewCheckMapper {
      * @param DepartmentId 部门ID
      * @return 面试地点
      */
-    List<AdmissionAddress> selectAvaliableInterviewAddress(
+    List<AdmissionAddress> selectAvailableInterviewAddress(
             @Param("round") Integer round,
             @Param("admissionId") Integer admissionId,
             @Param("departmentId") Integer DepartmentId

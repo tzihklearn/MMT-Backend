@@ -25,7 +25,7 @@
             AND `as`.is_deleted != 1
             AND ad.admission_id = #{admissionId,jdbcType=INTEGER}
     </select>
-    <select id="selectAvaliableInterviewAddress" resultType="com.sipc.mmtbackend.pojo.domain.AdmissionAddress">
+    <select id="selectAvailableInterviewAddress" resultType="com.sipc.mmtbackend.pojo.domain.AdmissionAddress">
         SELECT
             aa.*
         FROM
