@@ -8,16 +8,19 @@ import com.sipc.mmtbackend.pojo.domain.Department;
 import com.sipc.mmtbackend.pojo.domain.po.InterviewBoardRPo.DepartmentPassedCountPo;
 import com.sipc.mmtbackend.pojo.domain.po.InterviewBoardRPo.InterviewResultData;
 import com.sipc.mmtbackend.pojo.domain.po.InterviewBoardRPo.LineChartLineDataDaoPo;
+import com.sipc.mmtbackend.pojo.domain.po.InterviewBoardRPo.OrderPassedCountPo;
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
+import com.sipc.mmtbackend.pojo.dto.enums.InterviewRoundEnum;
 import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResultResult.GetDepartmentPassCountResult;
 import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResultResult.GetInterviewResultDataResult;
+import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResultResult.GetOrderPassCountResult;
 import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResultResult.po.DepartmentPassCountPo;
 import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResultResult.po.GetPassCountGroupByDepartmentResult;
+import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResultResult.po.OrderPassCountPo;
 import com.sipc.mmtbackend.pojo.dto.result.po.LineChartLineDataPo;
 import com.sipc.mmtbackend.service.InterviewBoardResultService;
 import com.sipc.mmtbackend.utils.CheckroleBUtil.pojo.BTokenSwapPo;
 import com.sipc.mmtbackend.utils.ThreadLocalContextUtil;
-import jdk.nashorn.internal.ir.IfNode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -135,7 +138,7 @@ public class InterviewBoardResultServiceImpl implements InterviewBoardResultServ
         }
         List<String> abscissaData = lineDataDaoPos.get(0).getAbscissaData();
         if (abscissaData == null){
-            log.warn("数据库错误：用户 " + context + " 获取获取不同部门通过人数随面试轮次变化折线图（组织折线图）时查询到非法面试轮次，相关查询结果如下：\n" + lineDataDaoPos);
+            log.warn("数据库错误：用户 " + context + " 获取不同部门通过人数随面试轮次变化折线图（组织折线图）时查询到非法面试轮次，相关查询结果如下：\n" + lineDataDaoPos);
             return CommonResult.serverError();
         }
         result.setRound(abscissaData);
@@ -146,6 +149,53 @@ public class InterviewBoardResultServiceImpl implements InterviewBoardResultServ
             results.add(depData);
         }
         result.setDepartments(results);
+        return CommonResult.success(result);
+    }
+
+    /**
+     * 获取最终各志愿通过人数（部门饼图）
+     *
+     * @param departmentId 部门ID
+     * @return 最终各志愿通过人数
+     */
+    @Override
+    public CommonResult<GetOrderPassCountResult> getOrderPassCount(int departmentId) {
+        BTokenSwapPo context = ThreadLocalContextUtil.getContext();
+        Admission admission = interviewCheckMapper.selectOrganizationActivateAdmission(context.getOrganizationId());
+        if (admission == null) {
+            log.warn("用户 " + context + " 尝试在无活动的纳新时查询面试最终数据");
+            return CommonResult.fail("查询失败：未开始纳新或纳新已结束");
+        }
+        Integer maxRound = interviewCheckMapper.selectOrganizationActivateInterviewRound(admission.getId());
+        if (maxRound == null){
+            log.warn("用户 " + context + " 在纳新 " + admission + " 中未查询到任何面试");
+            return CommonResult.fail("当前纳新未开启面试");
+        }
+        Department department = departmentMapper.selectById(departmentId);
+        if (department == null) {
+            log.warn("用户 " + context + " 在纳新 " + admission + " 请求不存在的部门" + departmentId + "的面试最终数据");
+            return CommonResult.fail("部门不存在或不属于当前组织");
+        } else if (!Objects.equals(department.getOrganizationId(), context.getOrganizationId())) {
+            log.warn("用户 " + context + " 在纳新 " + admission + " 请求不属于其组织的的部门" + department + "的面试最终数据");
+            return CommonResult.fail("部门不存在或不属于当前组织");
+        }
+        List<OrderPassedCountPo> countPos = interviewBoardRDataMapper.selectPassedCountPerOrder(maxRound, admission.getId(), departmentId);
+        GetOrderPassCountResult result = new GetOrderPassCountResult();
+        List<OrderPassCountPo> results = new ArrayList<>();
+        for (OrderPassedCountPo countPo : countPos) {
+            OrderPassCountPo opcp = new OrderPassCountPo();
+            opcp.setId(countPo.getId());
+            opcp.setCount(countPo.getCount());
+            InterviewRoundEnum interviewRoundEnum = InterviewRoundEnum.checkRound(countPo.getId());
+            if (interviewRoundEnum == null){
+                log.warn("数据库错误：用户 " + context + " 获取最终各志愿通过人数（部门饼图）时查询到非法面试轮次，相关查询结果如下：\n" + countPos);
+                return CommonResult.serverError();
+            }
+            opcp.setName(interviewRoundEnum.getName());
+            results.add(opcp);
+        }
+        result.setCount(results.size());
+        result.setOrders(results);
         return CommonResult.success(result);
     }
 }

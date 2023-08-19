@@ -79,7 +79,7 @@ public class InterviewBoardResultController {
     public CommonResult<GetOrderPassCountResult> getOrderPassCount(
             @RequestParam(value = "department") int departmentId
     ){
-        return null;
+        return interviewBoardResultService.getOrderPassCount(departmentId);
     }
 
     /**

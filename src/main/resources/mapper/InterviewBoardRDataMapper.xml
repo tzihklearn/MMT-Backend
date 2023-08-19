@@ -123,4 +123,38 @@
 				AND ml.round = zml.round
 				LEFT JOIN department `d` ON ml.department = d.id
 	</select>
+	<select id="selectPassedCountPerOrder"
+			resultType="com.sipc.mmtbackend.pojo.domain.po.InterviewBoardRPo.OrderPassedCountPo">
+		SELECT
+			ml.`order` AS "id",
+			COUNT( 1 ) AS "count"
+		FROM
+			(
+				SELECT DISTINCT
+					i.user_id AS "cId",
+					i.organization_order AS "order"
+				FROM
+					interview_status `i`
+				WHERE
+					i.is_deleted != 1
+					AND i.admission_id = #{admissionId,jdbcType=INTEGER}
+					AND i.department_id = #{departmentId,jdbcType=INTEGER}
+			) AS `ml`
+		LEFT JOIN (
+				SELECT
+					i.user_id AS "cId",
+					i.organization_order AS "order"
+				FROM
+					interview_status `i`
+				WHERE
+					i.is_deleted != 1
+					AND i.admission_id = #{admissionId,jdbcType=INTEGER}
+					AND i.round = #{round,jdbcType=INTEGER}
+					AND i.state = 9
+				) AS `zml` ON ml.cId = zml.cId
+		WHERE
+			zml.cId != NULL
+		GROUP BY
+			ml.`order`
+	</select>
 </mapper>
