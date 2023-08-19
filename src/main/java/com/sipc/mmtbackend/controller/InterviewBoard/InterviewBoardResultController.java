@@ -45,13 +45,13 @@ public class InterviewBoardResultController {
     }
 
     /**
-     * 获取不同部门通过人数随时间变化折线图（组织折线图）
+     * 获取不同部门通过人数随面试轮次变化折线图（组织折线图）
      *
      * @return 不同部门通过人数随时间变化折线图数据
      */
     @GetMapping("/orgLineChart")
     public CommonResult<GetPassCountGroupByDepartmentResult> getPassCountGroupByDepartmentLineChart(){
-        return null;
+        return interviewBoardResultService.getPassCountGroupByDepartmentLineChart();
     }
 
     /**

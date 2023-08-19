@@ -2,6 +2,7 @@ package com.sipc.mmtbackend.mapper;
 
 import com.sipc.mmtbackend.pojo.domain.po.InterviewBoardRPo.DepartmentPassedCountPo;
 import com.sipc.mmtbackend.pojo.domain.po.InterviewBoardRPo.InterviewResultData;
+import com.sipc.mmtbackend.pojo.domain.po.InterviewBoardRPo.LineChartLineDataDaoPo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -40,4 +41,13 @@ public interface InterviewBoardRDataMapper {
             @Param("round") Integer round,
             @Param("admissionId") Integer admissionId
     );
+
+    /**
+     * 查询不同部门通过人数随面试轮次变化情况
+     *
+     * @param admissionId 纳新ID
+     * @return 折线图数据
+     */
+    List<LineChartLineDataDaoPo> selectPassedCountLineChartGroupByRoundByAdmissionId(
+            @Param("admissionId") Integer admissionId);
 }
