@@ -18,7 +18,7 @@
         		WHERE
         			`is`.is_deleted != 1
 		    <if test="departmentId != null and departmentId > 0">
-			    AND `is`.department_id = #{departmentId,jdbcType=INTEGER}
+			    AND `is`.department_id = #{departmentId, jdbcType=INTEGER}
 		    </if>
         			AND `is`.admission_id = 2
         			AND `is`.round = 1
@@ -31,7 +31,7 @@
         		WHERE
         			`is`.is_deleted != 1
 		    <if test="departmentId != null and departmentId > 0">
-			    AND `is`.department_id = #{departmentId,jdbcType=INTEGER}
+			    AND `is`.department_id = #{departmentId, jdbcType=INTEGER}
 		    </if>
         			AND `is`.admission_id = 2
         			AND `is`.round = 2
@@ -44,7 +44,7 @@
         		WHERE
         			`is`.is_deleted != 1
 		    <if test="departmentId != null and departmentId > 0">
-			    AND `is`.department_id = #{departmentId,jdbcType=INTEGER}
+			    AND `is`.department_id = #{departmentId, jdbcType=INTEGER}
 		    </if>
         			AND `is`.admission_id = 2
         			AND `is`.state >= 5
@@ -58,11 +58,30 @@
         		WHERE
         			`is`.is_deleted != 1
 		    <if test="departmentId != null and departmentId > 0">
-			    AND `is`.department_id = #{departmentId,jdbcType=INTEGER}
+			    AND `is`.department_id = #{departmentId, jdbcType=INTEGER}
 		    </if>
         			AND `is`.admission_id = 2
         			AND `is`.state = 9
         			AND `is`.round = 1
         	) AS `pc`
     </select>
+	<select id="selectPassedCountPerDepartment"
+			resultType="com.sipc.mmtbackend.pojo.domain.po.InterviewBoardRPo.DepartmentPassedCountPo">
+		SELECT
+		    i.department_id AS "id",
+		    d.`name` AS "name",
+		    COUNT(1) AS "count"
+		FROM
+		    interview_status `i`
+		LEFT JOIN
+		    department `d`
+		ON i.department_id = d.id
+		WHERE
+		    i.is_deleted != 1
+		    AND d.is_deleted  != 1
+		    AND i.state = 9
+		    AND i.admission_id = #{admissionId, jdbcType=INTEGER}
+		    AND i.round = #{round, jdbcType=INTEGER}
+		    GROUP BY i.department_id
+	</select>
 </mapper>

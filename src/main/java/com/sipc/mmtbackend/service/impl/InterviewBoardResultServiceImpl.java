@@ -5,17 +5,23 @@ import com.sipc.mmtbackend.mapper.InterviewBoardRDataMapper;
 import com.sipc.mmtbackend.mapper.InterviewCheckMapper;
 import com.sipc.mmtbackend.pojo.domain.Admission;
 import com.sipc.mmtbackend.pojo.domain.Department;
+import com.sipc.mmtbackend.pojo.domain.po.InterviewBoardRPo.DepartmentPassedCountPo;
 import com.sipc.mmtbackend.pojo.domain.po.InterviewBoardRPo.InterviewResultData;
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
+import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResultResult.GetDepartmentPassCountResult;
 import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResultResult.GetInterviewResultDataResult;
+import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResultResult.po.DepartmentPassCountPo;
 import com.sipc.mmtbackend.service.InterviewBoardResultService;
 import com.sipc.mmtbackend.utils.CheckroleBUtil.pojo.BTokenSwapPo;
 import com.sipc.mmtbackend.utils.ThreadLocalContextUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.bouncycastle.asn1.misc.IDEACBCPar;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -61,6 +67,39 @@ public class InterviewBoardResultServiceImpl implements InterviewBoardResultServ
         result.setPassedCount(interviewResultData.getPassedCount());
         result.setSignupCount(interviewResultData.getSignupCount());
         result.setLastPassedCount(interviewResultData.getLastPassedCount());
+        return CommonResult.success(result);
+    }
+
+    /**
+     * 获取最终各部门通过人数（组织饼图）
+     *
+     * @return 各部门通过人数
+     */
+    @Override
+    public CommonResult<GetDepartmentPassCountResult> getDepartmentPassCount() {
+        BTokenSwapPo context = ThreadLocalContextUtil.getContext();
+        Admission admission = interviewCheckMapper.selectOrganizationActivateAdmission(context.getOrganizationId());
+        if (admission == null) {
+            log.warn("用户 " + context + " 尝试在无活动的纳新时查询面试最终数据");
+            return CommonResult.fail("查询失败：未开始纳新或纳新已结束");
+        }
+        Integer maxRound = interviewCheckMapper.selectOrganizationActivateInterviewRound(admission.getId());
+        if (maxRound == null){
+            log.warn("用户 " + context + " 在纳新 " + admission + " 中未查询到任何面试");
+            return CommonResult.fail("当前纳新未开启面试");
+        }
+        List<DepartmentPassedCountPo> countPos = interviewBoardRDataMapper.selectPassedCountPerDepartment(maxRound, admission.getId());
+        GetDepartmentPassCountResult result = new GetDepartmentPassCountResult();
+        List<DepartmentPassCountPo> results = new ArrayList<>();
+        for (DepartmentPassedCountPo po : countPos) {
+            DepartmentPassCountPo dpcp = new DepartmentPassCountPo();
+            dpcp.setCount(po.getCount());
+            dpcp.setId(po.getId());
+            dpcp.setName(po.getName());
+            results.add(dpcp);
+        }
+        result.setCount(results.size());
+        result.setDepartments(results);
         return CommonResult.success(result);
     }
 }
