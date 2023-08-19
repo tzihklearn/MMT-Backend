@@ -48,4 +48,19 @@ public interface InterviewCheckMapper {
             @Param("admissionId") Integer admissionId,
             @Param("departmentId") Integer DepartmentId
     );
+
+    /**
+     * 查询指定的面试地点是否在当前部门的当前面试中使用
+     *
+     * @param round 面试轮次
+     * @param admissionId 纳新ID
+     * @param DepartmentId 部门ID
+     * @return 面试场地信息或 null
+     */
+    AdmissionAddress selectAddressByIdAndNowData(
+            @Param("addressId") Integer addressId,
+            @Param("round") Integer round,
+            @Param("admissionId") Integer admissionId,
+            @Param("departmentId") Integer DepartmentId
+    );
 }

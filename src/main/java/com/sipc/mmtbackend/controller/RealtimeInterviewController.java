@@ -4,6 +4,7 @@ import com.sipc.mmtbackend.annotation.BPermission;
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
 import com.sipc.mmtbackend.pojo.dto.param.RealtimeInterview.FinishInterviewParam;
 import com.sipc.mmtbackend.pojo.dto.param.RealtimeInterview.PostInterviewCommentParam;
+import com.sipc.mmtbackend.pojo.dto.param.RealtimeInterview.PutInterviewPlaceParam;
 import com.sipc.mmtbackend.pojo.dto.result.RealtimeIntreviewdResult.GetInterviewCommentResult;
 import com.sipc.mmtbackend.pojo.dto.result.RealtimeIntreviewdResult.GetInterviewPlacesResult;
 import com.sipc.mmtbackend.pojo.dto.result.RealtimeIntreviewdResult.GetInterviewProgressBarResult;
@@ -70,6 +71,16 @@ public class RealtimeInterviewController {
         return realtimeInterviewService.getIntervieweeList(page, keyword, placeId);
     }
 
+    /**
+     * 修改面试场地
+     *
+     * @param param 场地ID
+     * @return 处理结果
+     */
+    @PutMapping("/place")
+    public CommonResult<String> putInterviewPlace(@RequestBody PutInterviewPlaceParam param){
+        return realtimeInterviewService.putInterviewPlace(param);
+    }
     /**
      * 获取本轮与已结束轮次面试评价问题与回答
      *
