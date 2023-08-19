@@ -12,6 +12,7 @@ import com.sipc.mmtbackend.pojo.domain.po.RealtimeInterviewPo.InterviewStatusPo;
 import com.sipc.mmtbackend.pojo.domain.po.RealtimeInterviewPo.ProgressBarPo;
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
 import com.sipc.mmtbackend.pojo.dto.param.RealtimeInterview.FinishInterviewParam;
+import com.sipc.mmtbackend.pojo.dto.param.RealtimeInterview.PutInterviewPlaceParam;
 import com.sipc.mmtbackend.pojo.dto.result.RealtimeIntreviewdResult.GetInterviewPlacesResult;
 import com.sipc.mmtbackend.pojo.dto.result.RealtimeIntreviewdResult.GetInterviewProgressBarResult;
 import com.sipc.mmtbackend.pojo.dto.result.RealtimeIntreviewdResult.GetIntervieweeListResult;
@@ -81,7 +82,7 @@ public class RealtimeInterviewServiceImpl implements RealtimeInterviewService {
             log.warn("用户 " + context + " 在纳新 " + admission + " 中未查询到任何面试");
             return CommonResult.fail("当前纳新未开启面试");
         }
-        List<AdmissionAddress> addresses = interviewCheckMapper.selectAvaliableInterviewAddress(maxRound, admission.getId(), 0);
+        List<AdmissionAddress> addresses = interviewCheckMapper.selectAvailableInterviewAddress(maxRound, admission.getId(), 0);
         GetInterviewPlacesResult result = new GetInterviewPlacesResult();
         result.setCount(addresses.size());
         List<KVPo> results = new ArrayList<>();
@@ -226,5 +227,46 @@ public class RealtimeInterviewServiceImpl implements RealtimeInterviewService {
         result.setCount(results.size());
         result.setPages((int) iPage.getPages());
         return CommonResult.success(result);
+    }
+
+    /**
+     * 修改面试场地
+     *
+     * @param param 场地ID
+     * @return 处理结果
+     */
+    @Override
+    public CommonResult<String> putInterviewPlace(PutInterviewPlaceParam param) {
+        BTokenSwapPo context = ThreadLocalContextUtil.getContext();
+        Admission admission = interviewCheckMapper.selectOrganizationActivateAdmission(context.getOrganizationId());
+        if (admission == null) {
+            log.warn("用户 " + context + " 尝试在无活动的纳新时修改面试场地");
+            return CommonResult.fail("生成失败：未开始纳新或纳新已结束");
+        }
+        Integer maxRound = interviewCheckMapper.selectOrganizationActivateInterviewRound(admission.getId());
+        if (maxRound == null){
+            log.warn("用户 " + context + " 在纳新 " + admission + " 中未查询到任何面试");
+            return CommonResult.fail("当前纳新未开启面试");
+        }
+        InterviewStatus interviewStatus = interviewStatusMapper.selectById(param.getInterviewId());
+        if (interviewStatus == null){
+            log.warn("用户 " + context + " 尝试修改不存在的面试 " + param + "\n");
+            return CommonResult.fail("面试不存在或不属于当前纳新");
+        } else if (!Objects.equals(interviewStatus.getAdmissionId(), admission.getId())){
+            log.warn("用户 " + context + " 尝试修改不属于当前纳新 " + admission + " 的面试 " + interviewStatus + "\n");
+            return CommonResult.fail("面试不存在或不属于当前纳新");
+        }
+        AdmissionAddress admissionAddress = interviewCheckMapper.selectAddressByIdAndNowData(param.getPlaceId(), maxRound, admission.getId(), interviewStatus.getDepartmentId());
+        if (admissionAddress == null){
+            log.warn("用户 " + context + " 尝试将面试 " + param + " 的场地修改为 " + param.getPlaceId() + "\n");
+            return CommonResult.fail("面试场地不存在或不属于当前面试部门");
+        }
+        interviewStatus.setAdmissionAddressId(param.getPlaceId());
+        int update = interviewStatusMapper.updateById(interviewStatus);
+        if (update != 1){
+            log.warn("修改面试场地失败: " + interviewStatus + " ,受影响的行数: " + update + "\n");
+            return CommonResult.serverError();
+        }
+        return CommonResult.success();
     }
 }
