@@ -28,10 +28,10 @@ public class InterviewBoardResultController {
      * @return 面试最终数据
      */
     @GetMapping("/result")
-    public CommonResult<GetInterviewResultdataResult> getResultData(
+    public CommonResult<GetInterviewResultDataResult> getResultData(
             @RequestParam(value = "department", defaultValue = "0") int departmentId
     ){
-        return null;
+        return interviewBoardResultService.getResultData(departmentId);
     }
 
     /**
@@ -41,17 +41,17 @@ public class InterviewBoardResultController {
      */
     @GetMapping("/depPass")
     public CommonResult<GetDepartmentPassCountResult> getDepartmentPassCount(){
-        return null;
+        return interviewBoardResultService.getDepartmentPassCount();
     }
 
     /**
-     * 获取不同部门通过人数随时间变化折线图（组织折线图）
+     * 获取不同部门通过人数随面试轮次变化折线图（组织折线图）
      *
      * @return 不同部门通过人数随时间变化折线图数据
      */
     @GetMapping("/orgLineChart")
     public CommonResult<GetPassCountGroupByDepartmentResult> getPassCountGroupByDepartmentLineChart(){
-        return null;
+        return interviewBoardResultService.getPassCountGroupByDepartmentLineChart();
     }
 
     /**
@@ -79,7 +79,7 @@ public class InterviewBoardResultController {
     public CommonResult<GetOrderPassCountResult> getOrderPassCount(
             @RequestParam(value = "department") int departmentId
     ){
-        return null;
+        return interviewBoardResultService.getOrderPassCount(departmentId);
     }
 
     /**
@@ -92,6 +92,6 @@ public class InterviewBoardResultController {
     public CommonResult<GetPassCountGroupByOrderLineChartResult> getPassCountGroupByOrderLineChart(
             @RequestParam(value = "department") int departmentId
     ){
-        return null;
+        return interviewBoardResultService.getPassCountGroupByOrderLineChart(departmentId);
     }
 }

@@ -123,8 +123,13 @@ public class InterviewBoardBeforeServiceImpl implements InterviewBoardBeforeServ
                 context.getOrganizationId(), admission.getId());
         // 响应体数据
         GetNumberGroupByTimeAndDepartmentResult result = new GetNumberGroupByTimeAndDepartmentResult();
-        result.setDate(daoDatas.get(0).getAbscissaData());
         List<LineChartLineDataPo> departmentDates = new LinkedList<>();
+        if (daoDatas.size() == 0){
+            result.setDepartments(departmentDates);
+            result.setDate(new ArrayList<>());
+            return CommonResult.success(result);
+        }
+        result.setDate(daoDatas.get(0).getAbscissaData());
         for (LineChartLineDataDaoPo data : daoDatas){
             LineChartLineDataPo depData = new LineChartLineDataPo();
             depData.setName(data.getName());
@@ -201,8 +206,13 @@ public class InterviewBoardBeforeServiceImpl implements InterviewBoardBeforeServ
         List<LineChartLineDataDaoPo> daoDatas = interviewBoardBDataMapper.selectInterviewNumberLineChartGroupByDataByDepartmentIdIdAndAdmissionId(
                 departmentId, admission.getId());
         GetNumberGroupByTimeAndOrderResult result = new GetNumberGroupByTimeAndOrderResult();
-        result.setDate(daoDatas.get(0).getAbscissaData());
         List<LineChartLineDataPo> orderDates = new LinkedList<>();
+        if (daoDatas.size() == 0){
+            result.setOrders(orderDates);
+            result.setDate(new ArrayList<>());
+            return CommonResult.success(result);
+        }
+        result.setDate(daoDatas.get(0).getAbscissaData());
         for (LineChartLineDataDaoPo data : daoDatas){
             LineChartLineDataPo depData = new LineChartLineDataPo();
             depData.setName(data.getName());

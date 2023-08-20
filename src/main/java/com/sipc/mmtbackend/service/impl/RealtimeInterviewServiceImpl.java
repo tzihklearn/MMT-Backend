@@ -1,13 +1,22 @@
 package com.sipc.mmtbackend.service.impl;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.sipc.mmtbackend.mapper.InterviewCheckMapper;
+import com.sipc.mmtbackend.mapper.InterviewStatusMapper;
 import com.sipc.mmtbackend.mapper.RealtimeInterviewMapper;
 import com.sipc.mmtbackend.pojo.domain.Admission;
 import com.sipc.mmtbackend.pojo.domain.AdmissionAddress;
+import com.sipc.mmtbackend.pojo.domain.InterviewStatus;
+import com.sipc.mmtbackend.pojo.domain.po.RealtimeInterviewPo.InterviewStatusPo;
 import com.sipc.mmtbackend.pojo.domain.po.RealtimeInterviewPo.ProgressBarPo;
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
+import com.sipc.mmtbackend.pojo.dto.param.RealtimeInterview.FinishInterviewParam;
+import com.sipc.mmtbackend.pojo.dto.param.RealtimeInterview.PutInterviewPlaceParam;
 import com.sipc.mmtbackend.pojo.dto.result.RealtimeIntreviewdResult.GetInterviewPlacesResult;
 import com.sipc.mmtbackend.pojo.dto.result.RealtimeIntreviewdResult.GetInterviewProgressBarResult;
+import com.sipc.mmtbackend.pojo.dto.result.RealtimeIntreviewdResult.GetIntervieweeListResult;
+import com.sipc.mmtbackend.pojo.dto.result.RealtimeIntreviewdResult.po.IntervieweePo;
 import com.sipc.mmtbackend.pojo.dto.result.RealtimeIntreviewdResult.po.ProgressBarDataPo;
 import com.sipc.mmtbackend.pojo.dto.result.po.KVPo;
 import com.sipc.mmtbackend.service.RealtimeInterviewService;
@@ -21,6 +30,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor(onConstructor_ = {@Autowired})
@@ -29,6 +39,7 @@ public class RealtimeInterviewServiceImpl implements RealtimeInterviewService {
     private final InterviewCheckMapper interviewCheckMapper;
     private final RealtimeInterviewMapper realtimeInterviewMapper;
     private final CheckinQRCodeUtil checkinQRCodeUtil;
+    private final InterviewStatusMapper interviewStatusMapper;
 
     /**
      * 获取签到二维码
@@ -71,7 +82,7 @@ public class RealtimeInterviewServiceImpl implements RealtimeInterviewService {
             log.warn("用户 " + context + " 在纳新 " + admission + " 中未查询到任何面试");
             return CommonResult.fail("当前纳新未开启面试");
         }
-        List<AdmissionAddress> addresses = interviewCheckMapper.selectAvaliableInterviewAddress(maxRound, admission.getId(), 0);
+        List<AdmissionAddress> addresses = interviewCheckMapper.selectAvailableInterviewAddress(maxRound, admission.getId(), 0);
         GetInterviewPlacesResult result = new GetInterviewPlacesResult();
         result.setCount(addresses.size());
         List<KVPo> results = new ArrayList<>();
@@ -93,7 +104,7 @@ public class RealtimeInterviewServiceImpl implements RealtimeInterviewService {
         BTokenSwapPo context = ThreadLocalContextUtil.getContext();
         Admission admission = interviewCheckMapper.selectOrganizationActivateAdmission(context.getOrganizationId());
         if (admission == null) {
-            log.warn("用户 " + context + " 尝试在无活动的纳新时获取面试场地");
+            log.warn("用户 " + context + " 尝试在无活动的纳新时获取面试进度条");
             return CommonResult.fail("生成失败：未开始纳新或纳新已结束");
         }
         Integer maxRound = interviewCheckMapper.selectOrganizationActivateInterviewRound(admission.getId());
@@ -114,5 +125,148 @@ public class RealtimeInterviewServiceImpl implements RealtimeInterviewService {
         result.setBars(results);
         result.setGroupNum(results.size());
         return CommonResult.success(result);
+    }
+
+    /**
+     * 结束面试
+     *
+     * @param param 面试ID
+     * @return 处理结果
+     */
+    @Override
+    public CommonResult<String> finishInterview(FinishInterviewParam param) {
+        BTokenSwapPo context = ThreadLocalContextUtil.getContext();
+        Admission admission = interviewCheckMapper.selectOrganizationActivateAdmission(context.getOrganizationId());
+        if (admission == null) {
+            log.warn("用户 " + context + " 尝试在无活动的纳新时获取面试进度条");
+            return CommonResult.fail("生成失败：未开始纳新或纳新已结束");
+        }
+        Integer maxRound = interviewCheckMapper.selectOrganizationActivateInterviewRound(admission.getId());
+        if (maxRound == null){
+            log.warn("用户 " + context + " 在纳新 " + admission + " 中未查询到任何面试");
+            return CommonResult.fail("当前纳新未开启面试");
+        }
+        InterviewStatus interviewStatus = interviewStatusMapper.selectById(param.getInterviewId());
+        if (interviewStatus == null){
+            log.warn("用户 " + context + " 尝试结束不存在的面试 " + param + "\n");
+            return CommonResult.fail("面试不存在或不属于当前纳新");
+        } else if (!Objects.equals(interviewStatus.getAdmissionId(), admission.getId())){
+            log.warn("用户 " + context + " 尝试结束不属于当前纳新 " + admission + " 的面试 " + interviewStatus + "\n");
+            return CommonResult.fail("面试不存在或不属于当前纳新");
+        }
+        if (interviewStatus.getState() != 6){
+            log.warn("用户 " + context +" 尝试结束并非正在进行的面试 " + interviewStatus + "\n");
+            if (interviewStatus.getState() == 7){
+                return CommonResult.success("面试已结束，请勿重复请求");
+            } else {
+                return CommonResult.fail("面试未开始或已结束");
+            }
+        }
+        interviewStatus.setState(7);
+        int update = interviewStatusMapper.updateById(interviewStatus);
+        if (update != 1){
+            log.warn("结束面试失败: " + interviewStatus + " ,受影响的行数: " + update + "\n");
+            return CommonResult.serverError();
+        }
+        return CommonResult.success();
+    }
+
+    /**
+     * 获取面试人员名单
+     *
+     * @param pageId  第几页
+     * @param keyword 搜索关键词
+     * @param placeId 面试场地ID
+     * @return 被面试这名单
+     */
+    @Override
+    public CommonResult<GetIntervieweeListResult> getIntervieweeList(int pageId, String keyword, int placeId) {
+        BTokenSwapPo context = ThreadLocalContextUtil.getContext();
+        Admission admission = interviewCheckMapper.selectOrganizationActivateAdmission(context.getOrganizationId());
+        if (admission == null) {
+            log.warn("用户 " + context + " 尝试在无活动的纳新时获取面试进度条");
+            return CommonResult.fail("生成失败：未开始纳新或纳新已结束");
+        }
+        Integer maxRound = interviewCheckMapper.selectOrganizationActivateInterviewRound(admission.getId());
+        if (maxRound == null){
+            log.warn("用户 " + context + " 在纳新 " + admission + " 中未查询到任何面试");
+            return CommonResult.fail("当前纳新未开启面试");
+        }
+        Page<InterviewStatusPo> page = new Page<>(pageId, 10);
+        IPage<InterviewStatusPo> iPage = realtimeInterviewMapper.selectRealtimeInterviewData(
+                page, keyword, maxRound, admission.getId(), placeId);
+        if (iPage.getPages() < pageId){
+            page.setCurrent(iPage.getPages());
+            iPage = realtimeInterviewMapper.selectRealtimeInterviewData(
+                    page, keyword, maxRound, admission.getId(), placeId);
+        }
+        GetIntervieweeListResult result = new GetIntervieweeListResult();
+        List<IntervieweePo> results = new ArrayList<>();
+        for (InterviewStatusPo isp : iPage.getRecords()) {
+            IntervieweePo ip = new IntervieweePo();
+            ip.setId(isp.getId());
+            ip.setCId(isp.getCId());
+            ip.setStudentId(isp.getStudentId());
+            ip.setName(isp.getName());
+            ip.setClassName(isp.getClassName());
+            ip.setDepartment(isp.getDepartment());
+            ip.setTime(isp.getTime());
+            ip.setPlace(isp.getPlace());
+            // 0拒绝 1调整时间(待定) 2未安排 3已安排未通知 4已通知未签到 5已签到 6面试中(已面试，还没结果) 7待定 8失败 9通过
+            ip.setSigned(isp.getState() >= 5);
+            if (isp.getState() < 6){
+                ip.setStatus(0);
+            } else if (isp.getState() == 6){
+                ip.setStatus(1);
+            } else {
+                ip.setStatus(2);
+            }
+            results.add(ip);
+        }
+        result.setInterviewees(results);
+        result.setCount(results.size());
+        result.setPages((int) iPage.getPages());
+        return CommonResult.success(result);
+    }
+
+    /**
+     * 修改面试场地
+     *
+     * @param param 场地ID
+     * @return 处理结果
+     */
+    @Override
+    public CommonResult<String> putInterviewPlace(PutInterviewPlaceParam param) {
+        BTokenSwapPo context = ThreadLocalContextUtil.getContext();
+        Admission admission = interviewCheckMapper.selectOrganizationActivateAdmission(context.getOrganizationId());
+        if (admission == null) {
+            log.warn("用户 " + context + " 尝试在无活动的纳新时修改面试场地");
+            return CommonResult.fail("生成失败：未开始纳新或纳新已结束");
+        }
+        Integer maxRound = interviewCheckMapper.selectOrganizationActivateInterviewRound(admission.getId());
+        if (maxRound == null){
+            log.warn("用户 " + context + " 在纳新 " + admission + " 中未查询到任何面试");
+            return CommonResult.fail("当前纳新未开启面试");
+        }
+        InterviewStatus interviewStatus = interviewStatusMapper.selectById(param.getInterviewId());
+        if (interviewStatus == null){
+            log.warn("用户 " + context + " 尝试修改不存在的面试 " + param + "\n");
+            return CommonResult.fail("面试不存在或不属于当前纳新");
+        } else if (!Objects.equals(interviewStatus.getAdmissionId(), admission.getId())){
+            log.warn("用户 " + context + " 尝试修改不属于当前纳新 " + admission + " 的面试 " + interviewStatus + "\n");
+            return CommonResult.fail("面试不存在或不属于当前纳新");
+        }
+        AdmissionAddress admissionAddress = interviewCheckMapper.selectAddressByIdAndNowData(param.getPlaceId(), maxRound, admission.getId(), interviewStatus.getDepartmentId());
+        if (admissionAddress == null){
+            log.warn("用户 " + context + " 尝试将面试 " + param + " 的场地修改为 " + param.getPlaceId() + "\n");
+            return CommonResult.fail("面试场地不存在或不属于当前面试部门");
+        }
+        interviewStatus.setAdmissionAddressId(param.getPlaceId());
+        int update = interviewStatusMapper.updateById(interviewStatus);
+        if (update != 1){
+            log.warn("修改面试场地失败: " + interviewStatus + " ,受影响的行数: " + update + "\n");
+            return CommonResult.serverError();
+        }
+        return CommonResult.success();
     }
 }
