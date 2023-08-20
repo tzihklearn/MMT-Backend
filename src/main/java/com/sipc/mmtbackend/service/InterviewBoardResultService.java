@@ -4,6 +4,7 @@ import com.sipc.mmtbackend.pojo.dto.CommonResult;
 import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResultResult.GetDepartmentPassCountResult;
 import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResultResult.GetInterviewResultDataResult;
 import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResultResult.GetOrderPassCountResult;
+import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResultResult.GetPassCountGroupByOrderLineChartResult;
 import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResultResult.po.GetPassCountGroupByDepartmentResult;
 
 public interface InterviewBoardResultService {
@@ -36,4 +37,12 @@ public interface InterviewBoardResultService {
      * @return 最终各志愿通过人数
      */
     CommonResult<GetOrderPassCountResult> getOrderPassCount(int departmentId);
+
+    /**
+     * 获取不同志愿通过人数随时间变化折线图（部门折线图）
+     *
+     * @param departmentId 组织ID
+     * @return 不同志愿通过人数随时间变化情况
+     */
+    CommonResult<GetPassCountGroupByOrderLineChartResult> getPassCountGroupByOrderLineChart(int departmentId);
 }

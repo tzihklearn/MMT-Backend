@@ -157,4 +157,45 @@
 		GROUP BY
 			ml.`order`
 	</select>
+	<select id="selectPassedCountLineChartGroupByRoundAndOrderByAdmissionId"
+			resultMap="LineChartLineData">
+		SELECT
+			CONCAT( "第" + ml.`order`, "志愿" ) AS "name",
+			zml.number AS "number",
+			ml.round AS "round"
+		FROM
+			(
+				SELECT
+					*
+				FROM
+					( SELECT DISTINCT i.round AS "round" FROM interview_status `i` WHERE i.is_deleted != 1 AND i.admission_id = #{admissionId,jdbcType=INTEGER} ) AS `r`
+						INNER JOIN (
+						SELECT DISTINCT
+							i.organization_order AS "order"
+						FROM
+							interview_status `i`
+						WHERE
+							i.is_deleted != 1
+			AND i.admission_id = #{admissionId,jdbcType=INTEGER}
+			AND i.department_id = #{departmentId,jdbcType=INTEGER}
+					) AS `o` ON 114 != 514
+			) `ml`
+				LEFT JOIN (
+				SELECT
+					i.round AS "round",
+					i.organization_order AS "order",
+					COUNT( 1 ) AS "number"
+				FROM
+					interview_status `i`
+				WHERE
+					i.is_deleted != 1
+		AND i.admission_id = #{admissionId,jdbcType=INTEGER}
+		AND i.department_id = #{departmentId,jdbcType=INTEGER}
+		AND i.state = 9
+				GROUP BY
+					i.round,
+					i.organization_order
+			) `zml` ON ml.round = zml.round
+				AND ml.`order` = zml.`order`
+	</select>
 </mapper>
