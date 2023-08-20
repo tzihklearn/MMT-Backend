@@ -65,4 +65,16 @@ public interface InterviewBoardRDataMapper {
             @Param("admissionId") Integer admissionId,
             @Param("departmentId") Integer departmentId
     );
+
+    /**
+     * 查询不同志愿通过人数随面试轮次变化情况
+     *
+     * @param admissionId 纳新ID
+     * @param departmentId 部门ID
+     * @return 折线图数据
+     */
+    List<LineChartLineDataDaoPo> selectPassedCountLineChartGroupByRoundAndOrderByAdmissionId(
+            @Param("admissionId") Integer admissionId,
+            @Param("departmentId") Integer departmentId
+    );
 }

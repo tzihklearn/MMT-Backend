@@ -92,6 +92,6 @@ public class InterviewBoardResultController {
     public CommonResult<GetPassCountGroupByOrderLineChartResult> getPassCountGroupByOrderLineChart(
             @RequestParam(value = "department") int departmentId
     ){
-        return null;
+        return interviewBoardResultService.getPassCountGroupByOrderLineChart(departmentId);
     }
 }

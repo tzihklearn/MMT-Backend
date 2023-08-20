@@ -14,6 +14,7 @@ import com.sipc.mmtbackend.pojo.dto.enums.InterviewRoundEnum;
 import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResultResult.GetDepartmentPassCountResult;
 import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResultResult.GetInterviewResultDataResult;
 import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResultResult.GetOrderPassCountResult;
+import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResultResult.GetPassCountGroupByOrderLineChartResult;
 import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResultResult.po.DepartmentPassCountPo;
 import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResultResult.po.GetPassCountGroupByDepartmentResult;
 import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResultResult.po.OrderPassCountPo;
@@ -24,7 +25,9 @@ import com.sipc.mmtbackend.utils.ThreadLocalContextUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DeadlockLoserDataAccessException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -188,13 +191,70 @@ public class InterviewBoardResultServiceImpl implements InterviewBoardResultServ
             opcp.setCount(countPo.getCount());
             InterviewRoundEnum interviewRoundEnum = InterviewRoundEnum.checkRound(countPo.getId());
             if (interviewRoundEnum == null){
-                log.warn("数据库错误：用户 " + context + " 获取最终各志愿通过人数（部门饼图）时查询到非法面试轮次，相关查询结果如下：\n" + countPos);
+                log.warn("数据库错误：用户 " + context
+                        + " 获取最终各志愿通过人数（部门饼图）时查询到非法面试轮次，相关查询结果如下：\n"
+                        + countPos);
                 return CommonResult.serverError();
             }
             opcp.setName(interviewRoundEnum.getName());
             results.add(opcp);
         }
         result.setCount(results.size());
+        result.setOrders(results);
+        return CommonResult.success(result);
+    }
+
+    /**
+     * 获取不同志愿通过人数随时间变化折线图（部门折线图）
+     *
+     * @param departmentId 组织ID
+     * @return 不同志愿通过人数随时间变化情况
+     */
+    @Override
+    public CommonResult<GetPassCountGroupByOrderLineChartResult> getPassCountGroupByOrderLineChart(int departmentId) {
+        BTokenSwapPo context = ThreadLocalContextUtil.getContext();
+        Admission admission = interviewCheckMapper.selectOrganizationActivateAdmission(context.getOrganizationId());
+        if (admission == null) {
+            log.warn("用户 " + context + " 尝试在无活动的纳新时查询面试最终数据");
+            return CommonResult.fail("查询失败：未开始纳新或纳新已结束");
+        }
+        Integer maxRound = interviewCheckMapper.selectOrganizationActivateInterviewRound(admission.getId());
+        if (maxRound == null){
+            log.warn("用户 " + context + " 在纳新 " + admission + " 中未查询到任何面试");
+            return CommonResult.fail("当前纳新未开启面试");
+        }
+        Department department = departmentMapper.selectById(departmentId);
+        if (department == null) {
+            log.warn("用户 " + context + " 在纳新 " + admission + " 请求不存在的部门" + departmentId + "的面试最终数据");
+            return CommonResult.fail("部门不存在或不属于当前组织");
+        } else if (!Objects.equals(department.getOrganizationId(), context.getOrganizationId())) {
+            log.warn("用户 " + context + " 在纳新 " + admission + " 请求不属于其组织的的部门" + department + "的面试最终数据");
+            return CommonResult.fail("部门不存在或不属于当前组织");
+        }
+        List<LineChartLineDataDaoPo> chartLineDataDaoPos = interviewBoardRDataMapper.selectPassedCountLineChartGroupByRoundAndOrderByAdmissionId(
+                admission.getId(), departmentId
+        );
+        GetPassCountGroupByOrderLineChartResult result = new GetPassCountGroupByOrderLineChartResult();
+        List<LineChartLineDataPo> results = new ArrayList<>();
+        if (chartLineDataDaoPos.size() == 0){
+            result.setOrders(results);
+            result.setRound(new ArrayList<>());
+            return CommonResult.success(result);
+        }
+        List<String> abscissaData = chartLineDataDaoPos.get(0).getAbscissaData();
+        if (abscissaData == null){
+            log.warn("数据库错误：用户 " + context
+                    + " 获取不同志愿通过人数随面试轮次变化折线图（部门折线图）时查询到非法面试轮次，相关查询结果如下：\n"
+                    + chartLineDataDaoPos);
+            return CommonResult.serverError();
+        }
+        result.setRound(abscissaData);
+        for (LineChartLineDataDaoPo data : chartLineDataDaoPos) {
+            LineChartLineDataPo depData = new LineChartLineDataPo();
+            depData.setName(data.getName());
+            depData.setData(data.getYDatas());
+            results.add(depData);
+        }
         result.setOrders(results);
         return CommonResult.success(result);
     }
