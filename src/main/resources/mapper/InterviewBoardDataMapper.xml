@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sipc.mmtbackend.mapper.InterviewBoardDataMapper">
+
+    <select id="selectCountOfCheckinInterview" resultType="java.lang.Integer">
+        SELECT
+            COUNT( 1 )
+        FROM
+            interview_status `i`
+        WHERE
+            i.is_deleted != 1
+            AND i.round = 1
+	AND i.admission_id = #{admissionId,jdbcType=INTEGER}
+	AND i.state >= 5
+        GROUP BY
+            i.admission_id
+    </select>
+
+    <select id="selectNotFinishedInterview" resultType="com.sipc.mmtbackend.pojo.domain.InterviewStatus">
+        SELECT i.*
+        FROM interview_status `i`
+        WHERE i.is_deleted != 1
+        AND i.state != 0
+        AND i.admission_id = #{admissionId,jdbcType=INTEGER}
+          AND i.round = #{round,jdbcType=INTEGER}
+          AND i.state &lt; 7
+        ORDER BY i.end_time DESC
+    </select>
+</mapper>
