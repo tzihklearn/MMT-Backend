@@ -2,14 +2,8 @@ package com.sipc.mmtbackend.service;
 
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
 import com.sipc.mmtbackend.pojo.dto.data.QuestionPoData;
-import com.sipc.mmtbackend.pojo.dto.param.superAdmin.InterviewFormParam;
-import com.sipc.mmtbackend.pojo.dto.param.superAdmin.OrganizationInfoParam;
-import com.sipc.mmtbackend.pojo.dto.param.superAdmin.AdmissionPublishParam;
-import com.sipc.mmtbackend.pojo.dto.param.superAdmin.RegistrationFormParam;
-import com.sipc.mmtbackend.pojo.dto.result.superAdmin.InterviewFromResult;
-import com.sipc.mmtbackend.pojo.dto.result.superAdmin.OrganizationInfoResult;
-import com.sipc.mmtbackend.pojo.dto.result.superAdmin.RegistrationFormResult;
-import com.sipc.mmtbackend.pojo.dto.result.superAdmin.UploadAvatarResult;
+import com.sipc.mmtbackend.pojo.dto.param.superAdmin.*;
+import com.sipc.mmtbackend.pojo.dto.result.superAdmin.*;
 import com.sipc.mmtbackend.pojo.dto.result.superAdmin.po.SelectTypePo;
 import com.sipc.mmtbackend.pojo.exceptions.DateBaseException;
 import com.sipc.mmtbackend.pojo.exceptions.RunException;
@@ -37,4 +31,8 @@ public interface OrganizationService {
     CommonResult<String> saveInterviewFrom(InterviewFormParam interviewFormParam) throws RunException, DateBaseException;
 
     CommonResult<InterviewFromResult> getInterviewFrom() throws RunException;
+
+    CommonResult<MessageTemplateResult> setMessageTemplate(MessageTemplateParam messageTemplateParam) throws DateBaseException;
+
+    CommonResult<MessageTemplateResult> getMessageTemplate();
 }
