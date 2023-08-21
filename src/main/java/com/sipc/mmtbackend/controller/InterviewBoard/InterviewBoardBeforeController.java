@@ -36,7 +36,7 @@ public class InterviewBoardBeforeController {
      * @return 总人数与第一志愿人数
      */
     @GetMapping("/numData")
-    public CommonResult<GetSignUpNumResult> getDeptSignupNum(@RequestParam(value = "departmentId", required = false) Integer departmentId) {
+    public CommonResult<GetSignUpNumResult> getDeptSignupNum(@RequestParam(value = "departmentId", required = false, defaultValue = "0") Integer departmentId) {
         return interviewBoardBeforeService.getDeptSignupNum(departmentId);
     }
 
