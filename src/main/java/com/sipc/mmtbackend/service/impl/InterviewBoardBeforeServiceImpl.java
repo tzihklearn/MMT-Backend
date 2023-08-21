@@ -86,17 +86,22 @@ public class InterviewBoardBeforeServiceImpl implements InterviewBoardBeforeServ
         }
         if (departmentId != 0) {
             Department department = departmentMapper.selectById(departmentId);
-            if (department == null || !Objects.equals(department.getOrganizationId(), context.getOrganizationId())) {
-                log.info("B 端用户 " + context + " 尝试访问不存在或不属于已登录组织的部门 " + department + " 的信息");
-                return CommonResult.fail("查询失败：部门不存在");
+            if (department == null) {
+                log.info("B 端用户 " + context + " 尝试访问不存在的部门 " + departmentId + " 的信息");
+                return CommonResult.fail("查询失败：部门不存在或不属于当前组织");
+            } else if (!Objects.equals(department.getOrganizationId(), context.getOrganizationId())){
+                log.info("B 端用户 " + context + " 尝试访问不属于已登录组织的部门 " + department + " 的信息");
+                return CommonResult.fail("查询失败：部门不存在或不属于当前组织");
             }
         }
+        GetSignUpNumResult result = new GetSignUpNumResult();
         TotalNumPo totalNumPo = interviewBoardBDataMapper.selectTotalNumByDepartmentIdAndAdmissionId(departmentId, admission.getId());
         if (totalNumPo == null) {
-            log.warn("用户" + context + "查询组织 " + departmentId + " 的报名人数时出现异常，数据库返回空");
-            return CommonResult.serverError();
+            log.warn("用户" + context + "查询部门 " + departmentId + " 的报名人数时出现异常，数据库返回空");
+            result.setFirstChoiceNum(0);
+            result.setTotalNum(0);
+            return CommonResult.success(result);
         }
-        GetSignUpNumResult result = new GetSignUpNumResult();
         result.setFirstChoiceNum(totalNumPo.getFirstChoiceNum());
         result.setTotalNum(totalNumPo.getTotalNum());
         return CommonResult.success(result);
@@ -159,8 +164,13 @@ public class InterviewBoardBeforeServiceImpl implements InterviewBoardBeforeServ
         }
         Department department = departmentMapper.selectById(departmentId);
         if (department == null || !Objects.equals(department.getOrganizationId(), context.getOrganizationId())){
-            log.warn("用户 " + context + " 尝试查询不存在的组织或不属于其部门的组织 " + departmentId + " 的信息");
-            return CommonResult.fail("查询失败：部门不存在");
+            if (department == null) {
+                log.info("B 端用户 " + context + " 尝试访问不存在的部门 " + departmentId + " 的信息");
+                return CommonResult.fail("查询失败：部门不存在或不属于当前组织");
+            } else if (!Objects.equals(department.getOrganizationId(), context.getOrganizationId())){
+                log.info("B 端用户 " + context + " 尝试访问不属于已登录组织的部门 " + department + " 的信息");
+                return CommonResult.fail("查询失败：部门不存在或不属于当前组织");
+            }
         }
         List<PersonNumGroupByOrderPo> depPos =
                 interviewBoardBDataMapper.selectNumberGroupByOrderByAdmissionIdAndDepartmentId(
@@ -199,8 +209,13 @@ public class InterviewBoardBeforeServiceImpl implements InterviewBoardBeforeServ
         }
         Department department = departmentMapper.selectById(departmentId);
         if (department == null || !Objects.equals(department.getOrganizationId(), context.getOrganizationId())){
-            log.warn("用户 " + context + " 尝试查询不存在的组织或不属于其部门的组织 " + departmentId + " 的信息");
-            return CommonResult.fail("查询失败：部门不存在");
+            if (department == null) {
+                log.info("B 端用户 " + context + " 尝试访问不存在的部门 " + departmentId + " 的信息");
+                return CommonResult.fail("查询失败：部门不存在或不属于当前组织");
+            } else if (!Objects.equals(department.getOrganizationId(), context.getOrganizationId())){
+                log.info("B 端用户 " + context + " 尝试访问不属于已登录组织的部门 " + department + " 的信息");
+                return CommonResult.fail("查询失败：部门不存在或不属于当前组织");
+            }
         }
         // 数据库查询到的数据
         List<LineChartLineDataDaoPo> daoDatas = interviewBoardBDataMapper.selectInterviewNumberLineChartGroupByDataByDepartmentIdIdAndAdmissionId(
