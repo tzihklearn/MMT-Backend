@@ -74,7 +74,7 @@ public class InterviewBoardBeforeServiceImpl implements InterviewBoardBeforeServ
      * @return 总人数与第一志愿人数
      */
     @Override
-    public CommonResult<GetSignUpNumResult> getDeptSignupNum(Integer departmentId) {
+    public CommonResult<GetSignUpNumResult> getDeptSignupNum(int departmentId) {
         BTokenSwapPo context = ThreadLocalContextUtil.getContext();
         Admission admission = admissionMapper.selectOne(
                 new QueryWrapper<Admission>()
@@ -84,7 +84,7 @@ public class InterviewBoardBeforeServiceImpl implements InterviewBoardBeforeServ
             log.warn("用户 " + context + " 尝试在无活动的纳新时查询已报名人数");
             return CommonResult.fail("查询失败：未开始纳新或纳新已结束");
         }
-        if (departmentId != null) {
+        if (departmentId != 0) {
             Department department = departmentMapper.selectById(departmentId);
             if (department == null || !Objects.equals(department.getOrganizationId(), context.getOrganizationId())) {
                 log.info("B 端用户 " + context + " 尝试访问不存在或不属于已登录组织的部门 " + department + " 的信息");
