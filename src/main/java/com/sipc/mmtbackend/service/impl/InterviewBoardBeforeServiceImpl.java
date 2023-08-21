@@ -86,9 +86,12 @@ public class InterviewBoardBeforeServiceImpl implements InterviewBoardBeforeServ
         }
         if (departmentId != 0) {
             Department department = departmentMapper.selectById(departmentId);
-            if (department == null || !Objects.equals(department.getOrganizationId(), context.getOrganizationId())) {
-                log.info("B 端用户 " + context + " 尝试访问不存在或不属于已登录组织的部门 " + department + " 的信息");
-                return CommonResult.fail("查询失败：部门不存在");
+            if (department == null) {
+                log.info("B 端用户 " + context + " 尝试访问不存在的部门 " + departmentId + " 的信息");
+                return CommonResult.fail("查询失败：部门不存在或不属于当前组织");
+            } else if (!Objects.equals(department.getOrganizationId(), context.getOrganizationId())){
+                log.info("B 端用户 " + context + " 尝试访问不属于已登录组织的部门 " + department + " 的信息");
+                return CommonResult.fail("查询失败：部门不存在或不属于当前组织");
             }
         }
         TotalNumPo totalNumPo = interviewBoardBDataMapper.selectTotalNumByDepartmentIdAndAdmissionId(departmentId, admission.getId());
