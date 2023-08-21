@@ -97,7 +97,7 @@ public class InterviewBoardBeforeServiceImpl implements InterviewBoardBeforeServ
         GetSignUpNumResult result = new GetSignUpNumResult();
         TotalNumPo totalNumPo = interviewBoardBDataMapper.selectTotalNumByDepartmentIdAndAdmissionId(departmentId, admission.getId());
         if (totalNumPo == null) {
-            log.warn("用户" + context + "查询组织 " + departmentId + " 的报名人数时出现异常，数据库返回空");
+            log.warn("用户" + context + "查询部门 " + departmentId + " 的报名人数时出现异常，数据库返回空");
             result.setFirstChoiceNum(0);
             result.setTotalNum(0);
             return CommonResult.success(result);
