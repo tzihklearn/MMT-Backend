@@ -113,16 +113,16 @@
     <select id="selectNumberGroupByOrderByAdmissionIdAndDepartmentId"
             resultType="com.sipc.mmtbackend.pojo.domain.po.InterviewBoardBPo.PersonNumGroupByOrderPo">
         SELECT
-            u.do AS "orderNum",
+            u.department_order AS "orderNum",
             COUNT( 1 ) AS "number"
         FROM
-            user_volunteer u
+            user_volunteer `u`
         WHERE
             u.is_deleted != 1
-            	AND u.admission_id = #{admissionId,jdbcType=INTEGER}
-            	AND u.department_id = #{departmentId,jdbcType=INTEGER}
+            AND u.admission_id = #{admissionId,jdbcType=INTEGER}
+            AND u.department_id = #{departmentId,jdbcType=INTEGER}
         GROUP BY
-            u.department_order do
+            u.department_order
     </select>
     <select id="selectInterviewNumberLineChartGroupByDataByDepartmentIdIdAndAdmissionId"
             resultMap="LineChartLineData">
