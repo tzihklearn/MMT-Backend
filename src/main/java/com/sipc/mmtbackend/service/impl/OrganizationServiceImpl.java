@@ -503,6 +503,8 @@ public class OrganizationServiceImpl implements OrganizationService {
         } else {
             organizationInfoResult.setAvatarUrl(pictureUtil.getPictureURL(organization.getAvatarId(), false));
         }
+
+        organizationInfoResult.setId(organizationId);
         organizationInfoResult.setBriefIntroduction(organization.getDescription());
         organizationInfoResult.setTagList(tagDataList);
         organizationInfoResult.setIntroduction(organizationRecruit.getDescription());
