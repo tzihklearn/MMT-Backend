@@ -32,10 +32,10 @@ public class InterviewBoardController {
     /**
      * 获取当前纳新状态
      *
-     * @return 当前纳新状态
+     * @return 当前纳新状态 0未开始，1正在进行，2已结束
      */
     @GetMapping("/status")
     public CommonResult<GetIntreviewStatusResult> getInterviewStatus(){
-        return null;
+        return interviewBoardService.getInterviewStatus();
     }
 }

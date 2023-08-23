@@ -1,7 +1,6 @@
 package com.sipc.mmtbackend.pojo.dto.result.superAdmin;
 
 import com.sipc.mmtbackend.pojo.dto.data.InterviewFromData;
-import com.sipc.mmtbackend.pojo.dto.result.superAdmin.po.InterviewFromPo;
 import lombok.Data;
 
 import java.util.List;
