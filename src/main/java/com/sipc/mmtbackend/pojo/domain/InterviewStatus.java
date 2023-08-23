@@ -92,6 +92,12 @@ public class InterviewStatus implements Serializable {
     private Integer round;
 
     /**
+     * 是否已经调剂
+     */
+    @TableField("is_transfers")
+    private byte isTransfers;
+
+    /**
      * 逻辑删除字段
      */
     @TableField("is_deleted")

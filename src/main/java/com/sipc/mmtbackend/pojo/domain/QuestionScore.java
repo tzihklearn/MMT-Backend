@@ -19,37 +19,25 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-@TableName("interview_question")
-public class InterviewQuestion implements Serializable {
+@TableName("question_score")
+public class QuestionScore implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
-    @TableField("admission_id")
-    private Integer admissionId;
+    @TableField("interview_status_id")
+    private Integer interviewStatusId;
 
-    @TableField("question_id")
-    private Integer questionId;
+    @TableField("user_b_id")
+    private Integer userBId;
 
-    /**
-     * 1面试基本评价，2面试综合评价，3面试问题
-     */
-    @TableField("question_type")
-    private Integer questionType;
+    @TableField("interview_question_id")
+    private Integer interviewQuestionId;
 
-    /**
-     * 冗余字段，问题的选择类型，1单选，2多选，3下拉框，4输入框，5级联选择器，6量表题
-     */
-    @TableField("type")
-    private Integer type;
-
-    @TableField("round")
-    private Integer round;
-
-    @TableField("order")
-    private Integer order;
+    @TableField("score")
+    private Integer score;
 
     @TableField("is_deleted")
     @TableLogic
