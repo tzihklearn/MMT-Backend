@@ -13,6 +13,7 @@ import com.sipc.mmtbackend.pojo.dto.CommonResult;
 import com.sipc.mmtbackend.pojo.dto.param.dataDashboard.SiftParam;
 import com.sipc.mmtbackend.pojo.dto.result.DataDashboardExportResult;
 import com.sipc.mmtbackend.pojo.dto.result.dataDashboard.DataDashboardInfoResult;
+import com.sipc.mmtbackend.pojo.dto.result.dataDashboard.EvaluationInfoResult;
 import com.sipc.mmtbackend.pojo.dto.result.dataDashboard.ResumeInfoResult;
 import com.sipc.mmtbackend.pojo.dto.result.dataDashboard.po.*;
 import com.sipc.mmtbackend.service.DataDashboardService;
@@ -67,6 +68,16 @@ public class DataDashboardServiceImpl implements DataDashboardService {
     private final MessageMapper messageMapper;
 
     private final UserVolunteerMapper userVolunteerMapper;
+
+    private final InterviewEvaluationMapper interviewEvaluationMapper;
+
+    private final InterviewQuestionMapper interviewQuestionMapper;
+
+    private final UserBMapper userBMapper;
+
+    private final QuestionScoreMapper questionScoreMapper;
+
+//    private final
 
     private final RedisUtil redisUtil;
 
@@ -1118,6 +1129,160 @@ public class DataDashboardServiceImpl implements DataDashboardService {
         result.setInterviewFeedbackList(interviewFeedbackList);
         result.setSignIn(signIn);
         result.setInterviewArrangementList(interviewArrangementPos);
+
+        return CommonResult.success(result);
+    }
+
+    @Override
+    public CommonResult<EvaluationInfoResult> evaluationInfo(Integer id, Integer round) {
+
+        InterviewStatus interviewStatus = interviewStatusMapper.selectById(id);
+
+        if (interviewStatus == null) {
+            return CommonResult.fail();
+        }
+
+        if (!Objects.equals(round, interviewStatus.getRound())) {
+            interviewStatus = interviewStatusMapper.selectOne(
+                    new QueryWrapper<InterviewStatus>()
+                            .eq("user_id", interviewStatus.getUserId())
+                            .eq("admission_id", interviewStatus.getAdmissionId())
+                            .eq("department_id", interviewStatus.getDepartmentId())
+                            .eq("round", round)
+            );
+        }
+
+        if (interviewStatus == null) {
+            return CommonResult.fail();
+        }
+
+        EvaluationInfoResult result = new EvaluationInfoResult();
+        if (interviewStatus.getState() == 9) {
+            result.setStatus(1);
+        } else if (interviewStatus.getState() == 8 || interviewStatus.getState() == 0) {
+            result.setStatus(2);
+        } else {
+            result.setStatus(3);
+        }
+
+        result.setRound(interviewStatus.getRound());
+
+        List<InterviewerOpinionPo> interviewResult = new ArrayList<>();
+
+        List<InterviewerOpinionPo> passResult = new ArrayList<>();
+
+        List<InterviewerOpinionPo> comprehensiveQuestionList = new ArrayList<>();
+
+
+        List<String> userBList = new ArrayList<>();
+        for (InterviewEvaluation interviewEvaluation : interviewEvaluationMapper.selectList(
+                new QueryWrapper<InterviewEvaluation>()
+                        .eq("interview_id", id)
+        )) {
+
+            UserB userB = userBMapper.selectById(interviewEvaluation.getUserBId());
+
+            userBList.add(userB.getUserName());
+
+            //
+            InterviewerOpinionPo interviewerOpinionPo1 = new InterviewerOpinionPo();
+            interviewerOpinionPo1.setName(userB.getUserName());
+            if (interviewEvaluation.getIsPass() == 1) {
+                interviewerOpinionPo1.setOpinion("通过");
+            } else if (interviewEvaluation.getIsPass() == 2) {
+                interviewerOpinionPo1.setOpinion("失败");
+            } else {
+                interviewerOpinionPo1.setOpinion("待定");
+            }
+            interviewResult.add(interviewerOpinionPo1);
+
+            //
+            InterviewerOpinionPo interviewerOpinionPo2 = new InterviewerOpinionPo();
+            interviewerOpinionPo2.setName(userB.getUserName());
+            interviewerOpinionPo2.setOpinion(interviewEvaluation.getPassDepartment());
+            passResult.add(interviewerOpinionPo2);
+
+            //
+            InterviewerOpinionPo interviewerOpinionPo3 = new InterviewerOpinionPo();
+            interviewerOpinionPo3.setName(userB.getUserName());
+            interviewerOpinionPo3.setOpinion(interviewEvaluation.getEvaluation());
+            comprehensiveQuestionList.add(interviewerOpinionPo3);
+
+        }
+
+        result.setInterviewResult(interviewResult);
+        result.setPassResult(passResult);
+        result.setComprehensiveQuestionList(comprehensiveQuestionList);
+        result.setIsTransfers(interviewStatus.getIsTransfers() == 1);
+        Department department = departmentMapper.selectById(interviewStatus.getDepartmentId());
+        result.setPassDepartment(department.getName());
+
+        /*
+          获取面试分数及排名
+         */
+        InterviewGradingPo interviewGradingPo = new InterviewGradingPo();
+
+        interviewGradingPo.setRank(redisUtil.zSetScore("admission:" + interviewStatus.getAdmissionId() + ",department:" + interviewStatus.getDepartmentId() + ",round" + round,
+                id).intValue());
+
+        Interviewer interviewer = new Interviewer();
+        interviewer.setProject("面试官");
+        interviewer.setName(userBList);
+        interviewGradingPo.setInterviewer(interviewer);
+
+        List<QuestionScorePo> questionPoList = new ArrayList<>();
+
+        List<InterviewQuestion> interviewQuestions = interviewQuestionMapper.selectList(
+                new QueryWrapper<InterviewQuestion>()
+                        .eq("admission_id", interviewStatus.getAdmissionId())
+                        .eq("type", 6)
+        );
+        int[] arr = new int[interviewQuestions.size()];
+
+        QuestionScorePo questionScorePoT = new QuestionScorePo();
+        questionPoList.add(questionScorePoT);
+
+        for (InterviewQuestion interviewQuestion : interviewQuestions) {
+
+            QuestionScorePo questionScorePo = new QuestionScorePo();
+            QuestionData questionData = questionDataMapper.selectById(interviewQuestion.getQuestionId());
+//
+            questionScorePo.setQuestion(questionData.getQuestion());
+
+            int i = 0;
+            int sum = 0;
+
+            List<Integer> score = new ArrayList<>();
+            for (QuestionScore questionScore : questionScoreMapper.selectList(
+                    new QueryWrapper<QuestionScore>()
+                            .eq("interview_status_id", id)
+                            .eq("interview_question_id", questionData.getId())
+                            .orderByAsc("user_b_id")
+            )) {
+                score.add(questionScore.getScore());
+                arr[i] = questionScore.getScore();
+                sum += questionScore.getScore();
+                ++i;
+            }
+
+            score.add(sum/i);
+
+            questionScorePo.setScore(score);
+            questionPoList.add(questionScorePo);
+
+        }
+
+        questionScorePoT.setQuestion("总分");
+        List<Integer> score = new ArrayList<>();
+        for (int i = 0; i < interviewQuestions.size(); ++i) {
+            score.add(arr[i]);
+        }
+        questionScorePoT.setScore(score);
+        questionPoList.set(0, questionScorePoT);
+
+
+        interviewGradingPo.setQuestionPoList(questionPoList);
+        result.setInterviewGradingPo(interviewGradingPo);
 
         return CommonResult.success(result);
     }

@@ -103,5 +103,9 @@ public class RedisUtil {
         return result;
     }
 
+    public Double zSetScore(String key, Integer value) {
+        return redisTemplate.opsForZSet().score(key, value);
+    }
+
 
 }

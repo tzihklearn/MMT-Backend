@@ -5,6 +5,7 @@ import com.sipc.mmtbackend.pojo.dto.CommonResult;
 import com.sipc.mmtbackend.pojo.dto.param.dataDashboard.SiftParam;
 import com.sipc.mmtbackend.pojo.dto.result.DataDashboardExportResult;
 import com.sipc.mmtbackend.pojo.dto.result.dataDashboard.DataDashboardInfoResult;
+import com.sipc.mmtbackend.pojo.dto.result.dataDashboard.EvaluationInfoResult;
 import com.sipc.mmtbackend.pojo.dto.result.dataDashboard.ResumeInfoResult;
 import com.sipc.mmtbackend.service.DataDashboardService;
 import com.sipc.mmtbackend.utils.CheckroleBUtil.pojo.PermissionEnum;
@@ -45,9 +46,11 @@ public class DataDashboardController {
     public CommonResult<ResumeInfoResult> resume(@RequestParam Integer id) {
         return dataDashboardService.resume(id);
     }
-//
-//    @GetMapping("/interview/evaluation/info")
-//    public CommonResult<>
+
+    @GetMapping("/interview/evaluation/info")
+    public CommonResult<EvaluationInfoResult> evaluationInfo(@RequestParam Integer id, @RequestParam Integer round) {
+        return dataDashboardService.evaluationInfo(id, round);
+    }
 
     @PostMapping("/test")
     public CommonResult<String> test() throws RuntimeException {
