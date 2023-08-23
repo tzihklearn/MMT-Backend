@@ -52,6 +52,12 @@ public class DataDashboardController {
         return dataDashboardService.evaluationInfo(id, round);
     }
 
+    @PostMapping("/interview/evaluation/change")
+    @BPermission(PermissionEnum.COMMITTEE)
+    public CommonResult<String> changeEvaluation(@RequestParam Integer id, @RequestParam Integer round, @RequestParam Integer state) {
+        return dataDashboardService.changeEvaluation(id, round, state);
+    }
+
     @PostMapping("/test")
     public CommonResult<String> test() throws RuntimeException {
         throw new RuntimeException("test测试飞书机器人");

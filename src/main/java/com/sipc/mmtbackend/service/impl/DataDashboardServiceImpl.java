@@ -1286,4 +1286,43 @@ public class DataDashboardServiceImpl implements DataDashboardService {
 
         return CommonResult.success(result);
     }
+
+    @Override
+    public CommonResult<String> changeEvaluation(Integer id, Integer round, Integer state) {
+
+        InterviewStatus interviewStatus = interviewStatusMapper.selectById(id);
+
+        if (interviewStatus == null) {
+            return CommonResult.fail();
+        }
+
+        if (!Objects.equals(round, interviewStatus.getRound())) {
+            interviewStatus = interviewStatusMapper.selectOne(
+                    new QueryWrapper<InterviewStatus>()
+                            .eq("user_id", interviewStatus.getUserId())
+                            .eq("admission_id", interviewStatus.getAdmissionId())
+                            .eq("department_id", interviewStatus.getDepartmentId())
+                            .eq("round", round)
+            );
+        }
+
+        if (interviewStatus == null) {
+            return CommonResult.fail();
+        }
+
+        if (state == 1) {
+            interviewStatus.setState(9);
+        } else if (state == 2) {
+            interviewStatus.setState(8);
+        } else {
+            interviewStatus.setState(7);
+        }
+
+        int updateNum = interviewStatusMapper.updateById(interviewStatus);
+        if (updateNum != 1) {
+            log.error("");
+        }
+
+        return CommonResult.success("更改成功");
+    }
 }
