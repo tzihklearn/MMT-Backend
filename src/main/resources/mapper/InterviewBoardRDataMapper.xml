@@ -19,16 +19,15 @@
         FROM
         	(
         		SELECT
-        			count( 1 ) AS `c`
+        		    count( 1 ) AS `c`
         		FROM
-        			interview_status `is`
+        		    user_volunteer `uv`
         		WHERE
-        			`is`.is_deleted != 1
-		    <if test="departmentId != null and departmentId > 0">
-			    AND `is`.department_id = #{departmentId, jdbcType=INTEGER}
-		    </if>
-        			AND `is`.admission_id = 2
-        			AND `is`.round = 1
+        		    `uv`.is_deleted != 1
+			<if test="departmentId != null and departmentId > 0">
+					AND `uv`.department_id = #{departmentId,jdbcType=INTEGER}
+        	</if>
+        		    AND `uv`.admission_id = #{admissionId,jdbcType=INTEGER}
         	) AS `sc`,
         	(
         		SELECT
@@ -40,7 +39,7 @@
 		    <if test="departmentId != null and departmentId > 0">
 			    AND `is`.department_id = #{departmentId, jdbcType=INTEGER}
 		    </if>
-        			AND `is`.admission_id = 2
+        			AND `is`.admission_id = #{admissionId,jdbcType=INTEGER}
         			AND `is`.round = 2
         	) AS `lpc`,
         	(
@@ -53,7 +52,7 @@
 		    <if test="departmentId != null and departmentId > 0">
 			    AND `is`.department_id = #{departmentId, jdbcType=INTEGER}
 		    </if>
-        			AND `is`.admission_id = 2
+        			AND `is`.admission_id = #{admissionId,jdbcType=INTEGER}
         			AND `is`.state >= 5
         			AND `is`.round = 1
         	) AS `cc`,
@@ -67,7 +66,7 @@
 		    <if test="departmentId != null and departmentId > 0">
 			    AND `is`.department_id = #{departmentId, jdbcType=INTEGER}
 		    </if>
-        			AND `is`.admission_id = 2
+        			AND `is`.admission_id = #{admissionId,jdbcType=INTEGER}
         			AND `is`.state = 9
         			AND `is`.round = 1
         	) AS `pc`
