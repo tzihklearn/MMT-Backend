@@ -1,6 +1,6 @@
 package com.sipc.mmtbackend.mapper;
 
-import com.sipc.mmtbackend.pojo.domain.UserInfo;
+import com.sipc.mmtbackend.pojo.domain.Message;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -13,6 +13,6 @@ import org.apache.ibatis.annotations.Mapper;
  * @since 2023-08-23
  */
 @Mapper
-public interface UserInfoMapper extends BaseMapper<UserInfo> {
+public interface MessageMapper extends BaseMapper<Message> {
 
 }

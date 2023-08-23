@@ -4,10 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.sipc.mmtbackend.mapper.*;
 import com.sipc.mmtbackend.mapper.customization.MyInterviewStatusMapper;
 import com.sipc.mmtbackend.mapper.customization.MyMajorClassMapper;
-import com.sipc.mmtbackend.pojo.domain.Admission;
-import com.sipc.mmtbackend.pojo.domain.AdmissionAddress;
-import com.sipc.mmtbackend.pojo.domain.Department;
-import com.sipc.mmtbackend.pojo.domain.InterviewStatus;
+import com.sipc.mmtbackend.pojo.domain.*;
 import com.sipc.mmtbackend.pojo.domain.po.GroupIntCountPo;
 import com.sipc.mmtbackend.pojo.domain.po.GroupLocalTimeCountPo;
 import com.sipc.mmtbackend.pojo.domain.po.MajorClassPo;
@@ -16,9 +13,8 @@ import com.sipc.mmtbackend.pojo.dto.CommonResult;
 import com.sipc.mmtbackend.pojo.dto.param.dataDashboard.SiftParam;
 import com.sipc.mmtbackend.pojo.dto.result.DataDashboardExportResult;
 import com.sipc.mmtbackend.pojo.dto.result.dataDashboard.DataDashboardInfoResult;
-import com.sipc.mmtbackend.pojo.dto.result.dataDashboard.po.DataDashboardInfoPo;
-import com.sipc.mmtbackend.pojo.dto.result.dataDashboard.po.SiftBarPo;
-import com.sipc.mmtbackend.pojo.dto.result.dataDashboard.po.SiftInfoPo;
+import com.sipc.mmtbackend.pojo.dto.result.dataDashboard.ResumeInfoResult;
+import com.sipc.mmtbackend.pojo.dto.result.dataDashboard.po.*;
 import com.sipc.mmtbackend.service.DataDashboardService;
 import com.sipc.mmtbackend.utils.CheckroleBUtil.pojo.BTokenSwapPo;
 import com.sipc.mmtbackend.utils.RedisUtil;
@@ -59,6 +55,18 @@ public class DataDashboardServiceImpl implements DataDashboardService {
     private final MajorClassMapper majorClassMapper;
 
     private final MyMajorClassMapper myMajorClassMapper;
+
+    private final AdmissionQuestionMapper admissionQuestionMapper;
+
+    private final UserInfoMapper userInfoMapper;
+
+    private final QuestionDataMapper questionDataMapper;
+
+    private final RegistrationFromDataMapper registrationFromDataMapper;
+
+    private final MessageMapper messageMapper;
+
+    private final UserVolunteerMapper userVolunteerMapper;
 
     private final RedisUtil redisUtil;
 
@@ -884,6 +892,232 @@ public class DataDashboardServiceImpl implements DataDashboardService {
         DataDashboardExportResult result = new DataDashboardExportResult();
 
         result.setInterviewerInfoList(interviewerInfoList);
+
+        return CommonResult.success(result);
+    }
+
+    @Override
+    public CommonResult<ResumeInfoResult> resume(Integer id) {
+
+        /*
+          鉴权并且获取用户所属社团组织id
+         */
+        BTokenSwapPo context = ThreadLocalContextUtil.getContext();
+        Integer organizationId = context.getOrganizationId();
+
+        InterviewStatus interviewStatus = interviewStatusMapper.selectById(id);
+
+        //TODO:验证权限
+
+        if (interviewStatus == null) {
+            return CommonResult.fail("参数错误");
+        }
+
+        UserInfo userInfo = userInfoMapper.selectOne(new QueryWrapper<UserInfo>().eq("id", interviewStatus.getUserId()).last("limit 1"));
+
+        MajorClass majorClass = majorClassMapper.selectById(userInfo.getMajorClassId());
+        if (majorClass == null) {
+            return CommonResult.fail();
+        }
+        AcaMajor acaMajor = acaMajorMapper.selectById(majorClass.getMajorId());
+        if (acaMajor == null) {
+            return CommonResult.fail();
+        }
+
+        /*
+          获取报名基本问题
+         */
+        BasicQuestionPo basicQuestionPo = new BasicQuestionPo();
+        for (AdmissionQuestion admissionQuestion : admissionQuestionMapper.selectList(
+                new QueryWrapper<AdmissionQuestion>()
+                        .eq("admission_id", interviewStatus.getAdmissionId())
+                        .eq("question_type", 1)
+        )
+        ) {
+            //name
+            if (admissionQuestion.getQuestionId() == 1) {
+                basicQuestionPo.setName(userInfo.getName());
+            }
+            //studentId
+            else if (admissionQuestion.getQuestionId() == 2) {
+                basicQuestionPo.setStudentId(userInfo.getStudentId());
+            }
+            //phone
+            else if (admissionQuestion.getQuestionId() == 3) {
+                basicQuestionPo.setPhone(userInfo.getPhone());
+            }
+            //gender
+            else if (admissionQuestion.getQuestionId() == 4) {
+                basicQuestionPo.setGender(userInfo.getGander() == 1 ? "男":"女");
+            }
+            //email
+            else if (admissionQuestion.getQuestionId() == 5) {
+                basicQuestionPo.setEmail(userInfo.getEmail());
+            }
+            //QQNumber
+            else if (admissionQuestion.getQuestionId() == 6) {
+                basicQuestionPo.setEmail(userInfo.getQq());
+            }
+            //academy
+            else if (admissionQuestion.getQuestionId() == 7) {
+                basicQuestionPo.setAcademy(acaMajor.getAcademy());
+            }
+            //major
+            else if (admissionQuestion.getQuestionId() == 8) {
+                basicQuestionPo.setMajor(acaMajor.getMajor());
+            }
+            //className
+            else if (admissionQuestion.getQuestionId() == 9) {
+                basicQuestionPo.setClassName(majorClass.getClassNum());
+            }
+
+        }
+
+        /*
+          获取部门基本问题
+         */
+        DepartmentQuestionPo departmentQuestionPo = new DepartmentQuestionPo();
+
+        Department department = departmentMapper.selectById(interviewStatus.getDepartmentId());
+
+        departmentQuestionPo.setDepartmentName(department.getName());
+        UserVolunteer userVolunteer = userVolunteerMapper.selectOne(
+                new QueryWrapper<UserVolunteer>()
+                        .eq("admission_id", interviewStatus.getAdmissionId())
+                        .eq("department_id", interviewStatus.getDepartmentId())
+        );
+        departmentQuestionPo.setIsTransfers(userVolunteer.getIsTransfers() == 1);
+
+        List<QuestionAnswerPo> departmentQuestionAnswerPoList = new ArrayList<>();
+        for (AdmissionQuestion admissionQuestion : admissionQuestionMapper.selectList(
+                new QueryWrapper<AdmissionQuestion>()
+                        .eq("admission_id", interviewStatus.getAdmissionId())
+                        .eq("department_id", interviewStatus.getDepartmentId())
+                        .eq("question_type", 2)
+        )
+        ) {
+            QuestionData questionData = questionDataMapper.selectById(admissionQuestion.getQuestionId());
+            RegistrationFromData registrationFromData = registrationFromDataMapper.selectOne(
+                    new QueryWrapper<RegistrationFromData>()
+                            .eq("user_id", interviewStatus.getUserId())
+                            .eq("admission_question_id", admissionQuestion.getId())
+            );
+
+            QuestionAnswerPo questionAnswerPo = new QuestionAnswerPo();
+            questionAnswerPo.setQuestionName(questionData.getQuestion());
+            questionAnswerPo.setAnswer(registrationFromData.getData());
+            questionAnswerPo.setOrder(admissionQuestion.getOrder());
+
+            departmentQuestionAnswerPoList.add(questionAnswerPo);
+        }
+
+        departmentQuestionPo.setQuestionList(departmentQuestionAnswerPoList);
+
+        /*
+          获取综合问题
+         */
+        ComprehensiveQuestionPo comprehensiveQuestion = new ComprehensiveQuestionPo();
+
+        List<QuestionAnswerPo> comprehensiveQuestionAnswerPoList = new ArrayList<>();
+        for (AdmissionQuestion admissionQuestion : admissionQuestionMapper.selectList(
+                new QueryWrapper<AdmissionQuestion>()
+                        .eq("admission_id", interviewStatus.getAdmissionId())
+                        .eq("department_id", interviewStatus.getDepartmentId())
+                        .eq("question_type", 3)
+        )
+        ) {
+            QuestionData questionData = questionDataMapper.selectById(admissionQuestion.getQuestionId());
+            RegistrationFromData registrationFromData = registrationFromDataMapper.selectOne(
+                    new QueryWrapper<RegistrationFromData>()
+                            .eq("user_id", interviewStatus.getUserId())
+                            .eq("admission_question_id", admissionQuestion.getId())
+            );
+
+            QuestionAnswerPo questionAnswerPo = new QuestionAnswerPo();
+            questionAnswerPo.setQuestionName(questionData.getQuestion());
+            questionAnswerPo.setAnswer(registrationFromData.getData());
+            questionAnswerPo.setOrder(admissionQuestion.getOrder());
+
+            comprehensiveQuestionAnswerPoList.add(questionAnswerPo);
+        }
+        comprehensiveQuestion.setQuestionList(comprehensiveQuestionAnswerPoList);
+
+        /*
+          获取面试反馈
+         */
+        List<InterviewFeedbackPo> interviewFeedbackList = new ArrayList<>();
+
+        for (Message message : messageMapper.selectList(
+                new QueryWrapper<Message>()
+                        .eq("user_id", userInfo.getId())
+                        .eq("interview_status_id", interviewStatus.getId())
+        )) {
+            InterviewFeedbackPo interviewFeedbackPo = new InterviewFeedbackPo();
+
+            interviewFeedbackPo.setTime(TimeTransUtil.tranStringToTimeNotS(message.getTime()));
+            if (message.getState() == 1) {
+                interviewFeedbackPo.setState("接受");
+            } else if (message.getState() == 2) {
+                interviewFeedbackPo.setState("拒绝");
+            } else {
+                interviewFeedbackPo.setState("待定");
+            }
+
+            interviewFeedbackList.add(interviewFeedbackPo);
+        }
+
+        /*
+          获取面试签到
+         */
+        InterviewFeedbackPo signIn = new InterviewFeedbackPo();
+        if (interviewStatus.getSignInTime() != null) {
+            signIn.setTime(TimeTransUtil.tranStringToTimeNotS(interviewStatus.getSignInTime()));
+            signIn.setState("完成签到");
+        } else {
+            if (interviewStatus.getStartTime() != null) {
+                signIn.setTime(TimeTransUtil.tranStringToTimeNotS(interviewStatus.getStartTime()));
+            } else {
+                signIn.setTime("--");
+            }
+            signIn.setState("未完成签到");
+        }
+
+        /*
+          获取面试安排
+         */
+        List<InterviewArrangementPo> interviewArrangementPos = new ArrayList<>();
+
+        for (InterviewStatus status : interviewStatusMapper.selectList(
+                new QueryWrapper<InterviewStatus>()
+                        .eq("admission_id", interviewStatus.getAdmissionId())
+                        .eq("department_id", interviewStatus.getDepartmentOrder())
+                        .orderByAsc("round")
+        )) {
+            InterviewArrangementPo interviewArrangementPo = new InterviewArrangementPo();
+            interviewArrangementPo.setRound(interviewArrangementPo.getRound());
+
+            if (status.getStartTime() != null) {
+                interviewArrangementPo.setTime(TimeTransUtil.tranStringToTimeNotS(status.getStartTime()));
+            } else {
+                interviewArrangementPo.setTime("--");
+            }
+
+            if (status.getAdmissionAddressId() != null) {
+                AdmissionAddress admissionAddress = admissionAddressMapper.selectById(status.getAdmissionAddressId());
+                interviewArrangementPo.setTime(admissionAddress.getName());
+            } else {
+                interviewArrangementPo.setTime("--");
+            }
+            interviewArrangementPos.add(interviewArrangementPo);
+        }
+
+        ResumeInfoResult result = new ResumeInfoResult();
+        result.setBasicQuestion(basicQuestionPo);
+        result.setDepartmentQuestion(departmentQuestionPo);
+        result.setComprehensiveQuestion(comprehensiveQuestion);
+        result.setInterviewFeedbackList(interviewFeedbackList);
+        result.setSignIn(signIn);
+        result.setInterviewArrangementList(interviewArrangementPos);
 
         return CommonResult.success(result);
     }

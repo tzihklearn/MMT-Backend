@@ -19,37 +19,22 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-@TableName("user_info")
-public class UserInfo implements Serializable {
+@TableName("registration_from_data")
+public class RegistrationFromData implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
-    @TableField("student_id")
-    private String studentId;
+    @TableField("user_id")
+    private Integer userId;
 
-    @TableField("major_class_id")
-    private Integer majorClassId;
+    @TableField("admission_question_id")
+    private Integer admissionQuestionId;
 
-    @TableField("name")
-    private String name;
-
-    /**
-     * 1为男，0为女
-     */
-    @TableField("gander")
-    private Byte gander;
-
-    @TableField("phone")
-    private String phone;
-
-    @TableField("qq")
-    private String qq;
-
-    @TableField("email")
-    private String email;
+    @TableField("data")
+    private String data;
 
     @TableField("is_deleted")
     @TableLogic

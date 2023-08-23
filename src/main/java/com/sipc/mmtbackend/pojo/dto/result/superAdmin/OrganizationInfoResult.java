@@ -16,6 +16,8 @@ import java.util.List;
 @Data
 public class OrganizationInfoResult {
 
+    private Integer id;
+
     /**
      * 社团名称
      */
