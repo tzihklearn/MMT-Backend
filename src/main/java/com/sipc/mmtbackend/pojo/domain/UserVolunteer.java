@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -19,37 +20,34 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-@TableName("user_info")
-public class UserInfo implements Serializable {
+@TableName("user_volunteer")
+public class UserVolunteer implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
-    @TableField("student_id")
-    private String studentId;
+    @TableField("user_id")
+    private Integer userId;
 
-    @TableField("major_class_id")
-    private Integer majorClassId;
+    @TableField("admission_id")
+    private Integer admissionId;
 
-    @TableField("name")
-    private String name;
+    @TableField("department_id")
+    private Integer departmentId;
 
-    /**
-     * 1为男，0为女
-     */
-    @TableField("gander")
-    private Byte gander;
+    @TableField("organization_order")
+    private Integer organizationOrder;
 
-    @TableField("phone")
-    private String phone;
+    @TableField("department_order")
+    private Integer departmentOrder;
 
-    @TableField("qq")
-    private String qq;
+    @TableField("register_time")
+    private LocalDateTime registerTime;
 
-    @TableField("email")
-    private String email;
+    @TableField("is_transfers")
+    private Byte isTransfers;
 
     @TableField("is_deleted")
     @TableLogic
