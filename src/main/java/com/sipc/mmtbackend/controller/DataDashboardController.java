@@ -54,7 +54,7 @@ public class DataDashboardController {
 
     @PostMapping("/interview/evaluation/change")
     @BPermission(PermissionEnum.COMMITTEE)
-    public CommonResult<String> changeEvaluation(@RequestParam Integer id, @RequestParam Integer round, @RequestParam Integer state) {
+    public CommonResult<String> changeEvaluation(@RequestParam Integer id, @RequestParam(required = false) Integer round, @RequestParam Integer state) {
         return dataDashboardService.changeEvaluation(id, round, state);
     }
 
