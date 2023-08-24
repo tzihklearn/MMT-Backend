@@ -1015,7 +1015,13 @@ public class DataDashboardServiceImpl implements DataDashboardService {
                         .eq("user_id", interviewStatus.getUserId())
                         .last("limit 1")
         );
-        departmentQuestionPo.setIsTransfers(userVolunteer.getIsTransfers() == 1);
+        if (userVolunteer != null) {
+            departmentQuestionPo.setIsTransfers(userVolunteer.getIsTransfers() == 1);
+        } else {
+            log.warn("userVolunteer数据缺少，admission_id:{}, department_id:{}, user_id:{}",
+                    interviewStatus.getAdmissionId(), interviewStatus.getDepartmentId(), interviewStatus.getUserId());
+        }
+
 
         List<QuestionAnswerPo> departmentQuestionAnswerPoList = new ArrayList<>();
         for (AdmissionQuestion admissionQuestion : admissionQuestionMapper.selectList(
