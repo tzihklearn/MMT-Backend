@@ -6,6 +6,7 @@ import com.sipc.mmtbackend.pojo.dto.result.DataDashboardExportResult;
 import com.sipc.mmtbackend.pojo.dto.result.dataDashboard.DataDashboardInfoResult;
 import com.sipc.mmtbackend.pojo.dto.result.dataDashboard.EvaluationInfoResult;
 import com.sipc.mmtbackend.pojo.dto.result.dataDashboard.ResumeInfoResult;
+import com.sipc.mmtbackend.pojo.dto.result.dataDashboard.RoundResult;
 import org.springframework.web.bind.annotation.RequestParam;
 
 public interface DataDashboardService {
