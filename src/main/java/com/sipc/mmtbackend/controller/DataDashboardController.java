@@ -48,7 +48,7 @@ public class DataDashboardController {
     }
 
     @GetMapping("/interview/evaluation/info")
-    public CommonResult<EvaluationInfoResult> evaluationInfo(@RequestParam Integer id, @RequestParam Integer round) {
+    public CommonResult<EvaluationInfoResult> evaluationInfo(@RequestParam Integer id, @RequestParam(required = false) Integer round) {
         return dataDashboardService.evaluationInfo(id, round);
     }
 
