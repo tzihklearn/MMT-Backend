@@ -1,9 +1,7 @@
 package com.sipc.mmtbackend.pojo.dto.result.dataDashboard;
 
-import com.sipc.mmtbackend.pojo.dto.result.dataDashboard.po.ComprehensivePo;
 import com.sipc.mmtbackend.pojo.dto.result.dataDashboard.po.InterviewGradingPo;
 import com.sipc.mmtbackend.pojo.dto.result.dataDashboard.po.InterviewerOpinionPo;
-import com.sipc.mmtbackend.pojo.dto.result.dataDashboard.po.QuestionAnswerPo;
 import lombok.Data;
 
 import java.util.List;
