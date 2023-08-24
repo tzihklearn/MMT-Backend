@@ -63,6 +63,7 @@ public class InterviewBoardBeforeServiceImpl implements InterviewBoardBeforeServ
             result.setCNum(result.getCNum() + po.getNumber());
             results.add(dep);
         }
+        result.setDepNums(results);
         result.setDepNum(results.size());
         return CommonResult.success(result);
     }
