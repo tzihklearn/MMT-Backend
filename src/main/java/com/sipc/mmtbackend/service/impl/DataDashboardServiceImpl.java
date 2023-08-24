@@ -1032,12 +1032,17 @@ public class DataDashboardServiceImpl implements DataDashboardService {
                             .eq("admission_question_id", admissionQuestion.getId())
             );
 
-            QuestionAnswerPo questionAnswerPo = new QuestionAnswerPo();
-            questionAnswerPo.setQuestionName(questionData.getQuestion());
-            questionAnswerPo.setAnswer(registrationFromData.getData());
-            questionAnswerPo.setOrder(admissionQuestion.getOrder());
+            if (registrationFromData != null) {
+                QuestionAnswerPo questionAnswerPo = new QuestionAnswerPo();
+                questionAnswerPo.setQuestionName(questionData.getQuestion());
+                questionAnswerPo.setAnswer(registrationFromData.getData());
+                questionAnswerPo.setOrder(admissionQuestion.getOrder());
+                departmentQuestionAnswerPoList.add(questionAnswerPo);
+            } else {
+                log.warn("registrationFromData数据缺少，user_id:{}, admission_question_id:{}",
+                        interviewStatus.getUserId(), admissionQuestion.getId());
+            }
 
-            departmentQuestionAnswerPoList.add(questionAnswerPo);
         }
 
         departmentQuestionPo.setQuestionList(departmentQuestionAnswerPoList);
@@ -1061,12 +1066,17 @@ public class DataDashboardServiceImpl implements DataDashboardService {
                             .eq("admission_question_id", admissionQuestion.getId())
             );
 
-            QuestionAnswerPo questionAnswerPo = new QuestionAnswerPo();
-            questionAnswerPo.setQuestionName(questionData.getQuestion());
-            questionAnswerPo.setAnswer(registrationFromData.getData());
-            questionAnswerPo.setOrder(admissionQuestion.getOrder());
+            if (registrationFromData != null) {
+                QuestionAnswerPo questionAnswerPo = new QuestionAnswerPo();
+                questionAnswerPo.setQuestionName(questionData.getQuestion());
+                questionAnswerPo.setAnswer(registrationFromData.getData());
+                questionAnswerPo.setOrder(admissionQuestion.getOrder());
 
-            comprehensiveQuestionAnswerPoList.add(questionAnswerPo);
+                comprehensiveQuestionAnswerPoList.add(questionAnswerPo);
+            } else {
+                log.warn("registrationFromData数据缺少，user_id:{}, admission_question_id:{}",
+                        interviewStatus.getUserId(), admissionQuestion.getId());
+            }
         }
         comprehensiveQuestion.setQuestionList(comprehensiveQuestionAnswerPoList);
 
