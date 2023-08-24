@@ -7,6 +7,7 @@ import com.sipc.mmtbackend.pojo.dto.result.DataDashboardExportResult;
 import com.sipc.mmtbackend.pojo.dto.result.dataDashboard.DataDashboardInfoResult;
 import com.sipc.mmtbackend.pojo.dto.result.dataDashboard.EvaluationInfoResult;
 import com.sipc.mmtbackend.pojo.dto.result.dataDashboard.ResumeInfoResult;
+import com.sipc.mmtbackend.pojo.dto.result.dataDashboard.RoundResult;
 import com.sipc.mmtbackend.service.DataDashboardService;
 import com.sipc.mmtbackend.utils.CheckroleBUtil.pojo.PermissionEnum;
 import lombok.RequiredArgsConstructor;
@@ -56,6 +57,11 @@ public class DataDashboardController {
     @BPermission(PermissionEnum.COMMITTEE)
     public CommonResult<String> changeEvaluation(@RequestParam Integer id, @RequestParam(required = false) Integer round, @RequestParam Integer state) {
         return dataDashboardService.changeEvaluation(id, round, state);
+    }
+
+    @GetMapping("/interview/evaluation/round")
+    public CommonResult<RoundResult> round(@RequestParam Integer id) {
+        return dataDashboardService.round(id);
     }
 
     @PostMapping("/test")

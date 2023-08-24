@@ -15,6 +15,7 @@ import com.sipc.mmtbackend.pojo.dto.result.DataDashboardExportResult;
 import com.sipc.mmtbackend.pojo.dto.result.dataDashboard.DataDashboardInfoResult;
 import com.sipc.mmtbackend.pojo.dto.result.dataDashboard.EvaluationInfoResult;
 import com.sipc.mmtbackend.pojo.dto.result.dataDashboard.ResumeInfoResult;
+import com.sipc.mmtbackend.pojo.dto.result.dataDashboard.RoundResult;
 import com.sipc.mmtbackend.pojo.dto.result.dataDashboard.po.*;
 import com.sipc.mmtbackend.service.DataDashboardService;
 import com.sipc.mmtbackend.utils.CheckroleBUtil.pojo.BTokenSwapPo;
@@ -1418,5 +1419,36 @@ public class DataDashboardServiceImpl implements DataDashboardService {
         }
 
         return CommonResult.success("更改成功");
+    }
+
+    @Override
+    public CommonResult<RoundResult> round(Integer id) {
+
+        /*
+          鉴权并且获取用户所属社团组织id
+         */
+        BTokenSwapPo context = ThreadLocalContextUtil.getContext();
+        Integer organizationId = context.getOrganizationId();
+
+//        Admission admission = admissionMapper.selectOne(
+//                new QueryWrapper<Admission>()
+//                        .eq("organization_id", organizationId)
+//                        .orderByDesc("id")
+//        );
+
+        InterviewStatus interviewStatus = interviewStatusMapper.selectById(id);
+
+        InterviewStatus interviewStatus1 = interviewStatusMapper.selectOne(
+                new QueryWrapper<InterviewStatus>()
+                        .eq("user_id", interviewStatus.getUserId())
+                        .eq("admission_id", interviewStatus.getAdmissionId())
+                        .eq("department_id", interviewStatus.getDepartmentId())
+                        .orderByDesc("round")
+                        .last("limit 1")
+        );
+        RoundResult result = new RoundResult();
+        result.setRound(interviewStatus1.getRound());
+
+        return CommonResult.success(result);
     }
 }

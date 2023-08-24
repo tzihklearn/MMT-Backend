@@ -6,6 +6,8 @@ import com.sipc.mmtbackend.pojo.dto.result.DataDashboardExportResult;
 import com.sipc.mmtbackend.pojo.dto.result.dataDashboard.DataDashboardInfoResult;
 import com.sipc.mmtbackend.pojo.dto.result.dataDashboard.EvaluationInfoResult;
 import com.sipc.mmtbackend.pojo.dto.result.dataDashboard.ResumeInfoResult;
+import com.sipc.mmtbackend.pojo.dto.result.dataDashboard.RoundResult;
+import org.springframework.web.bind.annotation.RequestParam;
 
 public interface DataDashboardService {
 
@@ -20,5 +22,7 @@ public interface DataDashboardService {
     CommonResult<EvaluationInfoResult> evaluationInfo(Integer id, Integer round);
 
     CommonResult<String> changeEvaluation(Integer id, Integer round, Integer state);
+
+    CommonResult<RoundResult> round(Integer id);
 
 }
