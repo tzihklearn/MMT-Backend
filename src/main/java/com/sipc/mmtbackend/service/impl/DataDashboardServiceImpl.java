@@ -1356,7 +1356,23 @@ public class DataDashboardServiceImpl implements DataDashboardService {
             return CommonResult.fail();
         }
 
-        if (!Objects.equals(round, interviewStatus.getRound())) {
+        /*
+          鉴权并且获取用户所属社团组织id
+         */
+        BTokenSwapPo context = ThreadLocalContextUtil.getContext();
+        Integer organizationId = context.getOrganizationId();
+
+        Admission admission = admissionMapper.selectOne(
+                new QueryWrapper<Admission>()
+                        .eq("organization_id", organizationId)
+                        .orderByDesc("id")
+        );
+
+        if (admission == null || !Objects.equals(admission.getId(), interviewStatus.getAdmissionId())) {
+            return CommonResult.fail();
+        }
+
+        if (round != null && !Objects.equals(round, interviewStatus.getRound())) {
             interviewStatus = interviewStatusMapper.selectOne(
                     new QueryWrapper<InterviewStatus>()
                             .eq("user_id", interviewStatus.getUserId())
