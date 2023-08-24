@@ -20,10 +20,7 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Base64;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -70,13 +67,13 @@ public class CheckinQRCodeUtil {
         QRPayloadPo payload = redisUtil.getString(redisKey, QRPayloadPo.class);
         if (payload == null){
             payload = new QRPayloadPo(organizationId, creatorId);
-            Date now = new Date();
-            Date tomorrow = new Date();
-            tomorrow.setDate(tomorrow.getDate() + 1);
-            tomorrow.setHours(0);
-            tomorrow.setMinutes(0);
-            tomorrow.setSeconds(0);
-            boolean redisOP = redisUtil.setString(qrKey, payload, (tomorrow.getTime() - now.getTime()), TimeUnit.MILLISECONDS);
+            Calendar tomorrow = Calendar.getInstance();
+            tomorrow.set(Calendar.DAY_OF_YEAR, tomorrow.get(Calendar.DAY_OF_YEAR) + 1);
+            tomorrow.set(Calendar.HOUR_OF_DAY, 0);
+            tomorrow.set(Calendar.MINUTE, 0);
+            tomorrow.set(Calendar.SECOND, 0);
+            tomorrow.set(Calendar.MILLISECOND, 0);
+            boolean redisOP = redisUtil.setString(qrKey, payload, tomorrow.getTimeInMillis() - System.currentTimeMillis(), TimeUnit.MILLISECONDS);
             if (!redisOP){
                 log.warn("Redis SetString key = " + qrKey + ", value = " + payload + "Error\n");
                 return null;
