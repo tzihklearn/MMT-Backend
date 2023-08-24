@@ -36,8 +36,8 @@ public class InterviewEvaluation implements Serializable {
     @TableField("is_pass")
     private Integer isPass;
 
-    @TableField("pass_department")
-    private String passDepartment;
+    @TableField("pass_department_id")
+    private Integer passDepartmentId;
 
     @TableField("evaluation")
     private String evaluation;

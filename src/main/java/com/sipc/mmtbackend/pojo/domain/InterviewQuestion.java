@@ -48,7 +48,7 @@ public class InterviewQuestion implements Serializable {
     @TableField("round")
     private Integer round;
 
-    @TableField("order")
+    @TableField("`order`")
     private Integer order;
 
     @TableField("is_deleted")

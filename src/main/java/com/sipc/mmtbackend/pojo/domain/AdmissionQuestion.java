@@ -57,7 +57,7 @@ public class AdmissionQuestion implements Serializable {
     /**
      * 问题次序
      */
-    @TableField("order")
+    @TableField("`order`")
     private Integer order;
 
     /**
