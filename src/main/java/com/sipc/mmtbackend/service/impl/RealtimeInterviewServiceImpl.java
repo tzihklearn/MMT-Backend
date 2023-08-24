@@ -13,6 +13,7 @@ import com.sipc.mmtbackend.pojo.domain.po.RealtimeInterviewPo.ProgressBarPo;
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
 import com.sipc.mmtbackend.pojo.dto.param.RealtimeInterview.FinishInterviewParam;
 import com.sipc.mmtbackend.pojo.dto.param.RealtimeInterview.PutInterviewPlaceParam;
+import com.sipc.mmtbackend.pojo.dto.result.RealtimeIntreviewdResult.GetInterviewCommentResult;
 import com.sipc.mmtbackend.pojo.dto.result.RealtimeIntreviewdResult.GetInterviewPlacesResult;
 import com.sipc.mmtbackend.pojo.dto.result.RealtimeIntreviewdResult.GetInterviewProgressBarResult;
 import com.sipc.mmtbackend.pojo.dto.result.RealtimeIntreviewdResult.GetIntervieweeListResult;
@@ -268,5 +269,36 @@ public class RealtimeInterviewServiceImpl implements RealtimeInterviewService {
             return CommonResult.serverError();
         }
         return CommonResult.success();
+    }
+
+    /**
+     * 获取本轮与已结束轮次面试评价问题与回答
+     *
+     * @param interviewId 本论面试ID
+     * @return 面试评价
+     */
+    @Override
+    public CommonResult<GetInterviewCommentResult> getInterviewComment(Integer interviewId) {
+        BTokenSwapPo context = ThreadLocalContextUtil.getContext();
+        Admission admission = interviewCheckMapper.selectOrganizationActivateAdmission(context.getOrganizationId());
+        if (admission == null) {
+            log.warn("用户 " + context + " 尝试在无活动的纳新时修改面试场地");
+            return CommonResult.fail("生成失败：未开始纳新或纳新已结束");
+        }
+        Integer maxRound = interviewCheckMapper.selectOrganizationActivateInterviewRound(admission.getId());
+        if (maxRound == null){
+            log.warn("用户 " + context + " 在纳新 " + admission + " 中未查询到任何面试");
+            return CommonResult.fail("当前纳新未开启面试");
+        }
+        InterviewStatus interviewStatus = interviewStatusMapper.selectById(interviewId);
+        if (interviewStatus == null){
+            log.warn("用户 " + context + " 尝试查询不存在的面试 " + interviewId + "的评价信息\n");
+            return CommonResult.fail("面试不存在或不属于当前纳新");
+        } else if (!Objects.equals(interviewStatus.getAdmissionId(), admission.getId())){
+            log.warn("用户 " + context + " 尝试查询不属于当前纳新 " + admission + " 的面试 " + interviewStatus + "的评价信息\n");
+            return CommonResult.fail("面试不存在或不属于当前纳新");
+        }
+
+        return null;
     }
 }

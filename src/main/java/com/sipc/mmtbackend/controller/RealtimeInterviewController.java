@@ -81,17 +81,18 @@ public class RealtimeInterviewController {
     public CommonResult<String> putInterviewPlace(@RequestBody PutInterviewPlaceParam param){
         return realtimeInterviewService.putInterviewPlace(param);
     }
+
     /**
      * 获取本轮与已结束轮次面试评价问题与回答
      *
-     * @param interview 本论面试ID
+     * @param interviewId 本论面试ID
      * @return 面试评价
      */
     @GetMapping("/comment")
     public CommonResult<GetInterviewCommentResult> getInterviewComment(
-            @RequestParam("interview") Integer interview
+            @RequestParam("interview") Integer interviewId
     ){
-        return null;
+        return realtimeInterviewService.getInterviewComment(interviewId);
     }
 
     /**
