@@ -14,6 +14,6 @@ public class QuestionScorePo {
 
     private String question;
 
-    private List<Integer> score;
+    private List<Double> score;
 
 }
