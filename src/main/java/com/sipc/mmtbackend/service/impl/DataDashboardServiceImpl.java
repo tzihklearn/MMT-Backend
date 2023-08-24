@@ -1012,6 +1012,8 @@ public class DataDashboardServiceImpl implements DataDashboardService {
                 new QueryWrapper<UserVolunteer>()
                         .eq("admission_id", interviewStatus.getAdmissionId())
                         .eq("department_id", interviewStatus.getDepartmentId())
+                        .eq("user_id", interviewStatus.getUserId())
+                        .last("limit 1")
         );
         departmentQuestionPo.setIsTransfers(userVolunteer.getIsTransfers() == 1);
 
