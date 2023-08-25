@@ -10,6 +10,7 @@ import com.sipc.mmtbackend.pojo.domain.po.GroupLocalTimeCountPo;
 import com.sipc.mmtbackend.pojo.domain.po.MajorClassPo;
 import com.sipc.mmtbackend.pojo.domain.po.MyInterviewStatusPo;
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
+import com.sipc.mmtbackend.pojo.dto.param.dataDashboard.EvaluationChangeParam;
 import com.sipc.mmtbackend.pojo.dto.param.dataDashboard.SiftParam;
 import com.sipc.mmtbackend.pojo.dto.result.DataDashboardExportResult;
 import com.sipc.mmtbackend.pojo.dto.result.dataDashboard.DataDashboardInfoResult;
@@ -1367,9 +1368,9 @@ public class DataDashboardServiceImpl implements DataDashboardService {
     }
 
     @Override
-    public CommonResult<String> changeEvaluation(Integer id, Integer round, Integer state) {
+    public CommonResult<String> changeEvaluation(EvaluationChangeParam evaluationChangeParam) {
 
-        InterviewStatus interviewStatus = interviewStatusMapper.selectById(id);
+        InterviewStatus interviewStatus = interviewStatusMapper.selectById(evaluationChangeParam.getId());
 
         if (interviewStatus == null) {
             return CommonResult.fail("参数id不存在");
@@ -1391,13 +1392,13 @@ public class DataDashboardServiceImpl implements DataDashboardService {
             return CommonResult.fail("请求id不属于该社团");
         }
 
-        if (round != null && !Objects.equals(round, interviewStatus.getRound())) {
+        if (evaluationChangeParam.getRound() != null && !Objects.equals(evaluationChangeParam.getRound(), interviewStatus.getRound())) {
             interviewStatus = interviewStatusMapper.selectOne(
                     new QueryWrapper<InterviewStatus>()
                             .eq("user_id", interviewStatus.getUserId())
                             .eq("admission_id", interviewStatus.getAdmissionId())
                             .eq("department_id", interviewStatus.getDepartmentId())
-                            .eq("round", round)
+                            .eq("round", evaluationChangeParam.getRound())
             );
         }
 
@@ -1405,9 +1406,9 @@ public class DataDashboardServiceImpl implements DataDashboardService {
             return CommonResult.fail("请求id不属于该社团");
         }
 
-        if (state == 1) {
+        if (evaluationChangeParam.getState() == 1) {
             interviewStatus.setState(9);
-        } else if (state == 2) {
+        } else if (evaluationChangeParam.getState() == 2) {
             interviewStatus.setState(8);
         } else {
             interviewStatus.setState(7);

@@ -2,6 +2,7 @@ package com.sipc.mmtbackend.controller;
 
 import com.sipc.mmtbackend.annotation.BPermission;
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
+import com.sipc.mmtbackend.pojo.dto.param.dataDashboard.EvaluationChangeParam;
 import com.sipc.mmtbackend.pojo.dto.param.dataDashboard.SiftParam;
 import com.sipc.mmtbackend.pojo.dto.result.DataDashboardExportResult;
 import com.sipc.mmtbackend.pojo.dto.result.dataDashboard.DataDashboardInfoResult;
@@ -55,8 +56,8 @@ public class DataDashboardController {
 
     @PostMapping("/interview/evaluation/change")
     @BPermission(PermissionEnum.COMMITTEE)
-    public CommonResult<String> changeEvaluation(@RequestParam Integer id, @RequestParam(required = false) Integer round, @RequestParam Integer state) {
-        return dataDashboardService.changeEvaluation(id, round, state);
+    public CommonResult<String> changeEvaluation(@RequestBody EvaluationChangeParam evaluationChangeParam) {
+        return dataDashboardService.changeEvaluation(evaluationChangeParam);
     }
 
     @GetMapping("/interview/evaluation/round")
