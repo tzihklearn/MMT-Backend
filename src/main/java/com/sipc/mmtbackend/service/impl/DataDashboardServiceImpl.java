@@ -1372,7 +1372,7 @@ public class DataDashboardServiceImpl implements DataDashboardService {
         InterviewStatus interviewStatus = interviewStatusMapper.selectById(id);
 
         if (interviewStatus == null) {
-            return CommonResult.fail();
+            return CommonResult.fail("参数id不存在");
         }
 
         /*
@@ -1388,7 +1388,7 @@ public class DataDashboardServiceImpl implements DataDashboardService {
         );
 
         if (admission == null || !Objects.equals(admission.getId(), interviewStatus.getAdmissionId())) {
-            return CommonResult.fail();
+            return CommonResult.fail("请求id不属于该社团");
         }
 
         if (round != null && !Objects.equals(round, interviewStatus.getRound())) {
@@ -1402,7 +1402,7 @@ public class DataDashboardServiceImpl implements DataDashboardService {
         }
 
         if (interviewStatus == null) {
-            return CommonResult.fail();
+            return CommonResult.fail("请求id不属于该社团");
         }
 
         if (state == 1) {
