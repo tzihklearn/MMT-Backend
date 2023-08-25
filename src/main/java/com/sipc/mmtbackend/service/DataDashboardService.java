@@ -1,6 +1,7 @@
 package com.sipc.mmtbackend.service;
 
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
+import com.sipc.mmtbackend.pojo.dto.param.dataDashboard.EvaluationChangeParam;
 import com.sipc.mmtbackend.pojo.dto.param.dataDashboard.SiftParam;
 import com.sipc.mmtbackend.pojo.dto.result.DataDashboardExportResult;
 import com.sipc.mmtbackend.pojo.dto.result.dataDashboard.DataDashboardInfoResult;
@@ -21,7 +22,7 @@ public interface DataDashboardService {
 
     CommonResult<EvaluationInfoResult> evaluationInfo(Integer id, Integer round);
 
-    CommonResult<String> changeEvaluation(Integer id, Integer round, Integer state);
+    CommonResult<String> changeEvaluation(EvaluationChangeParam evaluationChangeParam);
 
     CommonResult<RoundResult> round(Integer id);
 
