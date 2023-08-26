@@ -4,8 +4,8 @@ import lombok.Data;
 
 @Data
 public class ProgressBarDataPo {
-    // 时间段
-    private String time;
+    // 开始小时数
+    private Integer time;
     // 总人数
     private Integer total;
     // 已完成人数
