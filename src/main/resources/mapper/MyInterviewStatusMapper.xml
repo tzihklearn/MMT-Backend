@@ -152,5 +152,136 @@
 
             </if>
     </select>
+    <select id="selectIMByAdmissionIdAndRoundFirst"
+            resultType="com.sipc.mmtbackend.pojo.domain.po.InterviewMessagePo">
+        select its.id, ui.student_id, ui.name, ui.major_class_id, its.department_id, its.state, its.start_time as next_time,
+               its.admission_address_id as next_place_id, m.is_read as message_status
+        from interview_status as its
+                left join user_info as ui on ui.id = its.user_id
+                left join message as m on m.interview_status_id = its.id
+        where admission_id = #{admissionId, jdbcType=INTEGER}
+            and round = 1
+        limit #{start,jdbcType=INTEGER}, #{end,jdbcType=INTEGER}
+    </select>
+    <select id="selectIMByAdmissionIdAndRound"
+            resultType="com.sipc.mmtbackend.pojo.domain.po.InterviewMessagePo">
+        select its.id, ui.student_id, ui.name, ui.major_class_id, its.department_id, its.state, its.start_time as next_time,
+               its.admission_address_id as next_place_id, m.is_read as message_status
+        from interview_status as its
+                 left join user_info as ui on ui.id = its.user_id
+                 left join message as m on m.interview_status_id = its.id
+        where admission_id = #{admissionId, jdbcType=INTEGER}
+          and round = #{round,jdbcType=INTEGER}
+        limit #{start,jdbcType=INTEGER}, #{end,jdbcType=INTEGER}
+    </select>
+    <select id="selectDepartmentCountByAdmissionIdAndRound"
+            resultType="com.sipc.mmtbackend.pojo.domain.po.GroupIntCountPo">
+        select department_id as id, COUNT(id) as count
+        from interview_status
+        where admission_id = #{admissionId, jdbcType=INTEGER}
+            and round = #{round,jdbcType=INTEGER}
+        group by department_id
+        order by department_id
+    </select>
+    <select id="selectAddressCountByAdmissionIdAndRound"
+            resultType="com.sipc.mmtbackend.pojo.domain.po.GroupIntCountPo">
+        select admission_address_id as id, COUNT(id) as count
+        from interview_status
+        where admission_id = #{admissionId, jdbcType=INTEGER}
+            and round = #{round,jdbcType=INTEGER}
+        group by admission_address_id
+        order by admission_address_id
+    </select>
+    <select id="selectMessageStateByAdmissionIdAndRound"
+            resultType="com.sipc.mmtbackend.pojo.domain.po.GroupIntCountPo">
+        select state as id, COUNT(id) as count
+        from interview_status
+        where admission_id = #{admissionId, jdbcType=INTEGER}
+          and round = #{round,jdbcType=INTEGER}
+          and state = 2 or 3
+        group by state
+        order by state
+    </select>
+    <select id="selectArrangeByAdmissionIdAndSiftAndRoundFirst"
+            resultType="com.sipc.mmtbackend.pojo.domain.po.InterviewMessagePo">
+        select its.id, ui.student_id, ui.name, ui.major_class_id, its.department_id, its.state, its.start_time as next_time,
+        its.admission_address_id as next_place_id, m.is_read as message_status
+        from interview_status as its
+        left join user_info as ui on ui.id = its.user_id
+        left join message as m on m.interview_status_id = its.id
+        where admission_id = #{admissionId, jdbcType=INTEGER}
+        and round = 1
+        <if test="siftParam.departmentIdList.size() != 0">
+            and department_id in
+            <foreach collection="siftParam.departmentIdList" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="siftParam.admissionAddressList.size() != 0">
+            and ( admission_address_id is null
+            or
+            admission_address_id in
+            <foreach collection="siftParam.admissionAddressList" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+            )
+        </if>
+        <if test="siftParam.messageStatusList.size() != 0">
+            <foreach collection="siftParam.messageStatusList" item="item" open="(" separator="," close=")">
+                <choose>
+                    <when test="#{item == 1}">
+                        and its.state not in (2,3)
+                    </when>
+                    <when test="#{item == 2}">
+                        and its.state = 3
+                    </when>
+                    <when test="#{item == 3}">
+                        and its.state = 2
+                    </when>
+                </choose>
+            </foreach>
+        </if>
+    </select>
+    <select id="selectArrangeByAdmissionIdAndSiftAndRound"
+            resultType="com.sipc.mmtbackend.pojo.domain.po.InterviewMessagePo">
+        select its.id, ui.student_id, ui.name, ui.major_class_id, its.department_id, its.state, its.start_time as next_time,
+               its.admission_address_id as next_place_id, m.is_read as message_status
+        from interview_status as its
+                 left join user_info as ui on ui.id = its.user_id
+                 left join message as m on m.interview_status_id = its.id
+        where admission_id = #{admissionId, jdbcType=INTEGER}
+          and round = #{round,jdbcType=INTEGER}
+          <if test="siftParam.departmentIdList.size() != 0">
+              and department_id in
+              <foreach collection="siftParam.departmentIdList" item="item" open="(" separator="," close=")">
+                  #{item}
+              </foreach>
+          </if>
+          <if test="siftParam.admissionAddressList.size() != 0">
+              and ( admission_address_id is null
+              or
+              admission_address_id in
+              <foreach collection="siftParam.admissionAddressList" item="item" open="(" separator="," close=")">
+                  #{item}
+              </foreach>
+              )
+          </if>
+          <if test="siftParam.messageStatusList.size() != 0">
+              <foreach collection="siftParam.messageStatusList" item="item" open="(" separator="," close=")">
+                  <choose>
+                      <when test="#{item == 1}">
+                            and its.state not in (2,3)
+                      </when>
+                      <when test="#{item == 2}">
+                            and its.state = 3
+                      </when>
+                      <when test="#{item == 3}">
+                          and its.state = 2
+                      </when>
+                  </choose>
+              </foreach>
+          </if>
+    </select>
+
 
 </mapper>

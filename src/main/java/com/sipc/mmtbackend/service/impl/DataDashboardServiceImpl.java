@@ -112,7 +112,7 @@ public class DataDashboardServiceImpl implements DataDashboardService {
         Integer admissionId = admission.getId();
 
         //从redis中获取数据面板导航栏
-        SiftBarPo siftBarPo = redisUtil.getString("siftBar+" + admissionId, SiftBarPo.class);
+        SiftBarPo siftBarPo = redisUtil.getString("data,siftBar+" + admissionId, SiftBarPo.class);
 
 //        Organization organization = organizationMapper.selectById(organizationId);
 //

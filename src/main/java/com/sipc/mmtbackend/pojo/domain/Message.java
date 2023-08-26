@@ -59,7 +59,7 @@ public class Message implements Serializable {
 - 3为“用户发送”的信息
      */
     @TableField("type")
-    private Boolean type;
+    private Integer type;
 
     @TableField("interview_status_id")
     private Integer interviewStatusId;
