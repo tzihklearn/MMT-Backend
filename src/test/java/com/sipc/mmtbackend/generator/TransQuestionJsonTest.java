@@ -23,7 +23,7 @@ public class TransQuestionJsonTest {
         List<QuestionValueData> questionValueDataList = new ArrayList<>();
 
         QuestionValueData questionValueData1 = new QuestionValueData();
-        questionValueData1.setValue("请输入你的班级");
+        questionValueData1.setValue("请输入你的姓名");
         questionValueData1.setChildValueList(null);
 
         questionValueDataList.add(questionValueData1);

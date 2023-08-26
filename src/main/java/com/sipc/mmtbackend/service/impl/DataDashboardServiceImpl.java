@@ -112,7 +112,7 @@ public class DataDashboardServiceImpl implements DataDashboardService {
         Integer admissionId = admission.getId();
 
         //从redis中获取数据面板导航栏
-        SiftBarPo siftBarPo = redisUtil.getString("siftBar+" + admissionId, SiftBarPo.class);
+        SiftBarPo siftBarPo = redisUtil.getString("data,siftBar+" + admissionId, SiftBarPo.class);
 
 //        Organization organization = organizationMapper.selectById(organizationId);
 //
@@ -233,7 +233,7 @@ public class DataDashboardServiceImpl implements DataDashboardService {
             siftBarPo.setNextPlaceBar(nextPlaceBar);
 
 
-            redisUtil.setString("siftBar+" + admissionId, siftBarPo, 5, TimeUnit.MINUTES);
+            redisUtil.setString("data,siftBar+" + admissionId, siftBarPo, 5, TimeUnit.MINUTES);
 
         }
 
@@ -362,7 +362,7 @@ public class DataDashboardServiceImpl implements DataDashboardService {
         Integer admissionId = admission.getId();
 
         //从redis中获取数据面板导航栏
-        SiftBarPo siftBarPo = redisUtil.getString("siftBar+" + admissionId, SiftBarPo.class);
+        SiftBarPo siftBarPo = redisUtil.getString("data,siftBar+" + admissionId, SiftBarPo.class);
 
 //        Organization organization = organizationMapper.selectById(organizationId);
 //
@@ -481,7 +481,7 @@ public class DataDashboardServiceImpl implements DataDashboardService {
             siftBarPo.setNextPlaceBar(nextPlaceBar);
 
 
-            redisUtil.setString("siftBar+" + admissionId, siftBarPo, 5, TimeUnit.MINUTES);
+            redisUtil.setString("data,siftBar+" + admissionId, siftBarPo, 5, TimeUnit.MINUTES);
 
         }
 
