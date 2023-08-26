@@ -119,7 +119,7 @@ public class RealtimeInterviewServiceImpl implements RealtimeInterviewService {
         for (ProgressBarPo pbp : progressBarPos) {
             ProgressBarDataPo pbdp = new ProgressBarDataPo();
             pbdp.setFinished(pbp.getFinished());
-            pbdp.setTime(pbp.getHour() + ":00-" + (pbp.getHour() + 1) + ":00");
+            pbdp.setTime(pbp.getHour());
             pbdp.setTotal(pbp.getTotal());
             results.add(pbdp);
         }
