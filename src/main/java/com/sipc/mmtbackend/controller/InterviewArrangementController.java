@@ -9,6 +9,7 @@ import com.sipc.mmtbackend.pojo.dto.result.interviewArrangement.AddressAllResult
 import com.sipc.mmtbackend.pojo.dto.result.interviewArrangement.IAAllResult;
 import com.sipc.mmtbackend.pojo.dto.result.interviewArrangement.MessageCheckResult;
 import com.sipc.mmtbackend.pojo.dto.result.interviewArrangement.SiftBarResult;
+import com.sipc.mmtbackend.service.InterviewArrangementService;
 import com.sipc.mmtbackend.utils.CheckroleBUtil.pojo.PermissionEnum;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,44 +26,46 @@ import org.springframework.web.bind.annotation.*;
 @BPermission(PermissionEnum.COMMITTEE)
 public class InterviewArrangementController {
 
+    private final InterviewArrangementService interviewArrangementService;
+
     @PostMapping("/schedule/manual")
     public CommonResult<String> manualSchedule(@RequestBody ScheduleParam scheduleParam) {
-        return null;
+        return interviewArrangementService.manualSchedule(scheduleParam);
     }
 
     @PostMapping("/schedule/automatic")
     public CommonResult<String> automaticSchedule(@RequestBody ScheduleParam scheduleParam) {
-        return null;
+        return interviewArrangementService.automaticSchedule(scheduleParam);
     }
 
     @GetMapping("/address/all")
     public CommonResult<AddressAllResult> addressAll(@RequestParam Integer round) {
-        return null;
+        return interviewArrangementService.addressAll(round);
     }
 
     @GetMapping("/sift/bar")
     public CommonResult<SiftBarResult> siftBar(@RequestParam Integer round) {
-        return null;
+        return interviewArrangementService.siftBar(round);
     }
 
     @GetMapping("/all")
     public CommonResult<IAAllResult> all(@RequestParam Integer page, @RequestParam Integer pageNum, @RequestParam Integer round) {
-        return null;
+        return interviewArrangementService.all(page, pageNum, round);
     }
 
     @GetMapping("/sift")
     public CommonResult<IAAllResult> sift(@RequestParam Integer page, @RequestParam Integer pageNum, @RequestParam Integer round, @RequestBody SiftParam siftParam) {
-        return null;
+        return interviewArrangementService.sift(page, pageNum, round, siftParam);
     }
 
     @GetMapping("/message/check")
     public CommonResult<MessageCheckResult> messageCheck(@RequestParam Integer round) {
-        return null;
+        return interviewArrangementService.messageCheck(round);
     }
 
     @PostMapping("/message/send")
     public CommonResult<String> messageSend(@RequestBody MessageSendParam messageSendParam) {
-        return null;
+        return interviewArrangementService.messageSend(messageSendParam);
     }
 
 }
