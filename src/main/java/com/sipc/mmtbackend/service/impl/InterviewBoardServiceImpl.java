@@ -29,7 +29,7 @@ import java.util.List;
 public class InterviewBoardServiceImpl implements InterviewBoardService {
     private final DepartmentMapper departmentMapper;
     private final InterviewCheckMapper interviewCheckMapper;
-    private InterviewBoardDataMapper interviewBoardDataMapper;
+    private final InterviewBoardDataMapper interviewBoardDataMapper;
 
     /**
      * 获取当前登录组织的部门列表
