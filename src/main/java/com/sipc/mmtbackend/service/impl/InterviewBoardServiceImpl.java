@@ -71,19 +71,22 @@ public class InterviewBoardServiceImpl implements InterviewBoardService {
         }
         log.info("用户 " + context + " 开始判断纳新 " + admission + " 的状态\n");
         GetIntreviewStatusResult result = new GetIntreviewStatusResult();
-        Integer checkinCount = interviewBoardDataMapper.selectCountOfCheckinInterview(admission.getId());
-        // 无人签到，面试前
-        if (checkinCount == 0){
-            log.info("第一轮已签到人数为0，面试未开始\n");
+        Integer maxRound = interviewCheckMapper.selectOrganizationActivateInterviewRound(admission.getId());
+        // 无活动的面试
+        if (maxRound == null){
+            log.info("未安排面试\n");
             result.setStatus(0);
             return CommonResult.success(result);
         }
-        log.info("\t第一轮已签到人数：" + checkinCount + "\n");
-        Integer maxRound = interviewCheckMapper.selectOrganizationActivateInterviewRound(admission.getId());
-        if (maxRound == null){
-            log.warn("用户 " + context + " 在纳新 " + admission + " 中未查询到任何面试");
-            return CommonResult.fail("当前纳新未开启面试");
-        }
+        log.info("\t当前面试轮次为第 " + maxRound + " 轮\n");
+//        Integer checkinCount = interviewBoardDataMapper.selectCountOfCheckinInterview(admission.getId());
+//        // 无人签到，面试中
+//        if (checkinCount == 0){
+//            log.info("第一轮已签到人数为0，面试未开始\n");
+//            result.setStatus(0);
+//            return CommonResult.success(result);
+//        }
+//        log.info("\t第一轮已签到人数：" + checkinCount + "\n");
         // 最新一轮不是计划的最后一轮面试
         if (maxRound < admission.getRounds()){
             log.info("最后一轮未开始，面试未结束\n");
