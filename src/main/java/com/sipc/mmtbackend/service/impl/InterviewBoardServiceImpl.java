@@ -80,6 +80,10 @@ public class InterviewBoardServiceImpl implements InterviewBoardService {
         }
         log.info("\t第一轮已签到人数：" + checkinCount + "\n");
         Integer maxRound = interviewCheckMapper.selectOrganizationActivateInterviewRound(admission.getId());
+        if (maxRound == null){
+            log.warn("用户 " + context + " 在纳新 " + admission + " 中未查询到任何面试");
+            return CommonResult.fail("当前纳新未开启面试");
+        }
         // 最新一轮不是计划的最后一轮面试
         if (maxRound < admission.getRounds()){
             log.info("最后一轮未开始，面试未结束\n");
