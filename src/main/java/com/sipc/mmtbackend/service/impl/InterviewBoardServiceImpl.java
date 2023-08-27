@@ -78,6 +78,7 @@ public class InterviewBoardServiceImpl implements InterviewBoardService {
             result.setStatus(0);
             return CommonResult.success(result);
         }
+        log.info("\t当前面试轮次为第 " + maxRound + " 轮\n");
 //        Integer checkinCount = interviewBoardDataMapper.selectCountOfCheckinInterview(admission.getId());
 //        // 无人签到，面试中
 //        if (checkinCount == 0){
