@@ -71,6 +71,8 @@ public class OrganizationServiceImpl implements OrganizationService {
 
     private final MessageTemplateMapper messageTemplateMapper;
 
+    private final AdmissionDepartmentMergeMapper admissionDepartmentMergeMapper;
+
     private final HttpServletRequest httpServletRequest;
 
     private final PictureUtil pictureUtil;
@@ -608,6 +610,22 @@ public class OrganizationServiceImpl implements OrganizationService {
 
         //设置报名表相关信息
         setRegistrationFormQuestion(registrationFormData, organizationId, admissionId);
+
+        //设置admission_department_merge
+        for (Department department : departmentMapper.selectList(
+                new QueryWrapper<Department>()
+                        .eq("organization_id", organizationId)
+        )) {
+            AdmissionDepartmentMerge admissionDepartmentMerge = new AdmissionDepartmentMerge();
+            admissionDepartmentMerge.setAdmissionId(admissionId);
+            admissionDepartmentMerge.setDepartmentId(department.getId());
+            admissionDepartmentMerge.setIsDeleted((byte) 0);
+            int insertNum = admissionDepartmentMergeMapper.insert(admissionDepartmentMerge);
+            if (insertNum != 1) {
+                log.error("发布社团纳新接口异常，admission_department_merge表插入数异常，插入数为：{}，插入信息为：{}", insertNum, admissionDepartmentMerge);
+                throw new DateBaseException("数据库插入异常");
+            }
+        }
 
         return CommonResult.success("保存报名表成功");
     }

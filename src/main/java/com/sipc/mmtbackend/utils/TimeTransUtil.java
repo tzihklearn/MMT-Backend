@@ -1,6 +1,7 @@
 package com.sipc.mmtbackend.utils;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
@@ -26,6 +27,10 @@ public class TimeTransUtil {
 
     public static String tranStringToTimeNotS(LocalDateTime localDateTime) {
         return localDateTime.format(TranStringToTimeNotS);
+    }
+
+    public static LocalDateTime transLongToTime(Long time) {
+        return LocalDateTime.ofEpochSecond(time, 0, ZoneOffset.of("+8"));
     }
 
 }

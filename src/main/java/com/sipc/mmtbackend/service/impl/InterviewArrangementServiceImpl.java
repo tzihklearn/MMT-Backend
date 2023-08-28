@@ -2,6 +2,7 @@ package com.sipc.mmtbackend.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.sipc.mmtbackend.mapper.*;
+import com.sipc.mmtbackend.mapper.customization.MyAdmissionAddressMapper;
 import com.sipc.mmtbackend.mapper.customization.MyInterviewStatusMapper;
 import com.sipc.mmtbackend.mapper.customization.MyMajorClassMapper;
 import com.sipc.mmtbackend.pojo.domain.*;
@@ -9,9 +10,7 @@ import com.sipc.mmtbackend.pojo.domain.po.GroupIntCountPo;
 import com.sipc.mmtbackend.pojo.domain.po.InterviewMessagePo;
 import com.sipc.mmtbackend.pojo.domain.po.MajorClassPo;
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
-import com.sipc.mmtbackend.pojo.dto.param.interviewArrangement.MessageSendParam;
-import com.sipc.mmtbackend.pojo.dto.param.interviewArrangement.ScheduleParam;
-import com.sipc.mmtbackend.pojo.dto.param.interviewArrangement.SiftParam;
+import com.sipc.mmtbackend.pojo.dto.param.interviewArrangement.*;
 import com.sipc.mmtbackend.pojo.dto.param.interviewArrangement.po.MessageSendPo;
 import com.sipc.mmtbackend.pojo.dto.result.dataDashboard.po.SiftInfoPo;
 import com.sipc.mmtbackend.pojo.dto.result.interviewArrangement.AddressAllResult;
@@ -21,14 +20,17 @@ import com.sipc.mmtbackend.pojo.dto.result.interviewArrangement.SiftBarResult;
 import com.sipc.mmtbackend.pojo.dto.result.interviewArrangement.po.AddressPo;
 import com.sipc.mmtbackend.pojo.dto.result.interviewArrangement.po.IAInfoPo;
 import com.sipc.mmtbackend.pojo.dto.result.interviewArrangement.po.SiftBarPo;
+import com.sipc.mmtbackend.pojo.exceptions.DateBaseException;
 import com.sipc.mmtbackend.service.InterviewArrangementService;
 import com.sipc.mmtbackend.utils.CheckroleBUtil.pojo.BTokenSwapPo;
 import com.sipc.mmtbackend.utils.RedisUtil;
 import com.sipc.mmtbackend.utils.ThreadLocalContextUtil;
 import com.sipc.mmtbackend.utils.TimeTransUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -44,6 +46,7 @@ import java.util.concurrent.TimeUnit;
  */
 @Service
 @RequiredArgsConstructor(onConstructor_ = {@Autowired})
+@Slf4j
 public class InterviewArrangementServiceImpl implements InterviewArrangementService {
 
     private final AdmissionMapper admissionMapper;
@@ -62,13 +65,15 @@ public class InterviewArrangementServiceImpl implements InterviewArrangementServ
 
     private final MyMajorClassMapper myMajorClassMapper;
 
-    private AdmissionDepartmentMergeMapper admissionDepartmentMergeMapper;
+    private final AdmissionDepartmentMergeMapper admissionDepartmentMergeMapper;
 
     private final AdmissionScheduleMapper admissionScheduleMapper;
 
     private final MessageTemplateMapper messageTemplateMapper;
 
     private final MessageMapper messageMapper;
+
+    private final MyAdmissionAddressMapper myAdmissionAddressMapper;
 
     private final RedisUtil redisUtil;
 
@@ -79,13 +84,295 @@ public class InterviewArrangementServiceImpl implements InterviewArrangementServ
     private final Map<Integer, String> classMap = new HashMap<>();
 
     @Override
-    public CommonResult<String> manualSchedule(ScheduleParam scheduleParam) {
-        return null;
+    public CommonResult<String> manualSchedule(ScheduleParam scheduleParam) throws DateBaseException {
+
+        /*
+          鉴权并且获取用户所属社团组织id
+         */
+        BTokenSwapPo context = ThreadLocalContextUtil.getContext();
+        Integer organizationId = context.getOrganizationId();
+
+        Admission admission = admissionMapper.selectOne(
+                new QueryWrapper<Admission>()
+                        .select("id")
+                        .eq("organization_id", organizationId)
+                        .orderByDesc("id")
+                        .last("limit 1")
+        );
+        if (admission == null) {
+            return CommonResult.fail("社团没有开始纳新");
+        }
+
+        int admissionId = admission.getId();
+
+        Map<Integer, List<Integer>> interviewIdMap = new HashMap<>();
+        Map<Integer, List<Integer>> addressIdMap = new HashMap<>();
+
+        //TODO：要使用多线程异步优化
+        for (Integer interviewId : scheduleParam.getInterviewIdList()) {
+            InterviewStatus interviewStatus = interviewStatusMapper.selectById(interviewId);
+            if (interviewStatus == null || interviewStatus.getAdmissionId() != admissionId) {
+                return CommonResult.fail("该社团不存在的数据");
+            }
+            List<Integer> integerList = interviewIdMap.get(interviewStatus.getDepartmentId());
+            if (integerList == null) {
+                integerList = new ArrayList<>();
+                integerList.add(interviewId);
+                interviewIdMap.put(interviewStatus.getDepartmentId(), integerList);
+            } else {
+                integerList.add(interviewId);
+            }
+        }
+
+        for (Integer addressId : scheduleParam.getAddressIdList()) {
+            AdmissionDepartmentMerge admissionDepartmentMerge = myAdmissionAddressMapper.selectDepartmentAndId(addressId);
+
+            if (admissionDepartmentMerge == null || admissionDepartmentMerge.getAdmissionId() != admissionId) {
+                return CommonResult.fail("该社团不存在的数据");
+            }
+
+            List<Integer> integerList = addressIdMap.get(admissionDepartmentMerge.getDepartmentId());
+            if (integerList == null) {
+                integerList = new ArrayList<>();
+                integerList.add(addressId);
+                addressIdMap.put(admissionDepartmentMerge.getDepartmentId(), integerList);
+            } else {
+                integerList.add(addressId);
+            }
+        }
+
+        for (Map.Entry<Integer, List<Integer>> addressIdMapEntry : addressIdMap.entrySet()) {
+            Integer departmentId = addressIdMapEntry.getKey();
+            List<Integer> addressIdList = addressIdMapEntry.getValue();
+            List<Integer> interviewIdList= interviewIdMap.get(departmentId);
+            if (interviewIdList != null) {
+                //TODO：要使用多线程异步优化
+                int i = 0;
+                int t = interviewIdList.size() / addressIdList.size();
+                if (t == 0) {
+                    for (Integer interviewId : interviewIdList) {
+                        InterviewStatus interviewStatus = new InterviewStatus();
+                        interviewStatus.setId(interviewId);
+                        interviewStatus.setAdmissionAddressId(addressIdList.get(i));
+                        interviewStatus.setStartTime(TimeTransUtil.transLongToTime(scheduleParam.getStartTime()));
+                        interviewStatus.setEndTime(TimeTransUtil.transLongToTime(scheduleParam.getStartTime() + scheduleParam.getTime() * 60));
+                        interviewStatus.setState(3);
+                        int updateNum = interviewStatusMapper.updateById(interviewStatus);
+                        if (updateNum != 1) {
+                            log.error("手动面试安排接口异常，interview_status表更新数异常，受影响的行数：{}，更新的数据：{}", updateNum, interviewStatus);
+                            throw new DateBaseException("数据库更新数据异常");
+                        }
+                        ++i;
+                    }
+                } else {
+                    for (Integer interviewId : interviewIdList) {
+                        InterviewStatus interviewStatus = new InterviewStatus();
+                        interviewStatus.setId(interviewId);
+                        interviewStatus.setAdmissionAddressId(addressIdList.get(i/t));
+                        interviewStatus.setStartTime(TimeTransUtil.transLongToTime(scheduleParam.getStartTime()));
+                        interviewStatus.setEndTime(TimeTransUtil.transLongToTime(scheduleParam.getStartTime() + (long) scheduleParam.getTime() * 60 * (i + 1)));
+                        interviewStatus.setState(3);
+                        int updateNum = interviewStatusMapper.updateById(interviewStatus);
+                        if (updateNum != 1) {
+                            log.error("手动面试安排接口异常，interview_status表更新数异常，受影响的行数：{}，更新的数据：{}", updateNum, interviewStatus);
+                            throw new DateBaseException("数据库更新数据异常");
+                        }
+                        ++i;
+                    }
+                }
+            }
+        }
+
+        return CommonResult.success("操作成功");
     }
 
     @Override
-    public CommonResult<String> automaticSchedule(ScheduleParam scheduleParam) {
-        return null;
+    public CommonResult<String> automaticSchedule(ScheduleParam scheduleParam) throws DateBaseException {
+        /*
+          鉴权并且获取用户所属社团组织id
+         */
+        BTokenSwapPo context = ThreadLocalContextUtil.getContext();
+        Integer organizationId = context.getOrganizationId();
+
+        Admission admission = admissionMapper.selectOne(
+                new QueryWrapper<Admission>()
+                        .select("id")
+                        .eq("organization_id", organizationId)
+                        .orderByDesc("id")
+                        .last("limit 1")
+        );
+        if (admission == null) {
+            return CommonResult.fail("社团没有开始纳新");
+        }
+
+        int admissionId = admission.getId();
+
+        Map<Integer, List<Integer>> interviewIdMap = new HashMap<>();
+        Map<Integer, List<Integer>> addressIdMap = new HashMap<>();
+
+        int flag = 0;
+
+        //TODO：要使用多线程异步优化
+        for (Integer interviewId : scheduleParam.getInterviewIdList()) {
+            InterviewStatus interviewStatus = interviewStatusMapper.selectById(interviewId);
+            if (interviewStatus == null || interviewStatus.getAdmissionId() != admissionId) {
+                return CommonResult.fail("该社团不存在的数据");
+            }
+            List<Integer> integerList = interviewIdMap.get(interviewStatus.getDepartmentId());
+            if (integerList == null) {
+                integerList = new ArrayList<>();
+                integerList.add(interviewId);
+                interviewIdMap.put(interviewStatus.getDepartmentId(), integerList);
+            } else {
+                integerList.add(interviewId);
+            }
+        }
+
+        for (Integer addressId : scheduleParam.getAddressIdList()) {
+            AdmissionDepartmentMerge admissionDepartmentMerge = myAdmissionAddressMapper.selectDepartmentAndId(addressId);
+
+            if (admissionDepartmentMerge == null || admissionDepartmentMerge.getAdmissionId() != admissionId) {
+                return CommonResult.fail("该社团不存在的数据");
+            }
+
+            List<Integer> integerList = addressIdMap.get(admissionDepartmentMerge.getDepartmentId());
+            if (integerList == null) {
+                integerList = new ArrayList<>();
+                integerList.add(addressId);
+                addressIdMap.put(admissionDepartmentMerge.getDepartmentId(), integerList);
+            } else {
+                integerList.add(addressId);
+            }
+        }
+
+        for (Map.Entry<Integer, List<Integer>> addressIdMapEntry : addressIdMap.entrySet()) {
+            Integer departmentId = addressIdMapEntry.getKey();
+            List<Integer> addressIdList = addressIdMapEntry.getValue();
+            List<Integer> interviewIdList= interviewIdMap.get(departmentId);
+            if (interviewIdList != null) {
+                //TODO：要使用多线程异步优化
+                int i = 0;
+                int t = interviewIdList.size() / addressIdList.size();
+                if (t == 0) {
+                    for (Integer interviewId : interviewIdList) {
+                        InterviewStatus interviewStatus = new InterviewStatus();
+                        interviewStatus.setId(interviewId);
+                        interviewStatus.setAdmissionAddressId(addressIdList.get(i));
+                        interviewStatus.setStartTime(TimeTransUtil.transLongToTime(scheduleParam.getStartTime()));
+                        long endTime = scheduleParam.getStartTime() + scheduleParam.getTime() * 60;
+                        interviewStatus.setEndTime(TimeTransUtil.transLongToTime(endTime));
+                        interviewStatus.setState(3);
+                        if (endTime > scheduleParam.getEndTime()) {
+                            break;
+                        }
+                        int updateNum = interviewStatusMapper.updateById(interviewStatus);
+                        if (updateNum != 1) {
+                            log.error("手动面试安排接口异常，interview_status表更新数异常，受影响的行数：{}，更新的数据：{}", updateNum, interviewStatus);
+                            throw new DateBaseException("数据库更新数据异常");
+                        }
+                        ++i;
+                    }
+                } else {
+                    for (Integer interviewId : interviewIdList) {
+                        InterviewStatus interviewStatus = new InterviewStatus();
+                        interviewStatus.setId(interviewId);
+                        interviewStatus.setAdmissionAddressId(addressIdList.get(i/t));
+                        interviewStatus.setStartTime(TimeTransUtil.transLongToTime(scheduleParam.getStartTime()));
+                        long endTime = scheduleParam.getStartTime() + (long) scheduleParam.getTime() * 60 * (i + 1);
+                        interviewStatus.setEndTime(TimeTransUtil.transLongToTime(endTime));
+                        interviewStatus.setState(3);
+                        if (endTime > scheduleParam.getEndTime()) {
+                            break;
+                        }
+                        int updateNum = interviewStatusMapper.updateById(interviewStatus);
+                        if (updateNum != 1) {
+                            log.error("手动面试安排接口异常，interview_status表更新数异常，受影响的行数：{}，更新的数据：{}", updateNum, interviewStatus);
+                            throw new DateBaseException("数据库更新数据异常");
+                        }
+                        ++i;
+                    }
+                }
+            }
+        }
+
+        return CommonResult.success("操作成功");
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public CommonResult<AddressAllResult> saveAddress(SaveAddressParam saveAddressParam) throws DateBaseException {
+
+        /*
+          鉴权并且获取用户所属社团组织id
+         */
+        BTokenSwapPo context = ThreadLocalContextUtil.getContext();
+        Integer organizationId = context.getOrganizationId();
+
+        Admission admission = admissionMapper.selectOne(
+                new QueryWrapper<Admission>()
+                        .select("id")
+                        .eq("organization_id", organizationId)
+                        .orderByDesc("id")
+                        .last("limit 1")
+        );
+        if (admission == null) {
+            return CommonResult.fail("社团没有开始纳新");
+        }
+
+        AdmissionDepartmentMerge admissionDepartmentMerge = admissionDepartmentMergeMapper.selectOne(
+                new QueryWrapper<AdmissionDepartmentMerge>()
+                        .select("id")
+                        .eq("admission_id", admission.getId())
+                        .eq("department_id", saveAddressParam.getDepartmentId())
+        );
+        AdmissionSchedule admissionSchedule = admissionScheduleMapper.selectOne(
+                new QueryWrapper<AdmissionSchedule>()
+                        .select("id")
+                        .eq("admission_department_id", admissionDepartmentMerge.getId())
+                        .eq("round", saveAddressParam.getRound())
+        );
+
+        AdmissionAddress admissionAddress = new AdmissionAddress();
+        admissionAddress.setName(saveAddressParam.getName());
+        admissionAddress.setAdmissionScheduleId(admissionSchedule.getId());
+        admissionAddress.setIsDeleted((byte) 0);
+        int insertNum = admissionAddressMapper.insert(admissionAddress);
+        if (insertNum != 1) {
+            log.error("设置社团纳新组织面试地点接口异常，admission_address表新增数据异常，影响行数：{}，新增数据：{}", insertNum, admissionAddress);
+            throw new DateBaseException("删除数据库数据异常");
+        }
+
+        return addressAll(saveAddressParam.getRound());
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public CommonResult<AddressAllResult> deletedAddress(DeletedAddressParam deletedAddressParam) throws DateBaseException {
+
+        /*
+          鉴权并且获取用户所属社团组织id
+         */
+        BTokenSwapPo context = ThreadLocalContextUtil.getContext();
+        Integer organizationId = context.getOrganizationId();
+
+        Admission admission = admissionMapper.selectOne(
+                new QueryWrapper<Admission>()
+                        .select("id")
+                        .eq("organization_id", organizationId)
+                        .orderByDesc("id")
+                        .last("limit 1")
+        );
+        if (admission == null) {
+            return CommonResult.fail("社团没有开始纳新");
+        }
+
+        int deleteNum = admissionAddressMapper.deleteById(deletedAddressParam.getAddressId());
+        if (deleteNum != 1) {
+            log.error("删除社团部门面试地点接口异常，admission_address表删除数据异常，影响行数：{}，删除数据id：{}", deleteNum, deletedAddressParam.getAddressId());
+            throw new DateBaseException("数据库删除数据异常");
+        }
+
+        return addressAll(deletedAddressParam.getRound());
     }
 
     @Override
