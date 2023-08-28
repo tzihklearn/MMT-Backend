@@ -37,7 +37,7 @@ public class InterviewArrangementController {
         return interviewArrangementService.automaticSchedule(scheduleParam);
     }
 
-    @PostMapping("/address/save")
+    @PostMapping("/address/add")
     public CommonResult<AddressAllResult> saveAddress(@RequestBody SaveAddressParam saveAddressParam) throws DateBaseException {
         return interviewArrangementService.saveAddress(saveAddressParam);
     }
