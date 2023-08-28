@@ -28,12 +28,12 @@ public class InterviewArrangementController {
     private final InterviewArrangementService interviewArrangementService;
 
     @PostMapping("/schedule/manual")
-    public CommonResult<String> manualSchedule(@RequestBody ScheduleParam scheduleParam) {
+    public CommonResult<String> manualSchedule(@RequestBody ScheduleParam scheduleParam) throws DateBaseException {
         return interviewArrangementService.manualSchedule(scheduleParam);
     }
 
     @PostMapping("/schedule/automatic")
-    public CommonResult<String> automaticSchedule(@RequestBody ScheduleParam scheduleParam) {
+    public CommonResult<String> automaticSchedule(@RequestBody ScheduleParam scheduleParam) throws DateBaseException {
         return interviewArrangementService.automaticSchedule(scheduleParam);
     }
 
