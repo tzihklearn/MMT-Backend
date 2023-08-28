@@ -2,13 +2,12 @@ package com.sipc.mmtbackend.controller;
 
 import com.sipc.mmtbackend.annotation.BPermission;
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
-import com.sipc.mmtbackend.pojo.dto.param.interviewArrangement.MessageSendParam;
-import com.sipc.mmtbackend.pojo.dto.param.interviewArrangement.ScheduleParam;
-import com.sipc.mmtbackend.pojo.dto.param.interviewArrangement.SiftParam;
+import com.sipc.mmtbackend.pojo.dto.param.interviewArrangement.*;
 import com.sipc.mmtbackend.pojo.dto.result.interviewArrangement.AddressAllResult;
 import com.sipc.mmtbackend.pojo.dto.result.interviewArrangement.IAAllResult;
 import com.sipc.mmtbackend.pojo.dto.result.interviewArrangement.MessageCheckResult;
 import com.sipc.mmtbackend.pojo.dto.result.interviewArrangement.SiftBarResult;
+import com.sipc.mmtbackend.pojo.exceptions.DateBaseException;
 import com.sipc.mmtbackend.service.InterviewArrangementService;
 import com.sipc.mmtbackend.utils.CheckroleBUtil.pojo.PermissionEnum;
 import lombok.RequiredArgsConstructor;
@@ -29,13 +28,23 @@ public class InterviewArrangementController {
     private final InterviewArrangementService interviewArrangementService;
 
     @PostMapping("/schedule/manual")
-    public CommonResult<String> manualSchedule(@RequestBody ScheduleParam scheduleParam) {
+    public CommonResult<String> manualSchedule(@RequestBody ScheduleParam scheduleParam) throws DateBaseException {
         return interviewArrangementService.manualSchedule(scheduleParam);
     }
 
     @PostMapping("/schedule/automatic")
-    public CommonResult<String> automaticSchedule(@RequestBody ScheduleParam scheduleParam) {
+    public CommonResult<String> automaticSchedule(@RequestBody ScheduleParam scheduleParam) throws DateBaseException {
         return interviewArrangementService.automaticSchedule(scheduleParam);
+    }
+
+    @PostMapping("/address/save")
+    public CommonResult<AddressAllResult> saveAddress(@RequestBody SaveAddressParam saveAddressParam) throws DateBaseException {
+        return interviewArrangementService.saveAddress(saveAddressParam);
+    }
+
+    @PostMapping("/address/deleted")
+    public CommonResult<AddressAllResult> deletedAddress(@RequestBody DeletedAddressParam deletedAddressParam) throws DateBaseException {
+        return interviewArrangementService.deletedAddress(deletedAddressParam);
     }
 
     @GetMapping("/address/all")
