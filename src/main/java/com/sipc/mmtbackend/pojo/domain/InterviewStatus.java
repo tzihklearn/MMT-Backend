@@ -62,6 +62,12 @@ public class InterviewStatus implements Serializable {
     private LocalDateTime signInTime;
 
     /**
+     * 真正结束时间
+     */
+    @TableField("true_end_time")
+    private LocalDateTime trueEndTime;
+
+    /**
      * 社团志愿次序
      */
     @TableField("organization_order")
@@ -91,11 +97,14 @@ public class InterviewStatus implements Serializable {
     @TableField("round")
     private Integer round;
 
+    @TableField("is_message")
+    private Integer isMessage;
+
     /**
      * 是否已经调剂
      */
     @TableField("is_transfers")
-    private byte isTransfers;
+    private Byte isTransfers;
 
     /**
      * 逻辑删除字段
