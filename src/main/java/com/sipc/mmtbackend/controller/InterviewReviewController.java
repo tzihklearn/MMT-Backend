@@ -12,7 +12,6 @@ import com.sipc.mmtbackend.pojo.dto.result.interviewreview.PieChatResult;
 import com.sipc.mmtbackend.pojo.exceptions.DateBaseException;
 import com.sipc.mmtbackend.service.InterviewReviewService;
 import com.sipc.mmtbackend.utils.CheckroleBUtil.pojo.PermissionEnum;
-import javafx.scene.chart.PieChart;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
