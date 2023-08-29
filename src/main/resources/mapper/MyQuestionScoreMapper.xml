@@ -3,14 +3,14 @@
 <mapper namespace="com.sipc.mmtbackend.mapper.customization.MyQuestionScoreMapper">
     <select id="selectPoAllByQuestionId"
             resultType="com.sipc.mmtbackend.pojo.domain.po.interviewReview.QuestionScorePo">
-        select user_b_id as user_id, interview_question_id, avg(score) as score
+        select interview_status_id as user_id, interview_question_id, avg(score) as score
         from question_score
         <if test="questionIds.size() != 0">
-            where score in
+            where interview_question_id in
             <foreach collection="questionIds" item="item" open="(" separator="," close=")">
                 #{item.id}
             </foreach>
         </if>
-        group by user_b_id, interview_question_id
+        group by interview_status_id, interview_question_id
     </select>
 </mapper>

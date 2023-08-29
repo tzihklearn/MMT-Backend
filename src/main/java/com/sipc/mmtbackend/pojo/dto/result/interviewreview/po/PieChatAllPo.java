@@ -1,5 +1,6 @@
 package com.sipc.mmtbackend.pojo.dto.result.interviewreview.po;
 
+import com.sipc.mmtbackend.pojo.dto.result.interviewArrangement.po.ResultOverviewPo;
 import lombok.Data;
 
 import java.util.List;
@@ -12,7 +13,7 @@ import java.util.List;
 @Data
 public class PieChatAllPo {
 
-    private List<PieChartPo> resultOverview;
+    private ResultOverviewPo resultOverview;
 
     private List<PieChartPo> departmentDivide;
 

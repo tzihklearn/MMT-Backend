@@ -17,6 +17,7 @@ import com.sipc.mmtbackend.pojo.dto.param.interviewArrangement.po.MessageSendPo;
 import com.sipc.mmtbackend.pojo.dto.param.interviewreview.ArrangeParam;
 import com.sipc.mmtbackend.pojo.dto.param.interviewreview.SendParam;
 import com.sipc.mmtbackend.pojo.dto.param.interviewreview.SiftParam;
+import com.sipc.mmtbackend.pojo.dto.result.interviewArrangement.po.ResultOverviewPo;
 import com.sipc.mmtbackend.pojo.dto.result.interviewreview.AddressResult;
 import com.sipc.mmtbackend.pojo.dto.result.interviewreview.InfoAllResult;
 import com.sipc.mmtbackend.pojo.dto.result.interviewreview.MessageTemplateResult;
@@ -33,6 +34,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -192,14 +195,20 @@ public class InterviewReviewServiceImpl implements InterviewReviewService {
         //查找面试问题
         List<InterviewQuestion> interviewQuestions = interviewQuestionMapper.selectList(
                 new QueryWrapper<InterviewQuestion>()
-                        .select("id")
-                        .select("question_id")
+//                        .select("id")
+//                        .select("question_id")
                         .eq("admission_id", admissionId)
                         .eq("round", admissionSchedule.getRound())
                         .eq("type", 6)
         );
 
         int i = 1;
+
+        QuestionPo questionPoL = new QuestionPo();
+        questionPoL.setLabel(0);
+        questionPoL.setQuestion("面试总分");
+        title.add(questionPoL);
+
         for (InterviewQuestion interviewQuestion : interviewQuestions) {
             QuestionData questionData = questionDataMapper.selectById(interviewQuestion.getQuestionId());
 
@@ -218,7 +227,8 @@ public class InterviewReviewServiceImpl implements InterviewReviewService {
         Map<Integer, Double> questionScoreMap = new HashMap<>();
 
         for (QuestionScorePo questionScorePo : myQuestionScoreMapper.selectPoAllByQuestionId(interviewQuestions)) {
-            questionScoreMap.put(questionScorePo.getUserId() * Common.QuestionScoreSilt + questionScorePo.getInterviewQuestionId(), questionScorePo.getScore());
+            BigDecimal b = BigDecimal.valueOf(questionScorePo.getScore());
+            questionScoreMap.put(questionScorePo.getUserId() * Common.QuestionScoreSilt + questionScorePo.getInterviewQuestionId(), b.setScale(2, RoundingMode.HALF_UP).doubleValue());
         }
 
         int start = (page - 1) * 10;
@@ -249,10 +259,13 @@ public class InterviewReviewServiceImpl implements InterviewReviewService {
 
                 ScorePo scorePo = new ScorePo();
                 scorePo.setLabel(j);
+
                 double scoreNumber = questionScoreMap.get(irInterviewStatusPo.getUserId() * Common.QuestionScoreSilt + interviewQuestion.getId());
                 scorePo.setScore(scoreNumber);
 
                 sum += scoreNumber;
+
+                score.add(scorePo);
 
                 ++j;
             }
@@ -335,13 +348,9 @@ public class InterviewReviewServiceImpl implements InterviewReviewService {
 
         int admissionId = admission.getId();
 
-        StateAllPo stateAll = new StateAllPo();
-
         List<QuestionPo> title = new ArrayList<>();
 
         List<InfoPo> tableData = new ArrayList<>();
-
-        PieChatAllPo pieChatAll = new PieChatAllPo();
 
         AdmissionDepartmentMerge admissionDepartmentMerge = admissionDepartmentMergeMapper.selectOne(
                 new QueryWrapper<AdmissionDepartmentMerge>()
@@ -367,6 +376,12 @@ public class InterviewReviewServiceImpl implements InterviewReviewService {
         );
 
         int i = 1;
+
+        QuestionPo questionPoL = new QuestionPo();
+        questionPoL.setLabel(0);
+        questionPoL.setQuestion("面试总分");
+        title.add(questionPoL);
+
         for (InterviewQuestion interviewQuestion : interviewQuestions) {
             QuestionData questionData = questionDataMapper.selectById(interviewQuestion.getQuestionId());
 
@@ -385,7 +400,8 @@ public class InterviewReviewServiceImpl implements InterviewReviewService {
         Map<Integer, Double> questionScoreMap = new HashMap<>();
 
         for (QuestionScorePo questionScorePo : myQuestionScoreMapper.selectPoAllByQuestionId(interviewQuestions)) {
-            questionScoreMap.put(questionScorePo.getUserId() * Common.QuestionScoreSilt + questionScorePo.getInterviewQuestionId(), questionScorePo.getScore());
+            BigDecimal b = BigDecimal.valueOf(questionScorePo.getScore());
+            questionScoreMap.put(questionScorePo.getUserId() * Common.QuestionScoreSilt + questionScorePo.getInterviewQuestionId(), b.setScale(2, RoundingMode.HALF_UP).doubleValue());
         }
 
 
@@ -442,6 +458,8 @@ public class InterviewReviewServiceImpl implements InterviewReviewService {
                     scorePo.setScore(scoreNumber);
 
                     sum += scoreNumber;
+
+                    score.add(scorePo);
 
                     ++j;
                 }
@@ -546,7 +564,7 @@ public class InterviewReviewServiceImpl implements InterviewReviewService {
 
         PieChatAllPo pieChatAll = new PieChatAllPo();
 
-        List<PieChartPo> resultOverview = new ArrayList<>();
+        ResultOverviewPo resultOverview = new ResultOverviewPo();
 
         List<PieChartPo> departmentDivide = new ArrayList<>();
 
@@ -556,8 +574,26 @@ public class InterviewReviewServiceImpl implements InterviewReviewService {
         pieChartPoL.setId(1);
         pieChartPoL.setContent("未操作");
         pieChartPoL.setNum(0);
+        resultOverview.setNotOperated(pieChartPoL);
 
-        resultOverview.add(pieChartPoL);
+        pieChartPoL = new PieChartPo();
+        pieChartPoL.setId(2);
+        pieChartPoL.setContent("失败");
+        pieChartPoL.setNum(0);
+        resultOverview.setFail(pieChartPoL);
+
+        pieChartPoL = new PieChartPo();
+        pieChartPoL.setId(3);
+        pieChartPoL.setContent("成功");
+        pieChartPoL.setNum(0);
+        resultOverview.setPass(pieChartPoL);
+
+        pieChartPoL = new PieChartPo();
+        pieChartPoL.setId(4);
+        pieChartPoL.setContent("待定");
+        pieChartPoL.setNum(0);
+        resultOverview.setUndetermined(pieChartPoL);
+
 
         for (GroupByNumPo groupByNumPo : myInterviewStatusMapper.selectGroupByAdmissionIdAndRoundAndDAndA(admissionId, admissionSchedule.getRound(), departmentId, addressId)) {
             Integer state = groupByNumPo.getId();
@@ -566,21 +602,21 @@ public class InterviewReviewServiceImpl implements InterviewReviewService {
                 pieChartPo.setId(4);
                 pieChartPo.setContent("待定");
                 pieChartPo.setNum(groupByNumPo.getNum());
-                resultOverview.add(pieChartPo);
+                resultOverview.setUndetermined(pieChartPo);
             } else if (state == 8) {
                 PieChartPo pieChartPo = new PieChartPo();
                 pieChartPo.setId(2);
                 pieChartPo.setContent("失败");
                 pieChartPo.setNum(groupByNumPo.getNum());
 
-                resultOverview.add(pieChartPo);
+                resultOverview.setFail(pieChartPo);
             } else if (state == 9) {
                 PieChartPo pieChartPo = new PieChartPo();
                 pieChartPo.setId(3);
                 pieChartPo.setContent("成功");
                 pieChartPo.setNum(groupByNumPo.getNum());
 
-                resultOverview.add(pieChartPo);
+                resultOverview.setPass(pieChartPo);
             } else {
                 pieChartPoL.setNum(pieChartPoL.getNum() + groupByNumPo.getNum());
             }
@@ -698,6 +734,10 @@ public class InterviewReviewServiceImpl implements InterviewReviewService {
                         .eq("organization_id", organizationId)
                         .eq("type", type)
         );
+
+        if (messageTemplate == null) {
+            return CommonResult.fail("未配置消息模板");
+        }
 
         result.setMessageTemplate(messageTemplate.getMessageTemplate());
 

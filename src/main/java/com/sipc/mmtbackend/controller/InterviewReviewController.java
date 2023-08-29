@@ -1,5 +1,6 @@
 package com.sipc.mmtbackend.controller;
 
+import com.sipc.mmtbackend.annotation.BPermission;
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
 import com.sipc.mmtbackend.pojo.dto.param.interviewreview.ArrangeParam;
 import com.sipc.mmtbackend.pojo.dto.param.interviewreview.SendParam;
@@ -10,6 +11,7 @@ import com.sipc.mmtbackend.pojo.dto.result.interviewreview.MessageTemplateResult
 import com.sipc.mmtbackend.pojo.dto.result.interviewreview.PieChatResult;
 import com.sipc.mmtbackend.pojo.exceptions.DateBaseException;
 import com.sipc.mmtbackend.service.InterviewReviewService;
+import com.sipc.mmtbackend.utils.CheckroleBUtil.pojo.PermissionEnum;
 import javafx.scene.chart.PieChart;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,8 +23,9 @@ import org.springframework.web.bind.annotation.*;
  * @since 2023.08.28
  */
 @RestController
-@RequestMapping("/interview/review")
+@RequestMapping("/b/interview/review")
 @RequiredArgsConstructor(onConstructor_ = {@Autowired})
+@BPermission(PermissionEnum.MEMBER)
 public class InterviewReviewController {
 
     private final InterviewReviewService interviewReviewService;
