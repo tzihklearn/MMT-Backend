@@ -524,7 +524,7 @@ public class InterviewReviewServiceImpl implements InterviewReviewService {
     }
 
     @Override
-    public CommonResult<PieChatResult> pieChatInfo(Integer departmentId, Integer addressId) {
+    public CommonResult<PieChatResult> pieChatInfo() {
 
         /*
           鉴权并且获取用户所属社团组织id
@@ -612,7 +612,7 @@ public class InterviewReviewServiceImpl implements InterviewReviewService {
 
         int sum = 0;
 
-        for (GroupByNumPo groupByNumPo : myInterviewStatusMapper.selectGroupByAdmissionIdAndRoundAndDAndA(admissionId, admissionSchedule.getRound(), departmentId, addressId)) {
+        for (GroupByNumPo groupByNumPo : myInterviewStatusMapper.selectGroupByAdmissionIdAndRoundAndDAndA(admissionId, admissionSchedule.getRound())) {
             Integer state = groupByNumPo.getId();
             if (state == 7) {
                 PieChartPo pieChartPo = new PieChartPo();
@@ -650,7 +650,7 @@ public class InterviewReviewServiceImpl implements InterviewReviewService {
 
         sum = 0;
 
-        for (GroupByNumPo groupByNumPo : myInterviewStatusMapper.selectGroupDByAdmissionIdAndRoundAndDAndA(admissionId, admissionSchedule.getRound(), departmentId, addressId)) {
+        for (GroupByNumPo groupByNumPo : myInterviewStatusMapper.selectGroupDByAdmissionIdAndRoundAndDAndA(admissionId, admissionSchedule.getRound())) {
             PieChartPo pieChartPo = new PieChartPo();
             pieChartPo.setId(groupByNumPo.getId());
             pieChartPo.setContent(departmentMap.get(groupByNumPo.getId()));
@@ -685,7 +685,7 @@ public class InterviewReviewServiceImpl implements InterviewReviewService {
 
         sum = 0;
 
-        for (GroupByNumPo groupByNumPo : myInterviewStatusMapper.selectGroupAByAdmissionIdAndRoundAndDAndA(admissionId, admissionSchedule.getRound(), departmentId, addressId)) {
+        for (GroupByNumPo groupByNumPo : myInterviewStatusMapper.selectGroupAByAdmissionIdAndRoundAndDAndA(admissionId, admissionSchedule.getRound())) {
             PieChartPo pieChartPo = new PieChartPo();
             pieChartPo.setId(groupByNumPo.getId());
             pieChartPo.setContent(addressMap.get(groupByNumPo.getId()));

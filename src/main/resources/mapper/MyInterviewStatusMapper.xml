@@ -349,12 +349,6 @@
           and round = #{round,jdbcType=INTEGER}
           and true_end_time is not null
           and state = 9
-          <if test="departmentId != null">
-              and department_id = #{departmentId,jdbcType=INTEGER}
-          </if>
-          <if test="addressId != null">
-              and admission_address_id = #{addressId,jdbcType=INTEGER}
-          </if>
           group by department_id
     </select>
     <select id="selectGroupAByAdmissionIdAndRoundAndDAndA"
@@ -365,12 +359,6 @@
           and round = #{round,jdbcType=INTEGER}
           and true_end_time is not null
           and state = 9
-          <if test="departmentId != null">
-              and department_id = #{departmentId,jdbcType=INTEGER}
-          </if>
-          <if test="addressId != null">
-              and admission_address_id = #{addressId,jdbcType=INTEGER}
-          </if>
         group by admission_address_id
     </select>
     <select id="selectGroupMessageByAdmissionIdAndRound"
