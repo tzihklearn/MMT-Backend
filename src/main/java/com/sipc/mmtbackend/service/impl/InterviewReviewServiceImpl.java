@@ -114,6 +114,8 @@ public class InterviewReviewServiceImpl implements InterviewReviewService {
 
         List<AddressPo> addressPoList = new ArrayList<>();
 
+        int round = 0;
+
         for (AdmissionDepartmentMerge admissionDepartmentMerge : admissionDepartmentMergeMapper.selectList(
                 new QueryWrapper<AdmissionDepartmentMerge>().eq("admission_id", admissionId))
         ) {
@@ -123,6 +125,12 @@ public class InterviewReviewServiceImpl implements InterviewReviewService {
                             .orderByDesc("round")
                             .last("limit 1")
             );
+
+            if (admissionSchedule == null) {
+                continue;
+            }
+
+            round = admissionSchedule.getRound();
 
             for (AdmissionAddress admissionAddress : admissionAddressMapper.selectList(
                     new QueryWrapper<AdmissionAddress>()
@@ -141,7 +149,7 @@ public class InterviewReviewServiceImpl implements InterviewReviewService {
 
         AddressResult result = new AddressResult();
         result.setAddressPoList(addressPoList);
-
+        result.setRound(round);
 
         return CommonResult.success(result);
     }
@@ -555,12 +563,20 @@ public class InterviewReviewServiceImpl implements InterviewReviewService {
                         .last("limit 1")
         );
 
+        if (admissionDepartmentMerge == null) {
+            return CommonResult.fail("该社团没有部门参与纳新");
+        }
+
         AdmissionSchedule admissionSchedule = admissionScheduleMapper.selectOne(
                 new QueryWrapper<AdmissionSchedule>()
                         .eq("admission_department_id", admissionDepartmentMerge.getId())
                         .orderByDesc("round")
                         .last("limit 1")
         );
+
+        if (admissionSchedule == null) {
+            return CommonResult.fail("改社团没有发起任何一轮面试");
+        }
 
         PieChatAllPo pieChatAll = new PieChatAllPo();
 
@@ -622,6 +638,8 @@ public class InterviewReviewServiceImpl implements InterviewReviewService {
             }
         }
 
+//        List<Integer> notDepartmentId = new ArrayList<>();
+
         for (GroupByNumPo groupByNumPo : myInterviewStatusMapper.selectGroupDByAdmissionIdAndRoundAndDAndA(admissionId, admissionSchedule.getRound(), departmentId, addressId)) {
             PieChartPo pieChartPo = new PieChartPo();
             pieChartPo.setId(groupByNumPo.getId());
@@ -629,7 +647,24 @@ public class InterviewReviewServiceImpl implements InterviewReviewService {
             pieChartPo.setNum(groupByNumPo.getNum());
 
             departmentDivide.add(pieChartPo);
+
+//            notDepartmentId.add(groupByNumPo.getId());
         }
+
+//        for (AdmissionDepartmentMerge departmentMerge : admissionDepartmentMergeMapper.selectList(
+//                new QueryWrapper<AdmissionDepartmentMerge>()
+//                        .eq("admission_id", admissionId)
+//                        .notIn("department_id", notDepartmentId)
+//        )) {
+//            PieChartPo pieChartPo = new PieChartPo();
+//            pieChartPo.setId(departmentMerge.getId());
+//            pieChartPo.setContent(departmentMap.get(departmentMerge.getId()));
+//            pieChartPo.setNum(0);
+//
+//            departmentDivide.add(pieChartPo);
+//        }
+
+//        List<Integer> notAddressId = new ArrayList<>();
 
         for (GroupByNumPo groupByNumPo : myInterviewStatusMapper.selectGroupAByAdmissionIdAndRoundAndDAndA(admissionId, admissionSchedule.getRound(), departmentId, addressId)) {
             PieChartPo pieChartPo = new PieChartPo();
@@ -639,6 +674,10 @@ public class InterviewReviewServiceImpl implements InterviewReviewService {
 
             addressDivide.add(pieChartPo);
         }
+
+//        admissionAddressMapper.selectList(
+//                new QueryWrapper<AdmissionAddress>()
+//        )
 
         pieChatAll.setResultOverview(resultOverview);
         pieChatAll.setDepartmentDivide(departmentDivide);
