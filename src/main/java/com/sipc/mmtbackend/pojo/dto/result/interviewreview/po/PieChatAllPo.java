@@ -15,8 +15,8 @@ public class PieChatAllPo {
 
     private ResultOverviewPo resultOverview;
 
-    private List<PieChartPo> departmentDivide;
+    private PieChartOnPo departmentDivide;
 
-    private List<PieChartPo> addressDivide;
+    private PieChartOnPo addressDivide;
 
 }

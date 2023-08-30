@@ -582,9 +582,9 @@ public class InterviewReviewServiceImpl implements InterviewReviewService {
 
         ResultOverviewPo resultOverview = new ResultOverviewPo();
 
-        List<PieChartPo> departmentDivide = new ArrayList<>();
+        List<PieChartPo> departmentDividePo = new ArrayList<>();
 
-        List<PieChartPo> addressDivide = new ArrayList<>();
+        List<PieChartPo> addressDividePo = new ArrayList<>();
 
         PieChartPo pieChartPoL = new PieChartPo();
         pieChartPoL.setId(1);
@@ -610,6 +610,7 @@ public class InterviewReviewServiceImpl implements InterviewReviewService {
         pieChartPoL.setNum(0);
         resultOverview.setUndetermined(pieChartPoL);
 
+        int sum = 0;
 
         for (GroupByNumPo groupByNumPo : myInterviewStatusMapper.selectGroupByAdmissionIdAndRoundAndDAndA(admissionId, admissionSchedule.getRound(), departmentId, addressId)) {
             Integer state = groupByNumPo.getId();
@@ -619,6 +620,7 @@ public class InterviewReviewServiceImpl implements InterviewReviewService {
                 pieChartPo.setContent("待定");
                 pieChartPo.setNum(groupByNumPo.getNum());
                 resultOverview.setUndetermined(pieChartPo);
+
             } else if (state == 8) {
                 PieChartPo pieChartPo = new PieChartPo();
                 pieChartPo.setId(2);
@@ -636,9 +638,17 @@ public class InterviewReviewServiceImpl implements InterviewReviewService {
             } else {
                 pieChartPoL.setNum(pieChartPoL.getNum() + groupByNumPo.getNum());
             }
+
+            sum += groupByNumPo.getNum();
         }
 
+        resultOverview.setNum(sum);
+
 //        List<Integer> notDepartmentId = new ArrayList<>();
+
+        PieChartOnPo departmentDivide = new PieChartOnPo();
+
+        sum = 0;
 
         for (GroupByNumPo groupByNumPo : myInterviewStatusMapper.selectGroupDByAdmissionIdAndRoundAndDAndA(admissionId, admissionSchedule.getRound(), departmentId, addressId)) {
             PieChartPo pieChartPo = new PieChartPo();
@@ -646,10 +656,15 @@ public class InterviewReviewServiceImpl implements InterviewReviewService {
             pieChartPo.setContent(departmentMap.get(groupByNumPo.getId()));
             pieChartPo.setNum(groupByNumPo.getNum());
 
-            departmentDivide.add(pieChartPo);
+            departmentDividePo.add(pieChartPo);
+
+            sum += groupByNumPo.getNum();
 
 //            notDepartmentId.add(groupByNumPo.getId());
         }
+
+        departmentDivide.setDivide(departmentDividePo);
+        departmentDivide.setNum(sum);
 
 //        for (AdmissionDepartmentMerge departmentMerge : admissionDepartmentMergeMapper.selectList(
 //                new QueryWrapper<AdmissionDepartmentMerge>()
@@ -666,14 +681,23 @@ public class InterviewReviewServiceImpl implements InterviewReviewService {
 
 //        List<Integer> notAddressId = new ArrayList<>();
 
+        PieChartOnPo addressDivide = new PieChartOnPo();
+
+        sum = 0;
+
         for (GroupByNumPo groupByNumPo : myInterviewStatusMapper.selectGroupAByAdmissionIdAndRoundAndDAndA(admissionId, admissionSchedule.getRound(), departmentId, addressId)) {
             PieChartPo pieChartPo = new PieChartPo();
             pieChartPo.setId(groupByNumPo.getId());
             pieChartPo.setContent(addressMap.get(groupByNumPo.getId()));
             pieChartPo.setNum(groupByNumPo.getNum());
 
-            addressDivide.add(pieChartPo);
+            addressDividePo.add(pieChartPo);
+
+            sum += groupByNumPo.getNum();
         }
+
+        addressDivide.setDivide(addressDividePo);
+        addressDivide.setNum(sum);
 
 //        admissionAddressMapper.selectList(
 //                new QueryWrapper<AdmissionAddress>()
