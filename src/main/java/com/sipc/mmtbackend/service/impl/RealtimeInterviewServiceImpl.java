@@ -29,6 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -164,6 +165,7 @@ public class RealtimeInterviewServiceImpl implements RealtimeInterviewService {
             }
         }
         interviewStatus.setState(7);
+        interviewStatus.setTrueEndTime(LocalDateTime.now());
         int update = interviewStatusMapper.updateById(interviewStatus);
         if (update != 1){
             log.warn("结束面试失败: " + interviewStatus + " ,受影响的行数: " + update + "\n");
