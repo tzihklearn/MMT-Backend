@@ -45,8 +45,8 @@ public class InterviewReviewController {
     }
 
     @GetMapping("/pie/chat/info")
-    public CommonResult<PieChatResult> pieChatInfo(@RequestParam(required = false) Integer departmentId, @RequestParam(required = false) Integer addressId) {
-        return interviewReviewService.pieChatInfo(departmentId, addressId);
+    public CommonResult<PieChatResult> pieChatInfo() {
+        return interviewReviewService.pieChatInfo();
     }
 
     @PostMapping("/arrange")

@@ -61,11 +61,11 @@ public interface MyInterviewStatusMapper extends InterviewStatusMapper {
 
     List<IRInterviewStatusPo> selectIRByAdmissionIdAndRoundAndNotTrueTimeSift(Integer admissionId, Integer round, com.sipc.mmtbackend.pojo.dto.param.interviewreview.SiftParam siftParam);
 
-    List<GroupByNumPo> selectGroupByAdmissionIdAndRoundAndDAndA(Integer admissionId, Integer round, Integer departmentId, Integer addressId);
+    List<GroupByNumPo> selectGroupByAdmissionIdAndRoundAndDAndA(Integer admissionId, Integer round);
 
-    List<GroupByNumPo> selectGroupDByAdmissionIdAndRoundAndDAndA(Integer admissionId, Integer round, Integer departmentId, Integer addressId);
+    List<GroupByNumPo> selectGroupDByAdmissionIdAndRoundAndDAndA(Integer admissionId, Integer round);
 
-    List<GroupByNumPo> selectGroupAByAdmissionIdAndRoundAndDAndA(Integer admissionId, Integer round, Integer departmentId, Integer addressId);
+    List<GroupByNumPo> selectGroupAByAdmissionIdAndRoundAndDAndA(Integer admissionId, Integer round);
 
     List<GroupByNumPo> selectGroupMessageByAdmissionIdAndRound(Integer admissionId, Integer round, Integer state);
 }

@@ -20,7 +20,7 @@ public interface InterviewReviewService {
 
     CommonResult<InfoAllResult> sift(SiftParam siftParam);
 
-    CommonResult<PieChatResult> pieChatInfo(Integer departmentId, Integer addressId);
+    CommonResult<PieChatResult> pieChatInfo();
 
     CommonResult<String> arrange(ArrangeParam arrangeParam) throws DateBaseException;
 
