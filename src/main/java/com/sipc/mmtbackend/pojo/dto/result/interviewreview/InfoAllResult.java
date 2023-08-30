@@ -23,4 +23,6 @@ public class InfoAllResult {
 
     private Integer allNum;
 
+    private Integer round;
+
 }
