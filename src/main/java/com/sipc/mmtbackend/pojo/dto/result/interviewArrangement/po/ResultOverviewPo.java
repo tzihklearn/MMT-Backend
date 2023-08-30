@@ -19,4 +19,6 @@ public class ResultOverviewPo {
     private PieChartPo pass;
 
     private PieChartPo fail;
+
+    private Integer num;
 }
