@@ -114,6 +114,8 @@ public class InterviewReviewServiceImpl implements InterviewReviewService {
 
         List<AddressPo> addressPoList = new ArrayList<>();
 
+        int round = 0;
+
         for (AdmissionDepartmentMerge admissionDepartmentMerge : admissionDepartmentMergeMapper.selectList(
                 new QueryWrapper<AdmissionDepartmentMerge>().eq("admission_id", admissionId))
         ) {
@@ -123,6 +125,12 @@ public class InterviewReviewServiceImpl implements InterviewReviewService {
                             .orderByDesc("round")
                             .last("limit 1")
             );
+
+            if (admissionSchedule == null) {
+                continue;
+            }
+
+            round = admissionSchedule.getRound();
 
             for (AdmissionAddress admissionAddress : admissionAddressMapper.selectList(
                     new QueryWrapper<AdmissionAddress>()
@@ -141,7 +149,7 @@ public class InterviewReviewServiceImpl implements InterviewReviewService {
 
         AddressResult result = new AddressResult();
         result.setAddressPoList(addressPoList);
-
+        result.setRound(round);
 
         return CommonResult.success(result);
     }
@@ -315,8 +323,6 @@ public class InterviewReviewServiceImpl implements InterviewReviewService {
         } else {
             result.setPageAll(count / 10);
         }
-
-        result.setRound(admissionSchedule.getRound());
 
         return CommonResult.success(result);
     }
@@ -513,8 +519,6 @@ public class InterviewReviewServiceImpl implements InterviewReviewService {
         } else {
             result.setPageAll(count / 10);
         }
-
-        result.setRound(admissionSchedule.getRound());
 
         return CommonResult.success(result);
     }

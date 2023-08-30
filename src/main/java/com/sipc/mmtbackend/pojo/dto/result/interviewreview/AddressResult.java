@@ -15,4 +15,6 @@ public class AddressResult {
 
     private List<AddressPo> addressPoList;
 
+    private Integer round;
+
 }
