@@ -116,7 +116,7 @@
             `is`.state ASC
     </select>
     <select id="selectAllInterviewEvaluationQnAByBCUID"
-            resultType="com.sipc.mmtbackend.pojo.domain.po.RealtimeInterviewPo.InterviewEvaluationAndAnswerPo">
+            resultMap="InterviewEvaluationAndAnswerData">
         SELECT
         	`is`.round AS "round",
         	ie.real_name AS "real_name",
