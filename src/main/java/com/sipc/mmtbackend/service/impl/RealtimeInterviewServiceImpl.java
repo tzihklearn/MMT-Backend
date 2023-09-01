@@ -304,6 +304,23 @@ public class RealtimeInterviewServiceImpl implements RealtimeInterviewService {
             log.warn("用户 " + context + " 尝试查询不属于当前纳新 " + admission + " 的面试 " + interviewStatus + "的评价信息\n");
             return CommonResult.fail("面试不存在或不属于当前纳新");
         }
+        if (interviewStatus.getState() < 3) {
+            log.warn("用户 " + context + " 尝试查询未安排的面试 " + interviewStatus + " 的评价信息");
+            return CommonResult.fail("面试未安排");
+        }
+        if (interviewStatus.getState() > 6) {
+            log.warn("用户 " + context + " 尝试查询已结束的面试 " + interviewStatus + " 的评价信息");
+            return CommonResult.fail("面试已结束");
+        }
+        // 开始面试
+        if (interviewStatus.getState() == 5){
+            interviewStatus.setState(6);
+            int i = interviewStatusMapper.updateById(interviewStatus);
+            if (i != 1){
+                log.warn("用户 " + context + " 第一个打开面试 " + interviewStatus + ", 更新面试状态时出现数据库错误");
+                return CommonResult.serverError();
+            }
+        }
         List<InterviewEvaluationAndAnswerPo> interviewEvaluationAndAnswerPos =
                 realtimeInterviewMapper.selectAllInterviewEvaluationQnAByBCUID(
                         admission.getId(), context.getUserId(), interviewStatus.getUserId());
