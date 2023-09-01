@@ -1,6 +1,7 @@
 package com.sipc.mmtbackend.mapper;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.sipc.mmtbackend.pojo.domain.po.RealtimeInterviewPo.InterviewEvaluationAndAnswerPo;
 import com.sipc.mmtbackend.pojo.domain.po.RealtimeInterviewPo.InterviewStatusPo;
 import com.sipc.mmtbackend.pojo.domain.po.RealtimeInterviewPo.ProgressBarPo;
 import org.apache.ibatis.annotations.Mapper;
@@ -45,5 +46,19 @@ public interface RealtimeInterviewMapper {
             @Param("round") Integer round,
             @Param("admissionId") Integer admissionId,
             @Param("place") Integer placeId
+    );
+
+    /**
+     * 根据 B、C 端用户 ID 查询所有面试评价问题与回答
+     *
+     * @param admissionId 纳新ID
+     * @param bId B 端用户 ID
+     * @param cId C 端用户 ID
+     * @return 所有面试评价问题与回答
+     */
+    List<InterviewEvaluationAndAnswerPo> selectAllInterviewEvaluationQnAByBCUID(
+            @Param("admissionId") Integer admissionId,
+            @Param("bId") Integer bId,
+            @Param("cId") Integer cId
     );
 }

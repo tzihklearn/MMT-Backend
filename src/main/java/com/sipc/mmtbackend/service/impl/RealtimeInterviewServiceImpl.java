@@ -8,21 +8,24 @@ import com.sipc.mmtbackend.mapper.RealtimeInterviewMapper;
 import com.sipc.mmtbackend.pojo.domain.Admission;
 import com.sipc.mmtbackend.pojo.domain.AdmissionAddress;
 import com.sipc.mmtbackend.pojo.domain.InterviewStatus;
+import com.sipc.mmtbackend.pojo.domain.po.RealtimeInterviewPo.InterviewEvaluationAndAnswerPo;
+import com.sipc.mmtbackend.pojo.domain.po.RealtimeInterviewPo.InterviewEvaluationQAPo;
 import com.sipc.mmtbackend.pojo.domain.po.RealtimeInterviewPo.InterviewStatusPo;
 import com.sipc.mmtbackend.pojo.domain.po.RealtimeInterviewPo.ProgressBarPo;
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
+import com.sipc.mmtbackend.pojo.dto.data.QuestionValueListData;
 import com.sipc.mmtbackend.pojo.dto.param.RealtimeInterview.FinishInterviewParam;
 import com.sipc.mmtbackend.pojo.dto.param.RealtimeInterview.PutInterviewPlaceParam;
 import com.sipc.mmtbackend.pojo.dto.result.RealtimeIntreviewdResult.GetInterviewCommentResult;
 import com.sipc.mmtbackend.pojo.dto.result.RealtimeIntreviewdResult.GetInterviewPlacesResult;
 import com.sipc.mmtbackend.pojo.dto.result.RealtimeIntreviewdResult.GetInterviewProgressBarResult;
 import com.sipc.mmtbackend.pojo.dto.result.RealtimeIntreviewdResult.GetIntervieweeListResult;
-import com.sipc.mmtbackend.pojo.dto.result.RealtimeIntreviewdResult.po.IntervieweePo;
-import com.sipc.mmtbackend.pojo.dto.result.RealtimeIntreviewdResult.po.ProgressBarDataPo;
+import com.sipc.mmtbackend.pojo.dto.result.RealtimeIntreviewdResult.po.*;
 import com.sipc.mmtbackend.pojo.dto.result.po.KVPo;
 import com.sipc.mmtbackend.service.RealtimeInterviewService;
 import com.sipc.mmtbackend.utils.CheckinQRCodeUtil.CheckinQRCodeUtil;
 import com.sipc.mmtbackend.utils.CheckroleBUtil.pojo.BTokenSwapPo;
+import com.sipc.mmtbackend.utils.JsonUtil;
 import com.sipc.mmtbackend.utils.ThreadLocalContextUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -42,6 +45,7 @@ public class RealtimeInterviewServiceImpl implements RealtimeInterviewService {
     private final RealtimeInterviewMapper realtimeInterviewMapper;
     private final CheckinQRCodeUtil checkinQRCodeUtil;
     private final InterviewStatusMapper interviewStatusMapper;
+    private final JsonUtil jsonUtil;
 
     /**
      * 获取签到二维码
@@ -300,7 +304,60 @@ public class RealtimeInterviewServiceImpl implements RealtimeInterviewService {
             log.warn("用户 " + context + " 尝试查询不属于当前纳新 " + admission + " 的面试 " + interviewStatus + "的评价信息\n");
             return CommonResult.fail("面试不存在或不属于当前纳新");
         }
-
-        return null;
+        List<InterviewEvaluationAndAnswerPo> interviewEvaluationAndAnswerPos =
+                realtimeInterviewMapper.selectAllInterviewEvaluationQnAByBCUID(
+                        admission.getId(), context.getUserId(), interviewStatus.getUserId());
+        GetInterviewCommentResult result = new GetInterviewCommentResult();
+        List<InterviewTablePo> interviewTables = new ArrayList<>();
+        for (InterviewEvaluationAndAnswerPo ieaap : interviewEvaluationAndAnswerPos) {
+            InterviewTablePo ritp = new InterviewTablePo();
+            ritp.setRound(ieaap.getRound());
+            ritp.setEditable(maxRound.equals(ieaap.getRound()));
+            ritp.setExpectDepartment(ieaap.getExpectDepartment());
+            ritp.setRealName(ieaap.getRealName());
+            List<QuestionAndAnswerPo> rqaas = new ArrayList<>();
+            for (InterviewEvaluationQAPo ieqa : ieaap.getQuestions()) {
+                QuestionAndAnswerPo rqaa = new QuestionAndAnswerPo();
+                rqaa.setOrder(ieqa.getOrder());
+                rqaa.setQType(ieqa.getQType());
+                rqaa.setType(ieqa.getType());
+                rqaa.setQuestion(ieqa.getQuestion());
+                rqaa.setQHint(ieqa.getQHint());
+                // 1单选，2多选，3下拉框，4输入框，5级联选择器，6量表题
+                switch (ieqa.getQType()){
+                    case 1:
+                    case 2:
+                    case 3:
+                    case 5:
+                        QuestionValueListData qOpts = jsonUtil.deserializationJson(ieqa.getQOpts(),QuestionValueListData.class );
+                        if (qOpts == null){
+                            log.warn("用户 " + context + " 在纳新 " + admission + " 面试" + interviewStatus + " 中解析面试问题 " + ieqa + " 出现错误");
+                            return CommonResult.serverError();
+                        }
+                        rqaa.setQOpts(qOpts);
+                        if (ieqa.getAStr() != null && ieqa.getAStr().length() != 0){
+                            MultipleChoiceAnswerPo aSelect = jsonUtil.deserializationJson(ieqa.getAStr(), MultipleChoiceAnswerPo.class);
+                            if (aSelect == null){
+                                log.warn("用户 " + context + " 在纳新 " + admission + " 面试" + interviewStatus + " 中解析面试问题 " + ieqa + " 的回答 " + ieqa.getAStr() + " 出现错误");
+                                return CommonResult.serverError();
+                            }
+                            rqaa.setASelect(aSelect);
+                        }
+                        break;
+                    case 4:
+                        rqaa.setAStr(ieqa.getAStr());
+                        break;
+                    case 6:
+                        rqaa.setAInt(ieqa.getAInt());
+                        break;
+                }
+                rqaas.add(rqaa);
+            }
+            ritp.setCount(rqaas.size());
+            ritp.setQuestions(rqaas);
+            interviewTables.add(ritp);
+        }
+        result.setCount(interviewTables.size());
+        return CommonResult.success(result);
     }
 }

@@ -9,8 +9,8 @@ import org.apache.ibatis.annotations.Mapper;
  *  Mapper 接口
  * </p>
  *
- * @author tzih
- * @since 2023-08-23
+ * @author DoudiNCer
+ * @since 2023-09-01
  */
 @Mapper
 public interface InterviewEvaluationMapper extends BaseMapper<InterviewEvaluation> {
