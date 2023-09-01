@@ -298,7 +298,7 @@ public class RealtimeInterviewServiceImpl implements RealtimeInterviewService {
         }
         InterviewStatus interviewStatus = interviewStatusMapper.selectById(interviewId);
         if (interviewStatus == null){
-            log.warn("用户 " + context + " 尝试查询不存在的面试 " + interviewId + "的评价信息\n");
+            log.warn("用户 " + context + " 尝试查询不存在的面试 " + interviewStatus + "的评价信息\n");
             return CommonResult.fail("面试不存在或不属于当前纳新");
         } else if (!Objects.equals(interviewStatus.getAdmissionId(), admission.getId())){
             log.warn("用户 " + context + " 尝试查询不属于当前纳新 " + admission + " 的面试 " + interviewStatus + "的评价信息\n");

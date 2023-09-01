@@ -7,6 +7,7 @@
         <result column="expect_department" property="expectDepartment" jdbcType="INTEGER"/>
         <collection property="questions"
                     ofType="com.sipc.mmtbackend.pojo.domain.po.RealtimeInterviewPo.InterviewEvaluationQAPo">
+            <result column="q_id" property="id" jdbcType="INTEGER"/>
             <result column="order" property="order" jdbcType="INTEGER"/>
             <result column="q_type" property="qType" jdbcType="INTEGER"/>
             <result column="type" property="type" jdbcType="INTEGER"/>
@@ -127,7 +128,8 @@
         	qd.`value` AS "opts",
         	qd.answer AS "hint",
         	qs.score AS "int",
-        	qs.`value` AS "str"
+        	qs.`value` AS "str",
+            qd.id AS "q_id"
         FROM
         	interview_evaluation `ie`
         	RIGHT JOIN interview_status `is` ON ie.interview_status_id = `is`.id
