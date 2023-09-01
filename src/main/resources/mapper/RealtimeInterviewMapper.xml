@@ -4,6 +4,7 @@
     <resultMap id="InterviewEvaluationAndAnswerData" type="com.sipc.mmtbackend.pojo.domain.po.RealtimeInterviewPo.InterviewEvaluationAndAnswerPo">
         <result column="round" property="round" jdbcType="INTEGER"/>
         <result column="real_name" property="realName" jdbcType="BOOLEAN"/>
+        <result column="is_pass" property="isPass" jdbcType="INTEGER"/>
         <result column="expect_department" property="expectDepartment" jdbcType="INTEGER"/>
         <collection property="questions"
                     ofType="com.sipc.mmtbackend.pojo.domain.po.RealtimeInterviewPo.InterviewEvaluationQAPo">
@@ -120,6 +121,7 @@
         	`is`.round AS "round",
         	ie.real_name AS "real_name",
         	ie.pass_department_id AS "expect_department",
+            ie.is_pass AS "is_pass",
         	iq.`order` AS "order",
         	iq.question_type AS "q_type",
         	iq.type AS "type",

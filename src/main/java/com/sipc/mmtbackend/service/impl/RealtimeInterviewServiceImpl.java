@@ -332,6 +332,7 @@ public class RealtimeInterviewServiceImpl implements RealtimeInterviewService {
             ritp.setEditable(maxRound.equals(ieaap.getRound()));
             ritp.setExpectDepartment(ieaap.getExpectDepartment());
             ritp.setRealName(ieaap.getRealName());
+            ritp.setIsPass(ieaap.getIsPass());
             List<QuestionAndAnswerPo> rqaas = new ArrayList<>();
             for (InterviewEvaluationQAPo ieqa : ieaap.getQuestions()) {
                 QuestionAndAnswerPo rqaa = new QuestionAndAnswerPo();
