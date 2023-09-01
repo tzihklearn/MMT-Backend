@@ -21,6 +21,4 @@ public class InterviewTablePo {
     private Integer count;
     // 问题与答案
     private List<QuestionAndAnswerPo> questions;
-    // 综合评价
-    private String overview;
 }

@@ -14,8 +14,8 @@ import lombok.Setter;
  * 
  * </p>
  *
- * @author tzih
- * @since 2023-08-23
+ * @author DoudiNCer
+ * @since 2023-09-01
  */
 @Getter
 @Setter
@@ -33,6 +33,12 @@ public class InterviewEvaluation implements Serializable {
     @TableField("user_b_id")
     private Integer userBId;
 
+    @TableField("real_name")
+    private Byte realName;
+
+    /**
+     * 1 通过，2失败，3待定
+     */
     @TableField("is_pass")
     private Integer isPass;
 
