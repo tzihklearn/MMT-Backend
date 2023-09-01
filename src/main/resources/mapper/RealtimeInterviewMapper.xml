@@ -21,7 +21,7 @@
         </collection>
     </resultMap>
     <select id="selectInterviewProgress"
-            resultMap="InterviewEvaluationAndAnswerData">
+            resultType="com.sipc.mmtbackend.pojo.domain.po.RealtimeInterviewPo.ProgressBarPo">
         SELECT
             zml.`hour` AS `hour`,
             zml.total AS `total`,
