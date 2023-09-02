@@ -4,8 +4,10 @@ import lombok.Data;
 
 @Data
 public class InterviewEvaluationQAPo {
-    // 问题ID（question_data的ID）
+    // 问题ID（interview_question的ID）
     private Integer id;
+    // 评价ID（question_score的ID）
+    private Integer sId;
     // 问题在当前分组的序号
     private Integer order;
     // 问题分组（1面试基本评价，2面试综合评价，3面试问题）

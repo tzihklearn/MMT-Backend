@@ -6,9 +6,11 @@
         <result column="real_name" property="realName" jdbcType="BOOLEAN"/>
         <result column="is_pass" property="isPass" jdbcType="INTEGER"/>
         <result column="expect_department" property="expectDepartment" jdbcType="INTEGER"/>
+        <result column="ie_id" property="ieId" jdbcType="INTEGER"/>
         <collection property="questions"
                     ofType="com.sipc.mmtbackend.pojo.domain.po.RealtimeInterviewPo.InterviewEvaluationQAPo">
             <result column="q_id" property="id" jdbcType="INTEGER"/>
+            <result column="s_id" property="sId" jdbcType="INTEGER"/>
             <result column="order" property="order" jdbcType="INTEGER"/>
             <result column="q_type" property="qType" jdbcType="INTEGER"/>
             <result column="type" property="type" jdbcType="INTEGER"/>
@@ -20,6 +22,7 @@
             <result column="int" property="aInt" jdbcType="INTEGER"/>
         </collection>
     </resultMap>
+
     <select id="selectInterviewProgress"
             resultType="com.sipc.mmtbackend.pojo.domain.po.RealtimeInterviewPo.ProgressBarPo">
         SELECT
@@ -115,6 +118,7 @@
             `is`.state ASC,
             `is`.state ASC
     </select>
+
     <select id="selectAllInterviewEvaluationQnAByBCUID"
             resultMap="InterviewEvaluationAndAnswerData">
         SELECT
@@ -131,7 +135,7 @@
         	qd.answer AS "hint",
         	qs.score AS "int",
         	qs.`value` AS "str",
-            qd.id AS "q_id"
+            iq.id AS "q_id"
         FROM
         	interview_evaluation `ie`
         	RIGHT JOIN interview_status `is` ON ie.interview_status_id = `is`.id
@@ -148,5 +152,43 @@
         	AND `is`.admission_id = #{admissionId,jdbcType=INTEGER}
         	AND `is`.user_id = #{cId,jdbcType=INTEGER}
         	AND ie.user_b_id = #{bId,jdbcType=INTEGER}
+        ORDER BY `is`.round ASC, iq.question_type ASC, qd.id ASC
+    </select>
+
+    <select id="selectlatestInterviewEvaluationQnA"
+            resultMap="InterviewEvaluationAndAnswerData">
+        SELECT
+            `is`.round AS "round",
+            ie.real_name AS "real_name",
+            ie.pass_department_id AS "expect_department",
+            iq.`order` AS "order",
+            iq.question_type AS "q_type",
+            iq.type AS "type",
+            qd.question AS "question",
+            qd.num AS "max_score",
+            qd.`value` AS "opts",
+            qd.answer AS "hint",
+            qs.score AS "int",
+            qs.`value` AS "str",
+            iq.id AS "q_id",
+            qs.id AS "s_id",
+            ie.id AS "e_id",
+            ie.is_pass AS "is_pass"
+        FROM
+            interview_evaluation `ie`
+                RIGHT JOIN interview_status `is` ON ie.interview_status_id = `is`.id
+                LEFT JOIN interview_question iq ON `is`.admission_id = iq.admission_id
+                LEFT JOIN question_data qd ON iq.question_id = qd.id
+                LEFT JOIN question_score qs ON `is`.id = qs.interview_status_id
+        WHERE
+            `is`.round = iq.round
+            AND ie.user_b_id = qs.user_b_id
+            AND ie.is_deleted != 1
+            AND `is`.is_deleted != 1
+            AND iq.is_deleted != 1
+            AND qd.is_deleted != 1
+        	AND `is`.id = #{iId,jdbcType=INTEGER}
+            AND ie.user_b_id = #{bId,jdbcType=INTEGER}
+        ORDER BY qd.id ASC
     </select>
 </mapper>

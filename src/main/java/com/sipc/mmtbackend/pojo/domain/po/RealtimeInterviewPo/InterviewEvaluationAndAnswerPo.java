@@ -14,6 +14,8 @@ public class InterviewEvaluationAndAnswerPo {
     private Integer isPass;
     // 面试官期待的部门
     private Integer expectDepartment;
+    // interview_evaluation 表 ID
+    private Integer ieId;
     // 问题与答案
     private List<InterviewEvaluationQAPo> questions;
 }
