@@ -61,4 +61,16 @@ public interface RealtimeInterviewMapper {
             @Param("bId") Integer bId,
             @Param("cId") Integer cId
     );
+
+    /**
+     * 查询指定面试的面试问卷与
+     *
+     * @param interviewStatusId 面试状态ID
+     * @param bId 面试者ID
+     * @return 面试问题与回答
+     */
+    InterviewEvaluationAndAnswerPo selectlatestInterviewEvaluationQnA(
+            @Param("iId") Integer interviewStatusId,
+            @Param("bId") Integer bId
+    );
 }

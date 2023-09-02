@@ -2,6 +2,7 @@ package com.sipc.mmtbackend.service;
 
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
 import com.sipc.mmtbackend.pojo.dto.param.RealtimeInterview.FinishInterviewParam;
+import com.sipc.mmtbackend.pojo.dto.param.RealtimeInterview.PostInterviewCommentParam;
 import com.sipc.mmtbackend.pojo.dto.param.RealtimeInterview.PutInterviewPlaceParam;
 import com.sipc.mmtbackend.pojo.dto.result.RealtimeIntreviewdResult.GetInterviewCommentResult;
 import com.sipc.mmtbackend.pojo.dto.result.RealtimeIntreviewdResult.GetInterviewPlacesResult;
@@ -64,4 +65,12 @@ public interface RealtimeInterviewService {
      * @return 面试评价
      */
     CommonResult<GetInterviewCommentResult> getInterviewComment(Integer interviewId);
+
+    /**
+     * 提交/更新面试评价
+     *
+     * @param param 面试评价
+     * @return 处理结果
+     */
+    CommonResult<String> postInterviewComment(PostInterviewCommentParam param);
 }

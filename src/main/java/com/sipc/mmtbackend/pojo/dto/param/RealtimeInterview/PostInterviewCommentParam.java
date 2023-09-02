@@ -11,10 +11,10 @@ public class PostInterviewCommentParam {
     private Integer interview;
     // 是否实名评价
     private Boolean realName;
+    // 是否通过（1 通过，2失败，3待定）
+    private Integer isPass;
     // 面试官期待的部门
     private Integer expectDepartment;
     // 面试问题的回答
     private List<InterviewEvaluationPo> evaluations;
-    // 综合评价
-    private String overview;
 }

@@ -2,12 +2,9 @@ package com.sipc.mmtbackend.service.impl;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.sipc.mmtbackend.mapper.InterviewCheckMapper;
-import com.sipc.mmtbackend.mapper.InterviewStatusMapper;
-import com.sipc.mmtbackend.mapper.RealtimeInterviewMapper;
-import com.sipc.mmtbackend.pojo.domain.Admission;
-import com.sipc.mmtbackend.pojo.domain.AdmissionAddress;
-import com.sipc.mmtbackend.pojo.domain.InterviewStatus;
+import com.sipc.mmtbackend.mapper.*;
+import com.sipc.mmtbackend.mapper.customization.MyQuestionScoreMapper;
+import com.sipc.mmtbackend.pojo.domain.*;
 import com.sipc.mmtbackend.pojo.domain.po.RealtimeInterviewPo.InterviewEvaluationAndAnswerPo;
 import com.sipc.mmtbackend.pojo.domain.po.RealtimeInterviewPo.InterviewEvaluationQAPo;
 import com.sipc.mmtbackend.pojo.domain.po.RealtimeInterviewPo.InterviewStatusPo;
@@ -15,7 +12,9 @@ import com.sipc.mmtbackend.pojo.domain.po.RealtimeInterviewPo.ProgressBarPo;
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
 import com.sipc.mmtbackend.pojo.dto.data.QuestionValueListData;
 import com.sipc.mmtbackend.pojo.dto.param.RealtimeInterview.FinishInterviewParam;
+import com.sipc.mmtbackend.pojo.dto.param.RealtimeInterview.PostInterviewCommentParam;
 import com.sipc.mmtbackend.pojo.dto.param.RealtimeInterview.PutInterviewPlaceParam;
+import com.sipc.mmtbackend.pojo.dto.param.RealtimeInterview.po.InterviewEvaluationPo;
 import com.sipc.mmtbackend.pojo.dto.result.RealtimeIntreviewdResult.GetInterviewCommentResult;
 import com.sipc.mmtbackend.pojo.dto.result.RealtimeIntreviewdResult.GetInterviewPlacesResult;
 import com.sipc.mmtbackend.pojo.dto.result.RealtimeIntreviewdResult.GetInterviewProgressBarResult;
@@ -31,11 +30,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor(onConstructor_ = {@Autowired})
@@ -43,8 +45,10 @@ import java.util.Objects;
 public class RealtimeInterviewServiceImpl implements RealtimeInterviewService {
     private final InterviewCheckMapper interviewCheckMapper;
     private final RealtimeInterviewMapper realtimeInterviewMapper;
-    private final CheckinQRCodeUtil checkinQRCodeUtil;
     private final InterviewStatusMapper interviewStatusMapper;
+    private final InterviewEvaluationMapper interviewEvaluationMapper;
+    private final MyQuestionScoreMapper questionScoreMapper;
+    private final CheckinQRCodeUtil checkinQRCodeUtil;
     private final JsonUtil jsonUtil;
 
     /**
@@ -304,6 +308,23 @@ public class RealtimeInterviewServiceImpl implements RealtimeInterviewService {
             log.warn("用户 " + context + " 尝试查询不属于当前纳新 " + admission + " 的面试 " + interviewStatus + "的评价信息\n");
             return CommonResult.fail("面试不存在或不属于当前纳新");
         }
+        if (interviewStatus.getState() < 3) {
+            log.warn("用户 " + context + " 尝试查询未安排的面试 " + interviewStatus + " 的评价信息");
+            return CommonResult.fail("面试未安排");
+        }
+        if (interviewStatus.getState() > 6) {
+            log.warn("用户 " + context + " 尝试查询已结束的面试 " + interviewStatus + " 的评价信息");
+            return CommonResult.fail("面试已结束");
+        }
+        // 开始面试
+        if (interviewStatus.getState() == 5){
+            interviewStatus.setState(6);
+            int i = interviewStatusMapper.updateById(interviewStatus);
+            if (i != 1){
+                log.warn("用户 " + context + " 第一个打开面试 " + interviewStatus + ", 更新面试状态时出现数据库错误");
+                return CommonResult.serverError();
+            }
+        }
         List<InterviewEvaluationAndAnswerPo> interviewEvaluationAndAnswerPos =
                 realtimeInterviewMapper.selectAllInterviewEvaluationQnAByBCUID(
                         admission.getId(), context.getUserId(), interviewStatus.getUserId());
@@ -315,6 +336,7 @@ public class RealtimeInterviewServiceImpl implements RealtimeInterviewService {
             ritp.setEditable(maxRound.equals(ieaap.getRound()));
             ritp.setExpectDepartment(ieaap.getExpectDepartment());
             ritp.setRealName(ieaap.getRealName());
+            ritp.setIsPass(ieaap.getIsPass());
             List<QuestionAndAnswerPo> rqaas = new ArrayList<>();
             for (InterviewEvaluationQAPo ieqa : ieaap.getQuestions()) {
                 QuestionAndAnswerPo rqaa = new QuestionAndAnswerPo();
@@ -323,6 +345,7 @@ public class RealtimeInterviewServiceImpl implements RealtimeInterviewService {
                 rqaa.setType(ieqa.getType());
                 rqaa.setQuestion(ieqa.getQuestion());
                 rqaa.setQHint(ieqa.getQHint());
+                rqaa.setId(ieqa.getId());
                 // 1单选，2多选，3下拉框，4输入框，5级联选择器，6量表题
                 switch (ieqa.getQType()){
                     case 1:
@@ -359,5 +382,231 @@ public class RealtimeInterviewServiceImpl implements RealtimeInterviewService {
         }
         result.setCount(interviewTables.size());
         return CommonResult.success(result);
+    }
+
+    /**
+     * 提交/更新面试评价
+     *
+     * @param param 面试评价
+     * @return 处理结果
+     */
+    @Override
+    @Transactional
+    public CommonResult<String> postInterviewComment(PostInterviewCommentParam param) {
+        BTokenSwapPo context = ThreadLocalContextUtil.getContext();
+        Admission admission = interviewCheckMapper.selectOrganizationActivateAdmission(context.getOrganizationId());
+        if (admission == null) {
+            log.warn("用户 " + context + " 尝试在无活动的纳新时修改面试场地");
+            return CommonResult.fail("生成失败：未开始纳新或纳新已结束");
+        }
+        Integer maxRound = interviewCheckMapper.selectOrganizationActivateInterviewRound(admission.getId());
+        if (maxRound == null){
+            log.warn("用户 " + context + " 在纳新 " + admission + " 中未查询到任何面试");
+            return CommonResult.fail("当前纳新未开启面试");
+        }
+        InterviewStatus interviewStatus = interviewStatusMapper.selectById(param.getInterview());
+        if (interviewStatus == null){
+            log.warn("用户 " + context + " 尝试查询不存在的面试 " + param.getInterview() + "的评价信息\n");
+            return CommonResult.fail("面试不存在或不属于当前纳新");
+        } else if (!Objects.equals(interviewStatus.getAdmissionId(), admission.getId())){
+            log.warn("用户 " + context + " 尝试查询不属于当前纳新 " + admission + " 的面试 " + interviewStatus + "的评价信息\n");
+            return CommonResult.fail("面试不存在或不属于当前纳新");
+        }
+        if (interviewStatus.getState() < 3) {
+            log.warn("用户 " + context + " 尝试评价未安排的面试 " + interviewStatus);
+            return CommonResult.fail("面试未安排");
+        }
+        if (interviewStatus.getState() > 6) {
+            log.warn("用户 " + context + " 尝试评价已结束的面试 " + interviewStatus);
+            return CommonResult.fail("面试已结束");
+        }
+        InterviewEvaluationAndAnswerPo interviewEvaluationAndAnswerPo = realtimeInterviewMapper.selectlatestInterviewEvaluationQnA(interviewStatus.getId(), context.getUserId());
+        if (interviewEvaluationAndAnswerPo == null){
+            log.warn("不可能，这绝对不可能！用户 " + context + " 在纳新 " + admission + " 面试 " + interviewStatus + " 中查不到面试问题！");
+            return CommonResult.serverError();
+        }
+        InterviewEvaluation interviewEvaluation = interviewEvaluationMapper.selectById(interviewEvaluationAndAnswerPo.getIeId());
+        // 对前端返回的结果进行倒序排序
+        List<InterviewEvaluationPo> paramList =
+                param.getEvaluations().stream()
+                        .sorted(Comparator.comparing(InterviewEvaluationPo::getId).reversed())
+                        .collect(Collectors.toList());
+        // 创建新回答还是修改回答
+        if (interviewEvaluation == null){
+            interviewEvaluation = new InterviewEvaluation();
+            interviewEvaluation.setInterviewStatusId(interviewStatus.getId());
+            interviewEvaluation.setRealName((byte) (param.getRealName() ? 1 : 0));
+            interviewEvaluation.setUserBId(context.getUserId());
+            interviewEvaluation.setIsPass(param.getIsPass());
+            interviewEvaluation.setPassDepartmentId(param.getExpectDepartment());
+            int i = interviewEvaluationMapper.insert(interviewEvaluation);
+            if (i != 1){
+                log.warn("用户 " + context + " 在纳新 " + admission + " 面试 " + interviewStatus + " 中插入面试评价状态 " + interviewEvaluation + " 出现数据库错误");
+                return CommonResult.serverError();
+            }
+            List<QuestionScore> insertQs = new ArrayList<>();
+            int answer_i = 0;
+            List<InterviewEvaluationQAPo> questions = interviewEvaluationAndAnswerPo.getQuestions();
+            for (int qi = questions.size() - 1; qi >= 0; qi--){
+                boolean kill = false;
+                int ai = answer_i;
+                for (; ai < paramList.size(); ai++){
+                    if (Objects.equals(questions.get(qi).getId(), paramList.get(ai).getId())){
+                        answer_i = ai;
+                        QuestionScore qs = new QuestionScore();
+                        qs.setInterviewStatusId(interviewStatus.getId());
+                        qs.setInterviewQuestionId(questions.get(qi).getId());
+                        qs.setUserBId(context.getUserId());
+                        // 1单选，2多选，3下拉框，4输入框，5级联选择器，6量表题
+                        switch (questions.get(qi).getType()){
+                            case 1:
+                            case 2:
+                            case 3:
+                            case 5:
+                                MultipleChoiceAnswerPo aSelect = paramList.get(ai).getASelect();
+                                if (aSelect == null){
+                                    kill = true;
+                                    break;
+                                }
+                                String s = jsonUtil.serializationJson(aSelect);
+                                if (s == null){
+                                    log.warn("用户 " + context + " 在纳新 " + admission + " 面试" + interviewStatus + " 中序列化面试问题 " + paramList.get(ai) + " 的回答 " + aSelect + " 出现错误");
+                                    return CommonResult.serverError();
+                                }
+                                qs.setValue(s);
+                                break;
+                            case 4:
+                                String aStr = paramList.get(ai).getAStr();
+                                if (aStr == null || aStr.length() == 0){
+                                    kill = true;
+                                    break;
+                                }
+                                qs.setValue(aStr);
+                                break;
+                            case 6:
+                                Integer aInt = paramList.get(ai).getAInt();
+                                if (aInt == null){
+                                    kill = true;
+                                    break;
+                                }
+                                qs.setScore(aInt);
+                                break;
+                        }
+                        insertQs.add(qs);
+                        break;
+                    }
+                    if (kill) {
+                        break;
+                    }
+                }
+                if (kill || ai >= paramList.size()) {
+                    log.warn("用户 " + context + " 第一次评价面试 " + interviewStatus + " 回答了 " + param + ", 未回答 " + questions.get(qi));
+                    return CommonResult.fail("第一次提交评价须正确回答所有问题");
+                }
+            }
+            if (insertQs.size() != questions.size()){
+                log.warn("用户 " + context + " 第一次评价面试 " + interviewStatus + " 回答了 " + param + ", 但所需回答问题为 " + questions);
+                return CommonResult.fail("第一次提交评价须正确回答所有问题");
+            }
+            int insertAll = questionScoreMapper.insertBatch(insertQs);
+            if (insertAll != insertQs.size()){
+                log.warn("用户 " + context + " 第一次评价面试 " + interviewStatus + " 回答 " + param + ", 评价为 " + insertQs + "时插入数据库数量不符合预期 " + insertAll);
+                return CommonResult.serverError();
+            }
+        } else {
+            // 是否需要更新面试评价信息
+            boolean updateie = false;
+            if (param.getRealName() != null && param.getRealName() != (interviewEvaluation.getRealName().intValue() == 1)) {
+                updateie = true;
+                interviewEvaluation.setRealName((byte) (param.getRealName() ? 1 : 0));
+            }
+            if (param.getExpectDepartment() != null && !Objects.equals(param.getExpectDepartment(), interviewEvaluation.getPassDepartmentId())) {
+                updateie = true;
+                interviewEvaluation.setPassDepartmentId(param.getExpectDepartment());
+            }
+            if (param.getIsPass() != null && !Objects.equals(param.getIsPass(), interviewEvaluation.getIsPass())) {
+                updateie = true;
+                interviewEvaluation.setIsPass(param.getIsPass());
+            }
+            if (updateie) {
+                int i = interviewEvaluationMapper.updateById(interviewEvaluation);
+                if (i != 1) {
+                    log.warn("用户 " + context + " 在面试 " + interviewStatus + " 中更新面试评价状态 " + interviewEvaluation + " 出现数据库错误");
+                    return CommonResult.serverError();
+                }
+            }
+            List<QuestionScore> updateQs = new ArrayList<>();
+            int answer_i = 0;
+            List<InterviewEvaluationQAPo> questions = interviewEvaluationAndAnswerPo.getQuestions();
+            for (int qi = questions.size() - 1; qi >= 0; qi--) {
+                int ai = answer_i;
+                for (; ai < paramList.size(); ai++) {
+                    if (Objects.equals(questions.get(qi).getId(), paramList.get(ai).getId())) {
+                        answer_i = ai;
+                        boolean update = true;
+                        QuestionScore qs = new QuestionScore();
+                        qs.setInterviewStatusId(interviewStatus.getId());
+                        qs.setInterviewQuestionId(questions.get(qi).getId());
+                        qs.setUserBId(context.getUserId());
+                        // 1单选，2多选，3下拉框，4输入框，5级联选择器，6量表题
+                        switch (questions.get(qi).getType()) {
+                            case 1:
+                            case 2:
+                            case 3:
+                            case 5:
+                                MultipleChoiceAnswerPo aSelect = paramList.get(ai).getASelect();
+                                if (aSelect == null) {
+                                    break;
+                                }
+                                String s = jsonUtil.serializationJson(aSelect);
+                                if (s == null) {
+                                    log.warn("用户 " + context + " 在纳新 " + admission + " 面试" + interviewStatus + " 中序列化面试问题 " + paramList.get(ai) + " 的回答 " + aSelect + " 出现错误");
+                                    break;
+                                }
+                                if (!s.equals(questions.get(qi).getAStr())) {
+                                    qs.setValue(s);
+                                } else {
+                                    update = false;
+                                }
+                                break;
+                            case 4:
+                                String aStr = paramList.get(ai).getAStr();
+                                if (aStr == null) {
+                                    break;
+                                }
+                                if (!aStr.equals(questions.get(qi).getAStr())) {
+                                    qs.setValue(aStr);
+                                } else {
+                                    update = false;
+                                }
+                                break;
+                            case 6:
+                                Integer aInt = paramList.get(ai).getAInt();
+                                if (aInt == null) {
+                                    break;
+                                }
+                                if (!aInt.equals(questions.get(qi).getAInt())) {
+                                    qs.setScore(aInt);
+                                } else {
+                                    update = false;
+                                }
+                                break;
+                        }
+                        if (update) {
+                            updateQs.add(qs);
+                        }
+                        break;
+                    }
+                }
+            }
+            for (QuestionScore updateQ : updateQs) {
+                int i = questionScoreMapper.updateById(updateQ);
+                if (i != 1) {
+                    log.warn("用户 " + context + "在面试 " + interviewStatus + " 中更新面试评价 " + param + " 时出现数据库异常，受影响的评价为 " + updateQ);
+                    return CommonResult.serverError();
+                }
+            }
+        }
+        return CommonResult.success();
     }
 }

@@ -34,4 +34,14 @@ public class JsonUtil {
         }
         return t;
     }
+
+
+    public <T> String serializationJson(T t){
+        try {
+            return mapper.writeValueAsString(t);
+        } catch (JsonProcessingException e) {
+            log.warn("JsonUtil: 序列化 " + t + " 时抛出异常 JsonProcessingException ：" + e.getMessage());
+            return null;
+        }
+    }
 }
