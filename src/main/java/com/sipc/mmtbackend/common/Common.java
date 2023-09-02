@@ -1,6 +1,5 @@
 package com.sipc.mmtbackend.common;
 
-import lombok.Data;
 import org.springframework.stereotype.Component;
 
 /**

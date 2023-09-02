@@ -12,7 +12,6 @@ import com.sipc.mmtbackend.pojo.domain.po.MajorClassPo;
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
 import com.sipc.mmtbackend.pojo.dto.param.interviewArrangement.*;
 import com.sipc.mmtbackend.pojo.dto.param.interviewArrangement.po.MessageSendPo;
-import com.sipc.mmtbackend.pojo.dto.result.dataDashboard.po.SiftInfoPo;
 import com.sipc.mmtbackend.pojo.dto.result.interviewArrangement.AddressAllResult;
 import com.sipc.mmtbackend.pojo.dto.result.interviewArrangement.IAAllResult;
 import com.sipc.mmtbackend.pojo.dto.result.interviewArrangement.MessageCheckResult;

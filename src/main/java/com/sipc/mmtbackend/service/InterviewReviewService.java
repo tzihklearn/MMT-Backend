@@ -9,8 +9,6 @@ import com.sipc.mmtbackend.pojo.dto.result.interviewreview.InfoAllResult;
 import com.sipc.mmtbackend.pojo.dto.result.interviewreview.MessageTemplateResult;
 import com.sipc.mmtbackend.pojo.dto.result.interviewreview.PieChatResult;
 import com.sipc.mmtbackend.pojo.exceptions.DateBaseException;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 
 public interface InterviewReviewService {
 

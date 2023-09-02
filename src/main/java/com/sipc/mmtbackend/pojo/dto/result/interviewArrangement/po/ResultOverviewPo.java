@@ -1,7 +1,6 @@
 package com.sipc.mmtbackend.pojo.dto.result.interviewArrangement.po;
 
 import com.sipc.mmtbackend.pojo.dto.result.interviewreview.po.PieChartPo;
-import com.sipc.mmtbackend.pojo.dto.result.interviewreview.po.PieChatAllPo;
 import lombok.Data;
 
 /**
