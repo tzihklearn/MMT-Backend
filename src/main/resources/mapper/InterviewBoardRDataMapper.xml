@@ -9,6 +9,7 @@
 			<result column="number" property="number" jdbcType="INTEGER"/>
 		</collection>
 	</resultMap>
+
     <select id="selectInterviewResultData"
             resultType="com.sipc.mmtbackend.pojo.domain.po.InterviewBoardRPo.InterviewResultData">
         SELECT
@@ -71,6 +72,7 @@
         			AND `is`.round = 1
         	) AS `pc`
     </select>
+
 	<select id="selectPassedCountPerDepartment"
 			resultType="com.sipc.mmtbackend.pojo.domain.po.InterviewBoardRPo.DepartmentPassedCountPo">
 		SELECT
@@ -90,6 +92,7 @@
 		    AND i.round = #{round, jdbcType=INTEGER}
 		    GROUP BY i.department_id
 	</select>
+
 	<select id="selectPassedCountLineChartGroupByRoundByAdmissionId"
 			resultMap="LineChartLineData">
 		SELECT
@@ -122,6 +125,7 @@
 				AND ml.round = zml.round
 				LEFT JOIN department `d` ON ml.department = d.id
 	</select>
+
 	<select id="selectPassedCountPerOrder"
 			resultType="com.sipc.mmtbackend.pojo.domain.po.InterviewBoardRPo.OrderPassedCountPo">
 		SELECT
@@ -156,6 +160,7 @@
 		GROUP BY
 			ml.`order`
 	</select>
+
 	<select id="selectPassedCountLineChartGroupByRoundAndOrderByAdmissionId"
 			resultMap="LineChartLineData">
 		SELECT
@@ -196,5 +201,60 @@
 					i.organization_order
 			) `zml` ON ml.round = zml.round
 				AND ml.`order` = zml.`order`
+	</select>
+
+    <select id="selectPassedInterviewScoreAndRank"
+            resultType="com.sipc.mmtbackend.pojo.domain.po.InterviewBoardRPo.InterviewScoreAndRankPo">
+        SELECT
+            zl.rank AS "rank",
+            zl.`name` AS "name",
+            zl.score AS "score"
+        FROM
+            (
+                SELECT
+                    zml.`name` AS "name",
+                    zml.score AS "score",
+                    @curRank :=	IF ( @prevRank = score, @curRank, @incRank ) AS rank,
+                    @incRank := @incRank + 1,
+                    @prevRank := score
+                FROM
+                    (
+                        SELECT
+                            ml.`name` AS "name",
+                            AVG( ml.score ) AS "score"
+                        FROM
+                            (
+                                SELECT
+                                    ui.`name` AS "name",
+                                    SUM( qs.score ) AS "score"
+                                FROM
+                                    interview_status `is`
+                                    LEFT JOIN interview_question iq ON `is`.admission_id = iq.admission_id
+                                    LEFT JOIN question_score qs ON iq.id = qs.interview_question_id
+                                    LEFT JOIN user_info ui ON `is`.user_id = ui.id
+                                WHERE
+                                    `is`.is_deleted != 1
+                                    AND iq.is_deleted != 1
+                                    AND qs.is_deleted != 1
+                                    AND ui.is_deleted != 1
+                                    AND iq.question_type IN ( 1, 2 )
+                                    AND iq.type = 5
+                					AND `is`.state = 9
+                                    AND `is`.admission_id = #{admissionId,jdbcType=INTEGER}
+                                    AND `is`.round = #{round,jdbcType=INTEGER}
+                                <if test="departmentId != null and departmentId > 0">
+                                    AND `is`.department_id = #{departmentId,jdbcType=INTEGER}
+                                </if>
+                                GROUP BY
+                                    `is`.id,
+                                    qs.user_b_id
+                            ) `ml`
+                        GROUP BY
+                            ml.`name`
+                        ) `zml`,
+                        ( SELECT @curRank := 0, @prevRank := NULL, @incRank := 1 ) r
+                    ORDER BY
+                        zml.score DESC
+            ) `zl`
 	</select>
 </mapper>

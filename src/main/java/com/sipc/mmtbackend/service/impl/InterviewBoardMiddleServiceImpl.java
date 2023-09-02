@@ -201,17 +201,16 @@ public class InterviewBoardMiddleServiceImpl implements InterviewBoardMiddleServ
         if (departmentId != 0){
             Department department = departmentMapper.selectById(departmentId);
             if (department == null){
-                log.warn("用户 " + context + " 在纳新 " + admission + " 请求不存在的部门" + departmentId + "的签到列表");
+                log.warn("用户 " + context + " 在纳新 " + admission + " 请求不存在的部门" + departmentId + "的面试分数与排名");
                 return CommonResult.fail("部门不存在或不属于当前组织");
             } else if (!Objects.equals(department.getOrganizationId(), context.getOrganizationId())){
-                log.warn("用户 " + context + " 在纳新 " + admission + " 请求不属于其组织的的部门" + department + "的签到列表");
+                log.warn("用户 " + context + " 在纳新 " + admission + " 请求不属于其组织的的部门" + department + "的面试分数与排名");
                 return CommonResult.fail("部门不存在或不属于当前组织");
             }
         }
         Page<InterviewScoreAndRankPo> page = new Page<>(pageId, 15);
         IPage<InterviewScoreAndRankPo> iPage = interviewBoardMDataMapper.selectInterviewScoreAndRank(
                 page, round, admission.getId(), departmentId);
-
         GetInterviewRankAndScoreResult result = new GetInterviewRankAndScoreResult();
         List<RankAndScorePo> results = new ArrayList<>();
         for (InterviewScoreAndRankPo isar : iPage.getRecords()) {

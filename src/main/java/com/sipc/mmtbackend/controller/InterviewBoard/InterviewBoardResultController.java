@@ -66,7 +66,7 @@ public class InterviewBoardResultController {
             @RequestParam(value = "department", defaultValue = "0") int departmentId,
             @RequestParam(value = "page", defaultValue = "1") int pageId
     ){
-        return null;
+        return interviewBoardResultService.getPassedRankAndScore(departmentId, pageId);
     }
 
     /**

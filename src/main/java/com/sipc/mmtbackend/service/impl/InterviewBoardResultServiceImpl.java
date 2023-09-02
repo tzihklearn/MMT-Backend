@@ -1,23 +1,24 @@
 package com.sipc.mmtbackend.service.impl;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.sipc.mmtbackend.mapper.DepartmentMapper;
 import com.sipc.mmtbackend.mapper.InterviewBoardRDataMapper;
 import com.sipc.mmtbackend.mapper.InterviewCheckMapper;
 import com.sipc.mmtbackend.pojo.domain.Admission;
 import com.sipc.mmtbackend.pojo.domain.Department;
+import com.sipc.mmtbackend.pojo.domain.po.InterviewBoardRPo.InterviewScoreAndRankPo;
 import com.sipc.mmtbackend.pojo.domain.po.InterviewBoardRPo.DepartmentPassedCountPo;
 import com.sipc.mmtbackend.pojo.domain.po.InterviewBoardRPo.InterviewResultData;
 import com.sipc.mmtbackend.pojo.domain.po.InterviewBoardRPo.LineChartLineDataDaoPo;
 import com.sipc.mmtbackend.pojo.domain.po.InterviewBoardRPo.OrderPassedCountPo;
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
 import com.sipc.mmtbackend.pojo.dto.enums.InterviewRoundEnum;
-import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResultResult.GetDepartmentPassCountResult;
-import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResultResult.GetInterviewResultDataResult;
-import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResultResult.GetOrderPassCountResult;
-import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResultResult.GetPassCountGroupByOrderLineChartResult;
+import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResultResult.*;
 import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResultResult.po.DepartmentPassCountPo;
 import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResultResult.po.GetPassCountGroupByDepartmentResult;
 import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResultResult.po.OrderPassCountPo;
+import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResultResult.po.RankAndScorePo;
 import com.sipc.mmtbackend.pojo.dto.result.po.LineChartLineDataPo;
 import com.sipc.mmtbackend.service.InterviewBoardResultService;
 import com.sipc.mmtbackend.utils.CheckroleBUtil.pojo.BTokenSwapPo;
@@ -254,6 +255,54 @@ public class InterviewBoardResultServiceImpl implements InterviewBoardResultServ
             results.add(depData);
         }
         result.setOrders(results);
+        return CommonResult.success(result);
+    }
+
+    /**
+     * 获取面试通过者排名与分数
+     *
+     * @param departmentId 部门ID, 默认0
+     * @param pageId       页码，默认1
+     * @return 通过面试者排名与分数
+     */
+    @Override
+    public CommonResult<GetPassedRankAndScoreResult> getPassedRankAndScore(int departmentId, int pageId) {
+        BTokenSwapPo context = ThreadLocalContextUtil.getContext();
+        Admission admission = interviewCheckMapper.selectOrganizationActivateAdmission(context.getOrganizationId());
+        if (admission == null) {
+            log.warn("用户 " + context + " 尝试在无活动的纳新时查询面试最终数据");
+            return CommonResult.fail("查询失败：未开始纳新或纳新已结束");
+        }
+        Integer maxRound = interviewCheckMapper.selectOrganizationActivateInterviewRound(admission.getId());
+        if (maxRound == null){
+            log.warn("用户 " + context + " 在纳新 " + admission + " 中未查询到任何面试");
+            return CommonResult.fail("当前纳新未开启面试");
+        }
+        if (departmentId != 0){
+            Department department = departmentMapper.selectById(departmentId);
+            if (department == null){
+                log.warn("用户 " + context + " 在纳新 " + admission + " 请求不存在的部门" + departmentId + "的面试最终数据");
+                return CommonResult.fail("部门不存在或不属于当前组织");
+            } else if (!Objects.equals(department.getOrganizationId(), context.getOrganizationId())){
+                log.warn("用户 " + context + " 在纳新 " + admission + " 请求不属于其组织的的部门" + department + "的面试最终数据");
+                return CommonResult.fail("部门不存在或不属于当前组织");
+            }
+        }
+        Page<InterviewScoreAndRankPo> page = new Page<>(pageId, 15);
+        IPage<InterviewScoreAndRankPo> iPage = interviewBoardRDataMapper.selectPassedInterviewScoreAndRank(
+                page, maxRound, admission.getId(), departmentId);
+        GetPassedRankAndScoreResult result = new GetPassedRankAndScoreResult();
+        List<RankAndScorePo> results = new ArrayList<>();
+        for (InterviewScoreAndRankPo isar : iPage.getRecords()) {
+            RankAndScorePo ras = new RankAndScorePo();
+            ras.setName(isar.getName());
+            ras.setRank(isar.getRank());
+            ras.setScore(isar.getScore());
+            results.add(ras);
+        }
+        result.setScore(results);
+        result.setCount(results.size());
+        result.setPages((int) iPage.getPages());
         return CommonResult.success(result);
     }
 }
