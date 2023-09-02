@@ -23,6 +23,7 @@
             AND i.state >= 5
             AND i.admission_id = #{admissionId,jdbcType=INTEGER}
     </select>
+
     <select id="selectInterviewProgress"
             resultType="com.sipc.mmtbackend.pojo.domain.po.InterviewBoardMPo.InterviewProgressPo">
         SELECT
@@ -69,5 +70,59 @@
                 GROUP BY
                     aa.`name`
             ) AS `ml` ON zml.room = ml.room
+    </select>
+
+    <select id="selectInterviewScoreAndRank"
+            resultType="com.sipc.mmtbackend.pojo.domain.po.InterviewBoardMPo.InterviewScoreAndRankPo">
+        SELECT
+            zl.rank AS "rank",
+            zl.`name` AS "name",
+            zl.score AS "score"
+        FROM
+            (
+                SELECT
+                    zml.`name` AS "name",
+                    zml.score AS "score",
+                    @curRank :=	IF ( @prevRank = score, @curRank, @incRank ) AS rank,
+                    @incRank := @incRank + 1,
+                    @prevRank := score
+                FROM
+                    (
+                        SELECT
+                            ml.`name` AS "name",
+                            AVG( ml.score ) AS "score"
+                        FROM
+                            (
+                                SELECT
+                                    ui.`name` AS "name",
+                                    SUM( qs.score ) AS "score"
+                                FROM
+                                    interview_status `is`
+                                    LEFT JOIN interview_question iq ON `is`.admission_id = iq.admission_id
+                                    LEFT JOIN question_score qs ON iq.id = qs.interview_question_id
+                                    LEFT JOIN user_info ui ON `is`.user_id = ui.id
+                                WHERE
+                                    `is`.is_deleted != 1
+                                    AND iq.is_deleted != 1
+                                    AND qs.is_deleted != 1
+                                    AND ui.is_deleted != 1
+                                    AND iq.question_type IN ( 1, 2 )
+                                    AND iq.type = 5
+                                    AND `is`.admission_id = #{admissionId,jdbcType=INTEGER}
+                                    AND `is`.round = #{round,jdbcType=INTEGER}
+                                <if test="departmentId != null and departmentId > 0">
+                                    AND `is`.department_id = #{departmentId,jdbcType=INTEGER}
+                                </if>
+                                GROUP BY
+                                    `is`.id,
+                                    qs.user_b_id
+                            ) `ml`
+                        GROUP BY
+                            ml.`name`
+                        ) `zml`,
+                        ( SELECT @curRank := 0, @prevRank := NULL, @incRank := 1 ) r
+                    ORDER BY
+                        zml.score DESC
+            ) `zl`
     </select>
 </mapper>

@@ -1,7 +1,9 @@
 package com.sipc.mmtbackend.mapper;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.sipc.mmtbackend.pojo.domain.po.InterviewBoardMPo.CheckinInfoLPo;
 import com.sipc.mmtbackend.pojo.domain.po.InterviewBoardMPo.InterviewProgressPo;
+import com.sipc.mmtbackend.pojo.domain.po.InterviewBoardMPo.InterviewScoreAndRankPo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -37,6 +39,22 @@ public interface InterviewBoardMDataMapper {
      * @return 各地点面试进度
      */
     List<InterviewProgressPo> selectInterviewProgress(
+            @Param("round") Integer round,
+            @Param("admissionId") Integer admissionId,
+            @Param("departmentId") Integer departmentId
+    );
+
+    /**
+     * 查询面试分数与排名
+     *
+     * @param page MyBatis Plus 分页器
+     * @param round 面试轮次
+     * @param admissionId 纳新ID
+     * @param departmentId 部门ID
+     * @return 面试分数与排名
+     */
+    IPage<InterviewScoreAndRankPo> selectInterviewScoreAndRank(
+            IPage<InterviewScoreAndRankPo> page,
             @Param("round") Integer round,
             @Param("admissionId") Integer admissionId,
             @Param("departmentId") Integer departmentId
