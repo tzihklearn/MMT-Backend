@@ -1,5 +1,8 @@
 package com.sipc.mmtbackend.mapper;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.sipc.mmtbackend.pojo.domain.po.InterviewBoardRPo.InterviewScoreAndRankPo;
 import com.sipc.mmtbackend.pojo.domain.po.InterviewBoardRPo.DepartmentPassedCountPo;
 import com.sipc.mmtbackend.pojo.domain.po.InterviewBoardRPo.InterviewResultData;
 import com.sipc.mmtbackend.pojo.domain.po.InterviewBoardRPo.LineChartLineDataDaoPo;
@@ -74,6 +77,22 @@ public interface InterviewBoardRDataMapper {
      * @return 折线图数据
      */
     List<LineChartLineDataDaoPo> selectPassedCountLineChartGroupByRoundAndOrderByAdmissionId(
+            @Param("admissionId") Integer admissionId,
+            @Param("departmentId") Integer departmentId
+    );
+
+    /**
+     * 查询通过面试的人员面试分数与排名
+     *
+     * @param page MyBatis Plus 分页器
+     * @param round 面试轮次
+     * @param admissionId 纳新ID
+     * @param departmentId 部门ID
+     * @return 面试分数与排名
+     */
+    IPage<InterviewScoreAndRankPo> selectPassedInterviewScoreAndRank(
+            Page<InterviewScoreAndRankPo> page,
+            @Param("round") Integer round,
             @Param("admissionId") Integer admissionId,
             @Param("departmentId") Integer departmentId
     );

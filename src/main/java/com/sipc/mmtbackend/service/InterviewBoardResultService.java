@@ -1,10 +1,7 @@
 package com.sipc.mmtbackend.service;
 
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
-import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResultResult.GetDepartmentPassCountResult;
-import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResultResult.GetInterviewResultDataResult;
-import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResultResult.GetOrderPassCountResult;
-import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResultResult.GetPassCountGroupByOrderLineChartResult;
+import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResultResult.*;
 import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardResultResult.po.GetPassCountGroupByDepartmentResult;
 
 public interface InterviewBoardResultService {
@@ -45,4 +42,13 @@ public interface InterviewBoardResultService {
      * @return 不同志愿通过人数随时间变化情况
      */
     CommonResult<GetPassCountGroupByOrderLineChartResult> getPassCountGroupByOrderLineChart(int departmentId);
+
+    /**
+     * 获取面试通过者排名与分数
+     *
+     * @param departmentId 部门ID, 默认0
+     * @param pageId 页码，默认1
+     * @return 通过面试者排名与分数
+     */
+    CommonResult<GetPassedRankAndScoreResult> getPassedRankAndScore(int departmentId, int pageId);
 }
