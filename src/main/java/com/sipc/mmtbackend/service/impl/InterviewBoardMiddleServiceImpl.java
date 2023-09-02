@@ -211,7 +211,6 @@ public class InterviewBoardMiddleServiceImpl implements InterviewBoardMiddleServ
         Page<InterviewScoreAndRankPo> page = new Page<>(pageId, 15);
         IPage<InterviewScoreAndRankPo> iPage = interviewBoardMDataMapper.selectInterviewScoreAndRank(
                 page, round, admission.getId(), departmentId);
-
         GetInterviewRankAndScoreResult result = new GetInterviewRankAndScoreResult();
         List<RankAndScorePo> results = new ArrayList<>();
         for (InterviewScoreAndRankPo isar : iPage.getRecords()) {
