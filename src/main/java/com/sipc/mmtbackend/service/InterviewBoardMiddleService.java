@@ -3,6 +3,7 @@ package com.sipc.mmtbackend.service;
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
 import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardMiddleResult.GetCheckinListResult;
 import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardMiddleResult.GetInterviewProgressCircleResult;
+import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardMiddleResult.GetInterviewRankAndScoreResult;
 import com.sipc.mmtbackend.pojo.dto.result.IntreviewBoardMiddleResult.GetInterviewRoundsResult;
 
 public interface InterviewBoardMiddleService {
@@ -30,4 +31,14 @@ public interface InterviewBoardMiddleService {
      * @return 各个面试地点的面试进度
      */
     CommonResult<GetInterviewProgressCircleResult> getInterviewProgressCircle(int round, int departmentId);
+
+    /**
+     * 获取面试分数与排名
+     *
+     * @param round 面试轮次，默认为1
+     * @param departmentId 部门 ID，默认0（全部部门）
+     * @param pageId 页码，默认1
+     * @return 排名与分数
+     */
+    CommonResult<GetInterviewRankAndScoreResult> getInterviewRankAndScore(int round, int departmentId, int pageId);
 }

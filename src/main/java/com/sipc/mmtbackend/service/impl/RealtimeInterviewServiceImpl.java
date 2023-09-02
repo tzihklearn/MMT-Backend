@@ -206,11 +206,12 @@ public class RealtimeInterviewServiceImpl implements RealtimeInterviewService {
         Page<InterviewStatusPo> page = new Page<>(pageId, 10);
         IPage<InterviewStatusPo> iPage = realtimeInterviewMapper.selectRealtimeInterviewData(
                 page, keyword, maxRound, admission.getId(), placeId);
-        if (iPage.getPages() < pageId){
-            page.setCurrent(iPage.getPages());
-            iPage = realtimeInterviewMapper.selectRealtimeInterviewData(
-                    page, keyword, maxRound, admission.getId(), placeId);
-        }
+        // 超出页数范围返回空
+//        if (iPage.getPages() < pageId){
+//            page.setCurrent(iPage.getPages());
+//            iPage = realtimeInterviewMapper.selectRealtimeInterviewData(
+//                    page, keyword, maxRound, admission.getId(), placeId);
+//        }
         GetIntervieweeListResult result = new GetIntervieweeListResult();
         List<IntervieweePo> results = new ArrayList<>();
         for (InterviewStatusPo isp : iPage.getRecords()) {
