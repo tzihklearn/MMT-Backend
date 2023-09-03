@@ -18,7 +18,7 @@ public class SiftParam {
 
     private Integer addressId;
 
-    private Byte isSort;
+    private Boolean isSort;
 
     private List<Integer> stateList;
 

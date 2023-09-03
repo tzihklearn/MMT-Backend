@@ -37,10 +37,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author tzih
@@ -376,8 +373,6 @@ public class InterviewReviewServiceImpl implements InterviewReviewService {
         //查找面试问题
         List<InterviewQuestion> interviewQuestions = interviewQuestionMapper.selectList(
                 new QueryWrapper<InterviewQuestion>()
-                        .select("id")
-                        .select("question_id")
                         .eq("admission_id", admissionId)
                         .eq("round", admissionSchedule.getRound())
                         .eq("type", 6)
@@ -505,6 +500,32 @@ public class InterviewReviewServiceImpl implements InterviewReviewService {
             }
             if (q >= end) {
                 break;
+            }
+        }
+
+        if (siftParam.getIsSort() != null) {
+            if (siftParam.getIsSort()) {
+                tableData.sort((o1, o2) -> {
+                    double t = o1.getScore().get(0).getScore() - o2.getScore().get(0).getScore();
+                    if (t > 0) {
+                        return 1;
+                    } else if (t ==0) {
+                        return 0;
+                    } else {
+                        return -1;
+                    }
+                });
+            } else {
+                tableData.sort((o1, o2) -> {
+                    double t = o2.getScore().get(0).getScore() - o1.getScore().get(0).getScore();
+                    if (t > 0) {
+                        return 1;
+                    } else if (t ==0) {
+                        return 0;
+                    } else {
+                        return -1;
+                    }
+                });
             }
         }
 
