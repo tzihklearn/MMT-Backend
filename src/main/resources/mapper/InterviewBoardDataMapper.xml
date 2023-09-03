@@ -24,6 +24,7 @@
         AND i.admission_id = #{admissionId,jdbcType=INTEGER}
           AND i.round = #{round,jdbcType=INTEGER}
           AND i.state &lt; 7
+          AND i.state >=4
         ORDER BY i.end_time DESC
     </select>
 </mapper>

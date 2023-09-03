@@ -103,7 +103,7 @@ public class RealtimeInterviewController {
      */
     @PutMapping("/comment")
     public CommonResult<String> postInterviewComment(@RequestBody PostInterviewCommentParam param){
-        return null;
+        return realtimeInterviewService.postInterviewComment(param);
     }
 
     /**

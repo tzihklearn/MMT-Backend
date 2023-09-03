@@ -7,8 +7,8 @@ import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import lombok.Getter;
-import lombok.Setter;
+
+import lombok.Data;
 
 /**
  * <p>
@@ -18,8 +18,7 @@ import lombok.Setter;
  * @author tzih
  * @since 2023-08-15
  */
-@Getter
-@Setter
+@Data
 @TableName("interview_status")
 public class InterviewStatus implements Serializable {
 

@@ -76,6 +76,6 @@ public class InterviewBoardMiddleController {
             @RequestParam(value = "department", defaultValue = "0") int departmentId,
             @RequestParam(value = "page", defaultValue = "1") int pageId
     ){
-        return null;
+        return interviewBoardMiddleService.getInterviewRankAndScore(round, departmentId, pageId);
     }
 }

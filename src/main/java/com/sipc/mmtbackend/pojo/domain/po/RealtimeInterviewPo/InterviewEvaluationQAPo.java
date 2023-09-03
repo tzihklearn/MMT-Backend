@@ -1,12 +1,13 @@
-package com.sipc.mmtbackend.pojo.dto.result.RealtimeIntreviewdResult.po;
+package com.sipc.mmtbackend.pojo.domain.po.RealtimeInterviewPo;
 
-import com.sipc.mmtbackend.pojo.dto.data.QuestionValueListData;
 import lombok.Data;
 
 @Data
-public class QuestionAndAnswerPo {
+public class InterviewEvaluationQAPo {
     // 问题ID（interview_question的ID）
     private Integer id;
+    // 评价ID（question_score的ID）
+    private Integer sId;
     // 问题在当前分组的序号
     private Integer order;
     // 问题分组（1面试基本评价，2面试综合评价，3面试问题）
@@ -18,13 +19,11 @@ public class QuestionAndAnswerPo {
     // 量表题、打分题满分
     private Integer qMaxScore;
     // 单选、多选的选项
-    private QuestionValueListData qOpts;
+    private String qOpts;
     // 面试问题参考
     private String qHint;
-    // 输入型回答（文本框）
+    // 输入型回答（文本框）、选项型回答（单选、多选）
     private String aStr;
     // 数字型回答（打分、量表）
     private Integer aInt;
-    // 选项型回答（单选、多选）
-    private MultipleChoiceAnswerPo aSelect;
 }

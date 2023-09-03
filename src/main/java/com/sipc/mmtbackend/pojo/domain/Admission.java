@@ -4,8 +4,8 @@ import com.baomidou.mybatisplus.annotation.*;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import lombok.Getter;
-import lombok.Setter;
+
+import lombok.Data;
 
 /**
  * <p>
@@ -15,8 +15,7 @@ import lombok.Setter;
  * @author tzih
  * @since 2023-06-03
  */
-@Getter
-@Setter
+@Data
 @TableName("admission")
 public class Admission implements Serializable {
 

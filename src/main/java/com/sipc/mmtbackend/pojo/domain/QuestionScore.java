@@ -14,8 +14,8 @@ import lombok.Setter;
  * 
  * </p>
  *
- * @author tzih
- * @since 2023-08-23
+ * @author DoudiNCer
+ * @since 2023-09-01
  */
 @Getter
 @Setter
@@ -38,6 +38,12 @@ public class QuestionScore implements Serializable {
 
     @TableField("score")
     private Integer score;
+
+    /**
+     * 输入框的内容，单选、多选、级联选择的结果
+     */
+    @TableField("value")
+    private String value;
 
     @TableField("is_deleted")
     @TableLogic
