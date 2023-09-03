@@ -315,13 +315,13 @@
         <if test="siftParam.addressId != null">
             and admission_address_id = #{siftParam.addressId}
         </if>
-        <if test="siftParam.stateList.size() != 0">
+        <if test="siftParam.stateList != null and siftParam.stateList.size() > 0">
           and state in
             <foreach collection="siftParam.stateList" item="item" open="(" separator="," close=")">
                 #{item}
             </foreach>
         </if>
-        <if test="siftParam.messageStateList.size() != 0">
+        <if test="siftParam.messageStateList != null and siftParam.messageStateList.size() != 0">
             and is_message in
             <foreach collection="siftParam.messageStateList" item="item" open="(" separator="," close=")">
                 #{item}
