@@ -30,7 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -143,8 +143,9 @@ public class UserBBServiceImpl implements UserBService {
         UserB userB = userBMapper.selectOne(new QueryWrapper<UserB>().eq("student_id", studentId));
         if (userB == null)
             return CommonResult.fail("用户不存在");
-        List<JoinedOrgResultPo> results = new LinkedList<>();
-        for (JoinedOrgPo joinedOrgPo : userBRoleMapper.selectJoinedOrganizationsByBUserId(userB.getId())) {
+        List<JoinedOrgPo> joinedOrgPos = userBRoleMapper.selectJoinedOrganizationsByBUserId(userB.getId());
+        List<JoinedOrgResultPo> results = new ArrayList<>(joinedOrgPos.size());
+        for (JoinedOrgPo joinedOrgPo : joinedOrgPos) {
             JoinedOrgResultPo result = new JoinedOrgResultPo();
             result.setOrganizationName(joinedOrgPo.getOrganizationName());
             result.setOrganizationId(joinedOrgPo.getOrganizationId());
@@ -375,8 +376,9 @@ public class UserBBServiceImpl implements UserBService {
     @Override
     public CommonResult<LoginedJoinOrgsResult> getLoginedJoinedOrgs() {
         BTokenSwapPo context = ThreadLocalContextUtil.getContext();
-        List<LoginedJoinedOrgResultPo> results = new LinkedList<>();
-        for (JoinedOrgPo joinedOrgPo : userBRoleMapper.selectJoinedOrganizationsByBUserId(context.getUserId())) {
+        List<JoinedOrgPo> joinedOrgPos = userBRoleMapper.selectJoinedOrganizationsByBUserId(context.getUserId());
+        List<LoginedJoinedOrgResultPo> results = new ArrayList<>(joinedOrgPos.size());
+        for (JoinedOrgPo joinedOrgPo : joinedOrgPos) {
             LoginedJoinedOrgResultPo po = new LoginedJoinedOrgResultPo();
             po.setOrganizationId(joinedOrgPo.getOrganizationId());
             po.setOrganizationName(joinedOrgPo.getOrganizationName());

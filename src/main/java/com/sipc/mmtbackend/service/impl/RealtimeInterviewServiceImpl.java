@@ -95,7 +95,7 @@ public class RealtimeInterviewServiceImpl implements RealtimeInterviewService {
         List<AdmissionAddress> addresses = interviewCheckMapper.selectAvailableInterviewAddress(maxRound, admission.getId(), 0);
         GetInterviewPlacesResult result = new GetInterviewPlacesResult();
         result.setCount(addresses.size());
-        List<KVPo> results = new ArrayList<>();
+        List<KVPo> results = new ArrayList<>(addresses.size());
         for (AdmissionAddress address : addresses) {
             results.add(new KVPo(address.getId(), address.getName()));
         }
@@ -124,7 +124,7 @@ public class RealtimeInterviewServiceImpl implements RealtimeInterviewService {
         }
         List<ProgressBarPo> progressBarPos = realtimeInterviewMapper.selectInterviewProgress(maxRound, admission.getId(), placeId);
         GetInterviewProgressBarResult result = new GetInterviewProgressBarResult();
-        List<ProgressBarDataPo> results = new ArrayList<>();
+        List<ProgressBarDataPo> results = new ArrayList<>(progressBarPos.size());
         for (ProgressBarPo pbp : progressBarPos) {
             ProgressBarDataPo pbdp = new ProgressBarDataPo();
             pbdp.setFinished(pbp.getFinished());
@@ -213,7 +213,7 @@ public class RealtimeInterviewServiceImpl implements RealtimeInterviewService {
 //                    page, keyword, maxRound, admission.getId(), placeId);
 //        }
         GetIntervieweeListResult result = new GetIntervieweeListResult();
-        List<IntervieweePo> results = new ArrayList<>();
+        List<IntervieweePo> results = new ArrayList<>(iPage.getRecords().size());
         for (InterviewStatusPo isp : iPage.getRecords()) {
             IntervieweePo ip = new IntervieweePo();
             ip.setId(isp.getId());
@@ -330,7 +330,7 @@ public class RealtimeInterviewServiceImpl implements RealtimeInterviewService {
                 realtimeInterviewMapper.selectAllInterviewEvaluationQnAByBCUID(
                         admission.getId(), context.getUserId(), interviewStatus.getUserId());
         GetInterviewCommentResult result = new GetInterviewCommentResult();
-        List<InterviewTablePo> interviewTables = new ArrayList<>();
+        List<InterviewTablePo> interviewTables = new ArrayList<>(interviewEvaluationAndAnswerPos.size());
         for (InterviewEvaluationAndAnswerPo ieaap : interviewEvaluationAndAnswerPos) {
             InterviewTablePo ritp = new InterviewTablePo();
             ritp.setRound(ieaap.getRound());

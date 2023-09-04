@@ -54,7 +54,7 @@ public class InterviewBoardBeforeServiceImpl implements InterviewBoardBeforeServ
                         admission.getId());
         GetNumberGroupByDepartmentResult result = new GetNumberGroupByDepartmentResult();
         result.setCNum(0);
-        List<GetNumberGroupByDepartmentPo> results = new LinkedList<>();
+        List<GetNumberGroupByDepartmentPo> results = new ArrayList<>(deps.size());
         for (PersonNumGroupByDepartmentPo po : deps) {
             GetNumberGroupByDepartmentPo dep = new GetNumberGroupByDepartmentPo();
             dep.setNum(po.getNumber());
@@ -129,7 +129,7 @@ public class InterviewBoardBeforeServiceImpl implements InterviewBoardBeforeServ
                 context.getOrganizationId(), admission.getId());
         // 响应体数据
         GetNumberGroupByTimeAndDepartmentResult result = new GetNumberGroupByTimeAndDepartmentResult();
-        List<LineChartLineDataPo> departmentDates = new LinkedList<>();
+        List<LineChartLineDataPo> departmentDates = new ArrayList<>(daoDatas.size());
         if (daoDatas.size() == 0){
             result.setDepartments(departmentDates);
             result.setDate(new ArrayList<>());
@@ -178,7 +178,7 @@ public class InterviewBoardBeforeServiceImpl implements InterviewBoardBeforeServ
                         admission.getId(), department.getId());
         GetNumberGroupByOrderResult result = new GetNumberGroupByOrderResult();
         result.setTotalNum(0);
-        List<GetNumberGroupByOrderPo> results = new LinkedList<>();
+        List<GetNumberGroupByOrderPo> results = new ArrayList<>(depPos.size());
         for (PersonNumGroupByOrderPo po : depPos){
             GetNumberGroupByOrderPo r = new GetNumberGroupByOrderPo();
             r.setOrderNum(po.getOrderNum());
@@ -222,7 +222,7 @@ public class InterviewBoardBeforeServiceImpl implements InterviewBoardBeforeServ
         List<LineChartLineDataDaoPo> daoDatas = interviewBoardBDataMapper.selectInterviewNumberLineChartGroupByDataByDepartmentIdIdAndAdmissionId(
                 departmentId, admission.getId());
         GetNumberGroupByTimeAndOrderResult result = new GetNumberGroupByTimeAndOrderResult();
-        List<LineChartLineDataPo> orderDates = new LinkedList<>();
+        List<LineChartLineDataPo> orderDates = new ArrayList<>(daoDatas.size());
         if (daoDatas.size() == 0){
             result.setOrders(orderDates);
             result.setDate(new ArrayList<>());

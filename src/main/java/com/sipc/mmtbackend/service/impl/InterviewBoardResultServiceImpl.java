@@ -98,7 +98,7 @@ public class InterviewBoardResultServiceImpl implements InterviewBoardResultServ
         }
         List<DepartmentPassedCountPo> countPos = interviewBoardRDataMapper.selectPassedCountPerDepartment(maxRound, admission.getId());
         GetDepartmentPassCountResult result = new GetDepartmentPassCountResult();
-        List<DepartmentPassCountPo> results = new ArrayList<>();
+        List<DepartmentPassCountPo> results = new ArrayList<>(countPos.size());
         for (DepartmentPassedCountPo po : countPos) {
             DepartmentPassCountPo dpcp = new DepartmentPassCountPo();
             dpcp.setCount(po.getCount());
@@ -132,7 +132,7 @@ public class InterviewBoardResultServiceImpl implements InterviewBoardResultServ
         List<LineChartLineDataDaoPo> lineDataDaoPos = interviewBoardRDataMapper.selectPassedCountLineChartGroupByRoundByAdmissionId(
                 admission.getId());
         GetPassCountGroupByDepartmentResult result = new GetPassCountGroupByDepartmentResult();
-        List<LineChartLineDataPo> results = new ArrayList<>();
+        List<LineChartLineDataPo> results = new ArrayList<>(lineDataDaoPos.size());
         if (lineDataDaoPos.size() == 0){
             result.setDepartments(results);
             result.setRound(new ArrayList<>());
@@ -183,7 +183,7 @@ public class InterviewBoardResultServiceImpl implements InterviewBoardResultServ
         }
         List<OrderPassedCountPo> countPos = interviewBoardRDataMapper.selectPassedCountPerOrder(maxRound, admission.getId(), departmentId);
         GetOrderPassCountResult result = new GetOrderPassCountResult();
-        List<OrderPassCountPo> results = new ArrayList<>();
+        List<OrderPassCountPo> results = new ArrayList<>(countPos.size());
         for (OrderPassedCountPo countPo : countPos) {
             OrderPassCountPo opcp = new OrderPassCountPo();
             opcp.setId(countPo.getId());
@@ -234,7 +234,7 @@ public class InterviewBoardResultServiceImpl implements InterviewBoardResultServ
                 admission.getId(), departmentId
         );
         GetPassCountGroupByOrderLineChartResult result = new GetPassCountGroupByOrderLineChartResult();
-        List<LineChartLineDataPo> results = new ArrayList<>();
+        List<LineChartLineDataPo> results = new ArrayList<>(chartLineDataDaoPos.size());
         if (chartLineDataDaoPos.size() == 0){
             result.setOrders(results);
             result.setRound(new ArrayList<>());
@@ -292,7 +292,7 @@ public class InterviewBoardResultServiceImpl implements InterviewBoardResultServ
         IPage<InterviewScoreAndRankPo> iPage = interviewBoardRDataMapper.selectPassedInterviewScoreAndRank(
                 page, maxRound, admission.getId(), departmentId);
         GetPassedRankAndScoreResult result = new GetPassedRankAndScoreResult();
-        List<RankAndScorePo> results = new ArrayList<>();
+        List<RankAndScorePo> results = new ArrayList<>(iPage.getRecords().size());
         for (InterviewScoreAndRankPo isar : iPage.getRecords()) {
             RankAndScorePo ras = new RankAndScorePo();
             ras.setName(isar.getName());

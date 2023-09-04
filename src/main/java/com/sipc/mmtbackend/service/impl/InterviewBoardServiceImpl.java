@@ -20,7 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -43,7 +43,7 @@ public class InterviewBoardServiceImpl implements InterviewBoardService {
                 new QueryWrapper<Department>()
                         .eq("organization_id", context.getOrganizationId()));
         GetDepartmentsResult result = new GetDepartmentsResult();
-        List<GetDepartmentPo> departments = new LinkedList<>();
+        List<GetDepartmentPo> departments = new ArrayList<>(departmentList.size());
         for (Department department : departmentList) {
             GetDepartmentPo gdp = new GetDepartmentPo();
             gdp.setDepartmentId(department.getId());

@@ -61,7 +61,7 @@ public class InterviewBoardMiddleServiceImpl implements InterviewBoardMiddleServ
         }
         GetInterviewRoundsResult result = new GetInterviewRoundsResult();
         result.setCount(maxRound);
-        List<KVPo> results = new ArrayList<>();
+        List<KVPo> results = new ArrayList<>(maxRound);
         for (int i = 1; i <= maxRound; i++){
             InterviewRoundEnum round = InterviewRoundEnum.checkRound(i);
             if (round == null){
@@ -110,7 +110,7 @@ public class InterviewBoardMiddleServiceImpl implements InterviewBoardMiddleServ
         }
         List<CheckinInfoLPo> checkinInfos = interviewBoardMDataMapper.selectCheckinInfo(round, admission.getId(), departmentId);
         GetCheckinListResult result = new GetCheckinListResult();
-        List<CheckinInfoPo> results = new ArrayList<>();
+        List<CheckinInfoPo> results = new ArrayList<>(checkinInfos.size());
         for (CheckinInfoLPo info : checkinInfos) {
             CheckinInfoPo po = new CheckinInfoPo();
             po.setName(info.getName());
@@ -160,7 +160,7 @@ public class InterviewBoardMiddleServiceImpl implements InterviewBoardMiddleServ
         }
         List<InterviewProgressPo> progress = interviewBoardMDataMapper.selectInterviewProgress(round, admission.getId(), departmentId);
         GetInterviewProgressCircleResult result = new GetInterviewProgressCircleResult();
-        List<InterviewRoomProgressPo> results = new ArrayList<>();
+        List<InterviewRoomProgressPo> results = new ArrayList<>(progress.size());
         for (InterviewProgressPo ipp : progress) {
             InterviewRoomProgressPo irpp = new InterviewRoomProgressPo();
             irpp.setName(ipp.getName());
@@ -212,7 +212,7 @@ public class InterviewBoardMiddleServiceImpl implements InterviewBoardMiddleServ
         IPage<InterviewScoreAndRankPo> iPage = interviewBoardMDataMapper.selectInterviewScoreAndRank(
                 page, round, admission.getId(), departmentId);
         GetInterviewRankAndScoreResult result = new GetInterviewRankAndScoreResult();
-        List<RankAndScorePo> results = new ArrayList<>();
+        List<RankAndScorePo> results = new ArrayList<>(iPage.getRecords().size());
         for (InterviewScoreAndRankPo isar : iPage.getRecords()) {
             RankAndScorePo ras = new RankAndScorePo();
             ras.setName(isar.getName());
