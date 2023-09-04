@@ -541,7 +541,7 @@ public class RealtimeInterviewServiceImpl implements RealtimeInterviewService {
             List<InterviewEvaluationQAPo> questions = interviewEvaluationAndAnswerPo.getQuestions();
             for (int qi = questions.size() - 1; qi >= 0; qi--) {
                 int ai = answer_i;
-                for (; ai < paramList.size(); ai++) {
+                while (ai < paramList.size()) {
                     if (Objects.equals(questions.get(qi).getId(), paramList.get(ai).getId())) {
                         answer_i = ai;
                         boolean update = true;
@@ -598,6 +598,7 @@ public class RealtimeInterviewServiceImpl implements RealtimeInterviewService {
                         }
                         break;
                     }
+                    ai++;
                 }
             }
             for (QuestionScore updateQ : updateQs) {
