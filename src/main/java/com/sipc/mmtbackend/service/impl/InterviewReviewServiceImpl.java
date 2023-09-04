@@ -280,24 +280,33 @@ public class InterviewReviewServiceImpl implements InterviewReviewService {
             infoPo.setScore(score);
             int stateId = irInterviewStatusPo.getState();
             infoPo.setStateId(stateId);
-            if (stateId == 9) {
-                infoPo.setState("通过");
-            } else if (stateId == 8) {
-                infoPo.setState("失败");
-            } else if (stateId == 7) {
-                infoPo.setState("待定");
-            } else {
-                infoPo.setState("--");
+            switch (stateId) {
+                case 9:
+                    infoPo.setState("通过");
+                    break;
+                case 8:
+                    infoPo.setState("失败");
+                    break;
+                case 7:
+                    infoPo.setState("待定");
+                    break;
+                default:
+                    infoPo.setState("--");
+                    break;
             }
 
             int messageStateId = irInterviewStatusPo.getIsMessage();
             infoPo.setMessageStateId(messageStateId);
-            if (messageStateId == 0) {
-                infoPo.setMessageState("未安排");
-            } else if (messageStateId == 1) {
-                infoPo.setMessageState("已安排未通知");
-            } else {
-                infoPo.setMessageState("已通知");
+            switch (messageStateId) {
+                case 0:
+                    infoPo.setMessageState("未安排");
+                    break;
+                case 1:
+                    infoPo.setMessageState("已安排未通知");
+                    break;
+                default:
+                    infoPo.setMessageState("已通知");
+                    break;
             }
 
             tableData.add(infoPo);
@@ -792,14 +801,17 @@ public class InterviewReviewServiceImpl implements InterviewReviewService {
 
         int state;
         int type;
-        if (status == 1) {
-            state = 9;
-            type = 2;
-        } else if (status == 0) {
-            state = 8;
-            type = 3;
-        } else {
-            return CommonResult.fail("参数不正确");
+        switch (status) {
+            case 1:
+                state = 9;
+                type = 2;
+                break;
+            case 0:
+                state = 8;
+                type = 3;
+                break;
+            default:
+                return CommonResult.fail("参数不正确");
         }
         for (GroupByNumPo groupByNumPo : myInterviewStatusMapper.selectGroupMessageByAdmissionIdAndRound(admissionId, admissionSchedule.getRound(), state)) {
             if (groupByNumPo.getId() == 2) {
