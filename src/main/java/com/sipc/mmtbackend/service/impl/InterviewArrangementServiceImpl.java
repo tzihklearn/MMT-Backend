@@ -674,6 +674,10 @@ public class InterviewArrangementServiceImpl implements InterviewArrangementServ
             count = interviewMessagePos.size();
             for (InterviewMessagePo interviewMessagePo : interviewMessagePos) {
                 if (i >= start && i < end) {
+                    if ( !interviewMessagePo.toString().contains(siftParam.getSearch())) {
+                        break;
+                    }
+
                     IAInfoPo iaInfoPo = new IAInfoPo();
                     iaInfoPo.setId(interviewMessagePo.getId());
                     iaInfoPo.setStudentId(interviewMessagePo.getStudentId());
@@ -714,6 +718,11 @@ public class InterviewArrangementServiceImpl implements InterviewArrangementServ
             count = interviewMessagePos.size();
             for (InterviewMessagePo interviewMessagePo : interviewMessagePos) {
                 if (i >= start && i < end) {
+
+                    if ( !interviewMessagePo.toString().contains(siftParam.getSearch())) {
+                        break;
+                    }
+
                     IAInfoPo iaInfoPo = new IAInfoPo();
                     iaInfoPo.setId(interviewMessagePo.getId());
                     iaInfoPo.setStudentId(interviewMessagePo.getStudentId());
