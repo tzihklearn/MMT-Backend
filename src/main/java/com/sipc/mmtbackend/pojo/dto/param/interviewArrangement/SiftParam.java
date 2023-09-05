@@ -18,4 +18,6 @@ public class SiftParam {
 
     private List<Integer> messageStatusList;
 
+    private String search;
+
 }
