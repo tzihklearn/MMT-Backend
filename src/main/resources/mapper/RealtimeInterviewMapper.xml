@@ -187,6 +187,7 @@
             AND `is`.is_deleted != 1
             AND iq.is_deleted != 1
             AND qd.is_deleted != 1
+            AND iq.question_type IN (1,2)
         	AND `is`.id = #{iId,jdbcType=INTEGER}
             AND ie.user_b_id = #{bId,jdbcType=INTEGER}
         ORDER BY qd.id ASC
