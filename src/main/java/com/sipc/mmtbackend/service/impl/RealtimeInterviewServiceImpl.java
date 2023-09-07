@@ -440,6 +440,17 @@ public class RealtimeInterviewServiceImpl implements RealtimeInterviewService {
             log.warn("不可能，这绝对不可能！用户 " + context + " 在纳新 " + admission + " 面试 " + interviewStatus + " 中查不到面试问题！");
             return CommonResult.serverError();
         }
+        if (param.getExpectDepartment() != null){
+            Department department = departmentMapper.selectById(param.getExpectDepartment());
+            if (department == null){
+                log.warn("用户 " + context + "指定不存在的部门为期望部门，请求体为：" + param);
+                return CommonResult.fail("期望的部门不存在或不属于当前组织");
+            }
+            if (!Objects.equals(department.getOrganizationId(), context.getOrganizationId())){
+                log.warn("用户 " + context + "指定不属于其所在组织的部门为期望部门，请求体为：" + param);
+                return CommonResult.fail("期望的部门不存在或不属于当前组织");
+            }
+        }
         InterviewEvaluation interviewEvaluation = interviewEvaluationMapper.selectById(interviewEvaluationAndAnswerPo.getIeId());
         // 对前端返回的结果进行倒序排序
         List<InterviewEvaluationPo> paramList =
