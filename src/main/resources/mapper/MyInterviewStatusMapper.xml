@@ -373,6 +373,18 @@
         group by is_message
         order by is_message
     </select>
+    <select id="selectGroupMessageByAdmissionIdAndRoundNoState"
+            resultType="com.sipc.mmtbackend.pojo.domain.po.interviewReview.GroupByNumPo">
+        select is_message as id, count(id) as num
+        from interview_status
+        where admission_id = #{admissionId, jdbcType=INTEGER}
+          and round = #{round,jdbcType=INTEGER}
+          and true_end_time is not null
+          and (state = 8 or state = 9)
+          and is_message != 1
+        group by is_message
+        order by is_message
+    </select>
 
 
 </mapper>

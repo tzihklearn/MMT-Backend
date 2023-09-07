@@ -10,13 +10,15 @@ import lombok.Data;
 @Data
 public class MessageTemplateResult {
 
-    private String messageTemplate;
+    private String messageSuccessTemplate;
 
-    private Integer notifiedNum;
+    private String messageFailTemplate;
 
-    private Integer allNum;
-
-    private Integer NotNotifiedNum;
+//    private Integer notifiedNum;
+//
+//    private Integer allNum;
+//
+//    private Integer NotNotifiedNum;
 
 
 }
