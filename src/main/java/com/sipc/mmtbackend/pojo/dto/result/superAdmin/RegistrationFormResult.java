@@ -1,5 +1,6 @@
 package com.sipc.mmtbackend.pojo.dto.result.superAdmin;
 
+import com.sipc.mmtbackend.pojo.dto.data.DepartmentQuestionData;
 import com.sipc.mmtbackend.pojo.dto.data.QuestionPoData;
 import lombok.Data;
 
@@ -21,7 +22,7 @@ public class RegistrationFormResult {
 
     private List<QuestionPoData> essentialQuestionList;
 
-    private List<QuestionPoData> departmentQuestionList;
+    private List<DepartmentQuestionData> departmentQuestionList;
 
     private List<QuestionPoData> comprehensiveQuestionList;
 

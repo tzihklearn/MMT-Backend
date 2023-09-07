@@ -48,7 +48,6 @@ import java.util.stream.Collectors;
 @Slf4j
 public class OrganizationServiceImpl implements OrganizationService {
 
-
     private final OrganizationMapper organizationMapper;
 
     private final OrganizationTagMergeMapper organizationTagMergeMapper;
@@ -712,7 +711,7 @@ public class OrganizationServiceImpl implements OrganizationService {
         registrationFormResult.setEssentialQuestionList(assemblingQuestionList(admissionId, 1));
 
         //获取部门问题列表
-        registrationFormResult.setDepartmentQuestionList(assemblingQuestionList(admissionId, 2));
+        registrationFormResult.setDepartmentQuestionList(assemblingDepartmentQuestionList(admissionId, 2));
 
         //获取综合问题列表
         registrationFormResult.setComprehensiveQuestionList(assemblingQuestionList(admissionId, 3));
@@ -743,10 +742,11 @@ public class OrganizationServiceImpl implements OrganizationService {
             QuestionPoData questionPoData = new QuestionPoData();
 
             questionPoData.setId(questionData.getId());
-            questionPoData.setName(questionData.getQuestion());
+            questionPoData.setContent(questionData.getQuestion());
             questionPoData.setType(questionData.getType());
             try {
-                questionPoData.setSelectValue(objectMapper.readValue(questionData.getValue(), QuestionValueListData.class));
+                //TODO:未检查的赋值: 'java.util.ArrayList' 赋值给 'java.util.List<java.lang.String>'
+                questionPoData.setValue(objectMapper.readValue(questionData.getValue(), ArrayList.class));
             } catch (JsonProcessingException e) {
                 log.error("获取系统内置问题接口异常，json转换对象异常，对象为:{}", questionData.getValue());
                 throw new RunException("json转换对象出错");
@@ -1216,7 +1216,7 @@ public class OrganizationServiceImpl implements OrganizationService {
 
         //设置纳新报名表部门问题
         if (registrationForm.getDepartmentQuestionList() != null) {
-            setQuestion(registrationForm.getDepartmentQuestionList(), organizationId, admissionId, 2, 0);
+            setDepartmentQuestion(registrationForm.getDepartmentQuestionList(), organizationId, admissionId, 2, 0);
         }
 
         //设置纳新报名表综合问题
@@ -1276,12 +1276,12 @@ public class OrganizationServiceImpl implements OrganizationService {
         for (QuestionPoData questionPoData : questionPoDataList) {
 
             //如果是部门问题，判断该部门在社团中是否存在，如果不存在，则跳过该问题
-            if (questionType == 2 && departmentMap.get(questionPoData.getDepartmentId()) == null) {
-                continue;
-            }
+//            if (questionType == 2 && departmentMap.get(questionPoData.getDepartmentId()) == null) {
+//                continue;
+//            }
 
             //如果报名表的问题的问题选项列表为空，则跳过该问题
-            if (round == 0 && questionPoData.getSelectValue() == null) {
+            if (round == 0 && questionPoData.getValue() == null) {
                 continue;
             }
 
@@ -1291,9 +1291,9 @@ public class OrganizationServiceImpl implements OrganizationService {
             if (questionPoData.getType() == 1) {
                 questionData = questionDataMapper.selectOne(
                         new QueryWrapper<QuestionData>()
-                                .eq("type", true)
-                                .eq("select_type_id", questionPoData.getSelectType())
-                                .eq("question", questionPoData.getName())
+//                                .eq("type", true)
+                                .eq("select_type_id", questionPoData.getType())
+                                .eq("question", questionPoData.getContent())
                 );
                 if (questionData == null) {
                     continue;
@@ -1305,36 +1305,43 @@ public class OrganizationServiceImpl implements OrganizationService {
               在question_date表中插入问题信息
              */
                 questionData.setType(0);
-                questionData.setSelectTypeId(questionPoData.getSelectType());
-                questionData.setQuestion(questionPoData.getName());
+                questionData.setSelectTypeId(questionPoData.getType());
+                questionData.setQuestion(questionPoData.getContent());
 
                 //将问题的选项信息转换为json字符串存储
                 ObjectMapper objectMapper = new ObjectMapper();
                 String json;
                 try {
-                    json = objectMapper.writeValueAsString(questionPoData.getSelectValue());
+                    json = objectMapper.writeValueAsString(questionPoData.getValue());
                 } catch (JsonProcessingException e) {
-                    log.error("发布纳新或保存报名表接口异常，对象转换json异常，对象为:{}", questionPoData.getSelectValue());
+                    log.error("发布纳新或保存报名表接口异常，对象转换json异常，对象为:{}", questionPoData.getValue());
                     throw new RunException("对象转换json字符串异常，异常为JsonProcessingException");
                 }
                 questionData.setValue(json);
 
                 //设置非级联选择器问题的选项数
-                if (questionPoData.getSelectType() != 5) {
-                    if (questionPoData.getSelectType() == 6) {
-                        questionData.setNum(questionPoData.getNum());
+                if (questionPoData.getType() != 5) {
+                    if (questionPoData.getType() == 6) {
+                        try {
+                            questionData.setNum(Integer.valueOf(questionPoData.getValue().get(0)));
+                        } catch (NumberFormatException e) {
+                            throw new RunException("string转int异常，错误的传参");
+                        }
                     }
                     //判断QuestionValueDataList是否为空，防止传入错误数据
-                    else if (questionPoData.getSelectValue().getQuestionValueDataList() == null) {
-                        questionData.setNum(1);
-                    } else {
-                        questionData.setNum(questionPoData.getSelectValue().getQuestionValueDataList().size());
-                    }
+//                    else if (questionPoData.getSelectValue().getQuestionValueDataList() == null) {
+//                        questionData.setNum(1);
+//                    } else {
+//                        questionData.setNum(questionPoData.getSelectValue().getQuestionValueDataList().size());
+//                    }
+                    questionData.setNum(questionPoData.getValue().size());
                 }
+                //TODO：级联选择器已被删除，之后删掉
                 //设置级联选择器问题的选项数
                 else {
                     //调用获取questionValueDataList的深度的方法获取深度设置为问题选项的数量
-                    questionData.setNum(getDepth(questionPoData.getSelectValue().getQuestionValueDataList()));
+//                    questionData.setNum(getDepth(questionPoData.getSelectValue().getQuestionValueDataList()));
+                    questionData.setNum(questionPoData.getValue().size());
                 }
                 questionData.setIsDeleted((byte) 0);
                 //在question_data表中插入问题信息
@@ -1354,9 +1361,9 @@ public class OrganizationServiceImpl implements OrganizationService {
                 AdmissionQuestion admissionQuestion = new AdmissionQuestion();
                 admissionQuestion.setAdmissionId(admissionId);
                 //如果是部门问题，设置对于的部门id
-                if (questionType == 2) {
-                    admissionQuestion.setDepartmentId(questionPoData.getDepartmentId());
-                }
+//                if (questionType == 2) {
+//                    admissionQuestion.setDepartmentId(questionPoData.getDepartmentId());
+//                }
                 admissionQuestion.setQuestionId(questionData.getId());
                 admissionQuestion.setQuestionType(questionType);
                 admissionQuestion.setOrder(order);
@@ -1389,6 +1396,134 @@ public class OrganizationServiceImpl implements OrganizationService {
         }
     }
 
+    private void setDepartmentQuestion(List<DepartmentQuestionData> questionPoDataList, int organizationId, int admissionId, int questionType, int round) throws RunException, DateBaseException {
+
+        //记录问题次序
+        int order = 0;
+
+        Map<Integer, Boolean> departmentMap = new HashMap<>();
+
+        //报名表设置中，如果是部门问题，则去数据库中找出社团所有的纳新部门，并且将其放入map中
+        if (round == 0 && questionType == 2) {
+            for (Department department : departmentMapper.selectList(
+                    new QueryWrapper<Department>()
+                            .select("id")
+                            .eq("organization_id", organizationId)
+            )) {
+                departmentMap.put(department.getId(), true);
+            }
+
+        }
+
+        //迭代处理报名表基本问题列表
+        for (DepartmentQuestionData departmentQuestionData : questionPoDataList) {
+
+            //如果是部门问题，判断该部门在社团中是否存在，如果不存在，则跳过该问题
+            if (questionType == 2 && departmentMap.get(departmentQuestionData.getDepartmentId()) == null) {
+                continue;
+            }
+
+            for (QuestionPoData questionPoData : departmentQuestionData.getQuestionList()) {
+                //如果报名表的问题的问题选项列表为空，则跳过该问题
+                if (round == 0 && questionPoData.getValue() == null) {
+                    continue;
+                }
+
+                ++order;
+                QuestionData questionData = new QuestionData();
+                //如果是系统内置问题
+                if (questionPoData.getType() == 1) {
+                    questionData = questionDataMapper.selectOne(
+                            new QueryWrapper<QuestionData>()
+//                                .eq("type", true)
+                                    .eq("select_type_id", questionPoData.getType())
+                                    .eq("question", questionPoData.getContent())
+                    );
+                    if (questionData == null) {
+                        continue;
+                    }
+                }
+                //如果是自定义问题，则新增问题信息记录
+                else {
+                /*
+              在question_date表中插入问题信息
+             */
+                    questionData.setType(0);
+                    questionData.setSelectTypeId(questionPoData.getType());
+                    questionData.setQuestion(questionPoData.getContent());
+
+                    //将问题的选项信息转换为json字符串存储
+                    ObjectMapper objectMapper = new ObjectMapper();
+                    String json;
+                    try {
+                        json = objectMapper.writeValueAsString(questionPoData.getValue());
+                    } catch (JsonProcessingException e) {
+                        log.error("发布纳新或保存报名表接口异常，对象转换json异常，对象为:{}", questionPoData.getValue());
+                        throw new RunException("对象转换json字符串异常，异常为JsonProcessingException");
+                    }
+                    questionData.setValue(json);
+
+                    //设置非级联选择器问题的选项数
+                    if (questionPoData.getType() != 5) {
+                        if (questionPoData.getType() == 6) {
+                            try {
+                                questionData.setNum(Integer.valueOf(questionPoData.getValue().get(0)));
+                            } catch (NumberFormatException e) {
+                                throw new RunException("string转int异常，错误的传参");
+                            }
+                        }
+                        //判断QuestionValueDataList是否为空，防止传入错误数据
+//                    else if (questionPoData.getSelectValue().getQuestionValueDataList() == null) {
+//                        questionData.setNum(1);
+//                    } else {
+//                        questionData.setNum(questionPoData.getSelectValue().getQuestionValueDataList().size());
+//                    }
+                        questionData.setNum(questionPoData.getValue().size());
+                    }
+                    //TODO：级联选择器已被删除，之后删掉
+                    //设置级联选择器问题的选项数
+                    else {
+                        //调用获取questionValueDataList的深度的方法获取深度设置为问题选项的数量
+//                    questionData.setNum(getDepth(questionPoData.getSelectValue().getQuestionValueDataList()));
+                        questionData.setNum(questionPoData.getValue().size());
+                    }
+                    questionData.setIsDeleted((byte) 0);
+                    //在question_data表中插入问题信息
+                    int insertNum = questionDataMapper.insert(questionData);
+                    if (insertNum != 1) {
+                        log.error("发布纳新或保存报名表接口异常，插入question_date表数据数错误，插入question_date表数据数：{}，插入社团id：{}，插入问题信息：{}",
+                                insertNum, organizationId, questionPoData);
+                        throw new DateBaseException("插入数据库操作异常");
+                    }
+                }
+
+                /*
+              在admission_question表中插入社团纳新报名表相关的问题信息
+             */
+                    AdmissionQuestion admissionQuestion = new AdmissionQuestion();
+                    admissionQuestion.setAdmissionId(admissionId);
+                    //如果是部门问题，设置对于的部门id
+
+                admissionQuestion.setDepartmentId(departmentQuestionData.getDepartmentId());
+
+                    admissionQuestion.setQuestionId(questionData.getId());
+                    admissionQuestion.setQuestionType(questionType);
+                    admissionQuestion.setOrder(order);
+                    admissionQuestion.setIsDeleted((byte) 0);
+
+                    int insertNum = admissionQuestionMapper.insert(admissionQuestion);
+                    if (insertNum != 1) {
+                        log.error("发布纳新接口异常，插入admission_question表数据数错误，插入admission_question表数据数：{}，插入社团id：{}，插入社团报名表问题信息：{}",
+                                insertNum, organizationId, admissionQuestion);
+                        throw new DateBaseException("插入数据库操作异常");
+                    }
+                }
+
+
+        }
+
+    }
+
     /**
      * 拼接报名表问题列表
      *
@@ -1419,16 +1554,16 @@ public class OrganizationServiceImpl implements OrganizationService {
             //拼装questionPoData对象
             QuestionPoData questionPoData = new QuestionPoData();
             questionPoData.setId(questionData.getId());
-            questionPoData.setName(questionData.getQuestion());
-            questionPoData.setType(questionData.getType());
-            questionPoData.setSelectType(questionData.getSelectTypeId());
-            questionPoData.setNum(questionData.getNum());
+            questionPoData.setContent(questionData.getQuestion());
+            questionPoData.setType(questionData.getSelectTypeId());
+//            questionPoData.setSelectType(questionData.getSelectTypeId());
+//            questionPoData.setValue(questionData.getNum()) ;
             if (questionData.getAnswer() != null) {
                 questionPoData.setAnswer(questionData.getAnswer());
             }
 
             try {
-                questionPoData.setSelectValue(objectMapper.readValue(questionData.getValue(), QuestionValueListData.class));
+                questionPoData.setValue(objectMapper.readValue(questionData.getValue(), List.class));
             } catch (JsonProcessingException e) {
                 log.error("发布纳新或保存报名表接口异常，json转换对象异常，对象为:{}", questionData.getValue());
                 throw new RunException("json转换对象出错");
@@ -1439,6 +1574,66 @@ public class OrganizationServiceImpl implements OrganizationService {
         }
 
         return questionList;
+    }
+
+    private List<DepartmentQuestionData> assemblingDepartmentQuestionList(int admissionId, int questionType) throws RunException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        //TODO:之后采用sql联表查询
+        List<DepartmentQuestionData> departmentQuestionList = new ArrayList<>();
+
+        for (AdmissionDepartmentMerge admissionDepartmentMerge : admissionDepartmentMergeMapper.selectList(
+                new QueryWrapper<AdmissionDepartmentMerge>()
+                        .eq("admission_id", admissionId)
+        )) {
+
+            DepartmentQuestionData departmentQuestionData = new DepartmentQuestionData();
+
+            departmentQuestionData.setDepartmentId(admissionDepartmentMerge.getDepartmentId());
+
+            List<QuestionPoData> questionList = new ArrayList<>();
+
+            for (AdmissionQuestion admissionQuestion : admissionQuestionMapper.selectList(
+                    new QueryWrapper<AdmissionQuestion>()
+                            .eq("admission_id", admissionId)
+                            .eq("question_type", questionType)
+                            .eq("department_id", admissionDepartmentMerge.getDepartmentId())
+                            .orderByAsc("`order`")
+            )) {
+                QuestionData questionData = questionDataMapper.selectOne(
+                        new QueryWrapper<QuestionData>()
+                                .eq("id", admissionQuestion.getQuestionId())
+                );
+                if (questionData == null) {
+                    continue;
+                }
+
+                //拼装questionPoData对象
+                QuestionPoData questionPoData = new QuestionPoData();
+                questionPoData.setId(questionData.getId());
+                questionPoData.setContent(questionData.getQuestion());
+                questionPoData.setType(questionData.getSelectTypeId());
+//            questionPoData.setSelectType(questionData.getSelectTypeId());
+//            questionPoData.setValue(questionData.getNum()) ;
+                if (questionData.getAnswer() != null) {
+                    questionPoData.setAnswer(questionData.getAnswer());
+                }
+
+                try {
+                    questionPoData.setValue(objectMapper.readValue(questionData.getValue(), List.class));
+                } catch (JsonProcessingException e) {
+                    log.error("发布纳新或保存报名表接口异常，json转换对象异常，对象为:{}", questionData.getValue());
+                    throw new RunException("json转换对象出错");
+                }
+
+                //将拼装好的questionPoData对象放入essentialQuestionList中
+                questionList.add(questionPoData);
+
+                departmentQuestionList.add(departmentQuestionData);
+            }
+            departmentQuestionData.setQuestionList(questionList);
+        }
+
+        return departmentQuestionList;
     }
 
     /**
@@ -1472,16 +1667,16 @@ public class OrganizationServiceImpl implements OrganizationService {
             //拼装questionPoData对象
             QuestionPoData questionPoData = new QuestionPoData();
             questionPoData.setId(questionData.getId());
-            questionPoData.setName(questionData.getQuestion());
+            questionPoData.setContent(questionData.getQuestion());
             questionPoData.setType(questionData.getType());
-            questionPoData.setSelectType(questionData.getSelectTypeId());
-            questionPoData.setNum(questionData.getNum());
+//            questionPoData.setSelectType(questionData.getSelectTypeId());
+//            questionPoData.setNum(questionData.getNum());
             if (questionData.getAnswer() != null) {
                 questionPoData.setAnswer(questionData.getAnswer());
             }
 
             try {
-                questionPoData.setSelectValue(objectMapper.readValue(questionData.getValue(), QuestionValueListData.class));
+                questionPoData.setValue(objectMapper.readValue(questionData.getValue(), List.class));
             } catch (JsonProcessingException e) {
                 log.error("发布纳新或保存报名表接口异常，json转换对象异常，对象为:{}", questionData.getValue());
                 throw new RunException("json转换对象出错");
