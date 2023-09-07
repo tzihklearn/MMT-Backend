@@ -20,7 +20,7 @@ public class RegistrationFormData {
 
     private List<QuestionPoData> essentialQuestionList;
 
-    private List<QuestionPoData> departmentQuestionList;
+    private List<DepartmentQuestionData> departmentQuestionList;
 
     private List<QuestionPoData> comprehensiveQuestionList;
 

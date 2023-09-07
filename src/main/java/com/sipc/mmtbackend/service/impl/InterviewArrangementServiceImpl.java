@@ -324,6 +324,11 @@ public class InterviewArrangementServiceImpl implements InterviewArrangementServ
                         .eq("admission_id", admission.getId())
                         .eq("department_id", saveAddressParam.getDepartmentId())
         );
+
+        if (admissionDepartmentMerge == null) {
+            return CommonResult.fail("该部门未加入纳新");
+        }
+
         AdmissionSchedule admissionSchedule = admissionScheduleMapper.selectOne(
                 new QueryWrapper<AdmissionSchedule>()
                         .select("id")
@@ -674,7 +679,7 @@ public class InterviewArrangementServiceImpl implements InterviewArrangementServ
             count = interviewMessagePos.size();
             for (InterviewMessagePo interviewMessagePo : interviewMessagePos) {
                 if (i >= start && i < end) {
-                    if ( !interviewMessagePo.toString().contains(siftParam.getSearch())) {
+                    if ( siftParam.getSearch() != null && !siftParam.getSearch().isEmpty() && !interviewMessagePo.toString().contains(siftParam.getSearch())) {
                         break;
                     }
 
@@ -719,7 +724,7 @@ public class InterviewArrangementServiceImpl implements InterviewArrangementServ
             for (InterviewMessagePo interviewMessagePo : interviewMessagePos) {
                 if (i >= start && i < end) {
 
-                    if ( !interviewMessagePo.toString().contains(siftParam.getSearch())) {
+                    if ( siftParam.getSearch() != null && !interviewMessagePo.toString().contains(siftParam.getSearch())) {
                         break;
                     }
 
