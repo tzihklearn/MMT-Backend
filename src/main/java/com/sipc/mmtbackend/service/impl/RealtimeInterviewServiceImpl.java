@@ -48,6 +48,8 @@ public class RealtimeInterviewServiceImpl implements RealtimeInterviewService {
     private final InterviewStatusMapper interviewStatusMapper;
     private final InterviewEvaluationMapper interviewEvaluationMapper;
     private final MyQuestionScoreMapper questionScoreMapper;
+    private final UserBMapper userBMapper;
+    private final DepartmentMapper departmentMapper;
     private final CheckinQRCodeUtil checkinQRCodeUtil;
     private final JsonUtil jsonUtil;
 
@@ -326,6 +328,16 @@ public class RealtimeInterviewServiceImpl implements RealtimeInterviewService {
                 return CommonResult.serverError();
             }
         }
+        UserB userB = userBMapper.selectById(context.getUserId());
+        if (userB == null){
+            log.warn("用户 " + context + " 在获取面试问题与回答时不知道自己叫什么了");
+            return CommonResult.serverError();
+        }
+        Department department = departmentMapper.selectById(interviewStatus.getDepartmentId());
+        if (department == null){
+            log.warn("用户 " + context + " 在获取面试问题与回答时查询不到面试状态 " + interviewStatus + "的组织新信息");
+            return CommonResult.serverError();
+        }
         List<InterviewEvaluationAndAnswerPo> interviewEvaluationAndAnswerPos =
                 realtimeInterviewMapper.selectAllInterviewEvaluationQnAByBCUID(
                         admission.getId(), context.getUserId(), interviewStatus.getUserId());
@@ -381,6 +393,8 @@ public class RealtimeInterviewServiceImpl implements RealtimeInterviewService {
             ritp.setQuestions(rqaas);
             interviewTables.add(ritp);
         }
+        result.setInterviewer(userB.getUserName());
+        result.setDepartment(department.getName());
         result.setCount(interviewTables.size());
         return CommonResult.success(result);
     }
@@ -425,6 +439,17 @@ public class RealtimeInterviewServiceImpl implements RealtimeInterviewService {
         if (interviewEvaluationAndAnswerPo == null){
             log.warn("不可能，这绝对不可能！用户 " + context + " 在纳新 " + admission + " 面试 " + interviewStatus + " 中查不到面试问题！");
             return CommonResult.serverError();
+        }
+        if (param.getExpectDepartment() != null){
+            Department department = departmentMapper.selectById(param.getExpectDepartment());
+            if (department == null){
+                log.warn("用户 " + context + "指定不存在的部门为期望部门，请求体为：" + param);
+                return CommonResult.fail("期望的部门不存在或不属于当前组织");
+            }
+            if (!Objects.equals(department.getOrganizationId(), context.getOrganizationId())){
+                log.warn("用户 " + context + "指定不属于其所在组织的部门为期望部门，请求体为：" + param);
+                return CommonResult.fail("期望的部门不存在或不属于当前组织");
+            }
         }
         InterviewEvaluation interviewEvaluation = interviewEvaluationMapper.selectById(interviewEvaluationAndAnswerPo.getIeId());
         // 对前端返回的结果进行倒序排序
