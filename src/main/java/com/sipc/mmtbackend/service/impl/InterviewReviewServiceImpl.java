@@ -749,7 +749,7 @@ public class InterviewReviewServiceImpl implements InterviewReviewService {
         for (Integer id : arrangeParam.getInterviewIdList()) {
             InterviewStatus interviewStatus = new InterviewStatus();
             interviewStatus.setId(id);
-            interviewStatus.setIsMessage(2);
+            interviewStatus.setIsMessage(1);
             int updateNum = interviewStatusMapper.updateById(interviewStatus);
             if (updateNum != 1) {
                 log.error("面试复盘安排通知接口异常，interview_status表更新数据数错误，受影响的行数：{}，要更新数据：{}", updateNum, interviewStatus);
