@@ -68,4 +68,6 @@ public interface MyInterviewStatusMapper extends InterviewStatusMapper {
     List<GroupByNumPo> selectGroupAByAdmissionIdAndRoundAndDAndA(Integer admissionId, Integer round);
 
     List<GroupByNumPo> selectGroupMessageByAdmissionIdAndRound(Integer admissionId, Integer round, Integer state);
+
+    List<GroupByNumPo> selectGroupMessageByAdmissionIdAndRoundNoState(Integer admissionId, Integer round);
 }

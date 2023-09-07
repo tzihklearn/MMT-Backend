@@ -5,10 +5,7 @@ import com.sipc.mmtbackend.pojo.dto.CommonResult;
 import com.sipc.mmtbackend.pojo.dto.param.interviewreview.ArrangeParam;
 import com.sipc.mmtbackend.pojo.dto.param.interviewreview.SendParam;
 import com.sipc.mmtbackend.pojo.dto.param.interviewreview.SiftParam;
-import com.sipc.mmtbackend.pojo.dto.result.interviewreview.AddressResult;
-import com.sipc.mmtbackend.pojo.dto.result.interviewreview.InfoAllResult;
-import com.sipc.mmtbackend.pojo.dto.result.interviewreview.MessageTemplateResult;
-import com.sipc.mmtbackend.pojo.dto.result.interviewreview.PieChatResult;
+import com.sipc.mmtbackend.pojo.dto.result.interviewreview.*;
 import com.sipc.mmtbackend.pojo.exceptions.DateBaseException;
 import com.sipc.mmtbackend.service.InterviewReviewService;
 import com.sipc.mmtbackend.utils.CheckroleBUtil.pojo.PermissionEnum;
@@ -55,8 +52,13 @@ public class InterviewReviewController {
     }
 
     @GetMapping("/message/template")
-    public CommonResult<MessageTemplateResult> messageTemplate(@RequestParam Byte status) {
-        return interviewReviewService.messageTemplate(status);
+    public CommonResult<MessageTemplateResult> messageTemplate() {
+        return interviewReviewService.messageTemplate();
+    }
+
+    @GetMapping("/message/num")
+    public CommonResult<MessageNumResult> messageNum(@RequestParam Integer status) {
+        return interviewReviewService.messageNum(status);
     }
 
     @PostMapping("/message/send")

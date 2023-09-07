@@ -18,10 +18,7 @@ import com.sipc.mmtbackend.pojo.dto.param.interviewreview.ArrangeParam;
 import com.sipc.mmtbackend.pojo.dto.param.interviewreview.SendParam;
 import com.sipc.mmtbackend.pojo.dto.param.interviewreview.SiftParam;
 import com.sipc.mmtbackend.pojo.dto.result.interviewArrangement.po.ResultOverviewPo;
-import com.sipc.mmtbackend.pojo.dto.result.interviewreview.AddressResult;
-import com.sipc.mmtbackend.pojo.dto.result.interviewreview.InfoAllResult;
-import com.sipc.mmtbackend.pojo.dto.result.interviewreview.MessageTemplateResult;
-import com.sipc.mmtbackend.pojo.dto.result.interviewreview.PieChatResult;
+import com.sipc.mmtbackend.pojo.dto.result.interviewreview.*;
 import com.sipc.mmtbackend.pojo.dto.result.interviewreview.po.*;
 import com.sipc.mmtbackend.pojo.exceptions.DateBaseException;
 import com.sipc.mmtbackend.service.InterviewReviewService;
@@ -497,12 +494,16 @@ public class InterviewReviewServiceImpl implements InterviewReviewService {
 
                 int messageStateId = irInterviewStatusPo.getIsMessage();
                 infoPo.setMessageStateId(messageStateId);
-                if (messageStateId == 0) {
-                    infoPo.setMessageState("未安排");
-                } else if (messageStateId == 1) {
-                    infoPo.setMessageState("已安排未通知");
-                } else {
-                    infoPo.setMessageState("已通知");
+                switch (messageStateId) {
+                    case 0:
+                        infoPo.setMessageState("未安排");
+                        break;
+                    case 1:
+                        infoPo.setMessageState("已安排未通知");
+                        break;
+                    default:
+                        infoPo.setMessageState("已通知");
+                        break;
                 }
 
                 tableData.add(infoPo);
@@ -761,7 +762,7 @@ public class InterviewReviewServiceImpl implements InterviewReviewService {
     }
 
     @Override
-    public CommonResult<MessageTemplateResult> messageTemplate(Byte status) {
+    public CommonResult<MessageTemplateResult> messageTemplate() {
 
         /*
           鉴权并且获取用户所属社团组织id
@@ -799,43 +800,109 @@ public class InterviewReviewServiceImpl implements InterviewReviewService {
 
         int sum = 0;
 
-        int state;
-        int type;
-        switch (status) {
-            case 1:
-                state = 9;
-                type = 2;
-                break;
-            case 0:
-                state = 8;
-                type = 3;
-                break;
-            default:
-                return CommonResult.fail("参数不正确");
-        }
-        for (GroupByNumPo groupByNumPo : myInterviewStatusMapper.selectGroupMessageByAdmissionIdAndRound(admissionId, admissionSchedule.getRound(), state)) {
-            if (groupByNumPo.getId() == 2) {
-                result.setNotNotifiedNum(groupByNumPo.getNum());
-                sum += groupByNumPo.getNum();
-            } else if (groupByNumPo.getId() == 3) {
-                result.setNotifiedNum(groupByNumPo.getNum());
-                sum += groupByNumPo.getNum();
-            }
-        }
-
-        result.setAllNum(sum);
-
         MessageTemplate messageTemplate = messageTemplateMapper.selectOne(
                 new QueryWrapper<MessageTemplate>()
                         .eq("organization_id", organizationId)
-                        .eq("type", type)
+                        .eq("type", 2)
         );
 
         if (messageTemplate == null) {
             return CommonResult.fail("未配置消息模板");
         }
 
-        result.setMessageTemplate(messageTemplate.getMessageTemplate());
+        result.setMessageSuccessTemplate(messageTemplate.getMessageTemplate());
+
+
+        messageTemplate = messageTemplateMapper.selectOne(
+                new QueryWrapper<MessageTemplate>()
+                        .eq("organization_id", organizationId)
+                        .eq("type", 3)
+        );
+
+        if (messageTemplate == null) {
+            return CommonResult.fail("未配置消息模板");
+        }
+
+        result.setMessageFailTemplate(messageTemplate.getMessageTemplate());
+
+        return CommonResult.success(result);
+    }
+
+    @Override
+    public CommonResult<MessageNumResult> messageNum(Integer status) {
+        /*
+          鉴权并且获取用户所属社团组织id
+         */
+        BTokenSwapPo context = ThreadLocalContextUtil.getContext();
+        Integer organizationId = context.getOrganizationId();
+
+        Admission admission = admissionMapper.selectOne(
+                new QueryWrapper<Admission>()
+                        .select("id")
+                        .eq("organization_id", organizationId)
+                        .orderByDesc("id")
+                        .last("limit 1")
+        );
+        if (admission == null) {
+            return CommonResult.fail("社团没有开始纳新");
+        }
+
+        int admissionId = admission.getId();
+
+        AdmissionDepartmentMerge admissionDepartmentMerge = admissionDepartmentMergeMapper.selectOne(
+                new QueryWrapper<AdmissionDepartmentMerge>()
+                        .eq("admission_id", admissionId)
+                        .last("limit 1")
+        );
+
+        AdmissionSchedule admissionSchedule = admissionScheduleMapper.selectOne(
+                new QueryWrapper<AdmissionSchedule>()
+                        .eq("admission_department_id", admissionDepartmentMerge.getId())
+                        .orderByDesc("round")
+                        .last("limit 1")
+        );
+
+        MessageNumResult result = new MessageNumResult();
+
+        int sum = 0;
+
+        int state;
+        switch (status) {
+            case 2:
+                state = -1;
+                break;
+            case 1:
+                state = 9;
+                break;
+            case 0:
+                state = 8;
+                break;
+            default:
+                return CommonResult.fail("参数不正确");
+        }
+        if (state == -1) {
+            for (GroupByNumPo groupByNumPo : myInterviewStatusMapper.selectGroupMessageByAdmissionIdAndRoundNoState(admissionId, admissionSchedule.getRound())) {
+                if (groupByNumPo.getId() == 2) {
+                    result.setNotNotifiedNum(groupByNumPo.getNum());
+                    sum += groupByNumPo.getNum();
+                } else if (groupByNumPo.getId() == 3) {
+                    result.setNotifiedNum(groupByNumPo.getNum());
+                    sum += groupByNumPo.getNum();
+                }
+            }
+        } else {
+            for (GroupByNumPo groupByNumPo : myInterviewStatusMapper.selectGroupMessageByAdmissionIdAndRound(admissionId, admissionSchedule.getRound(), state)) {
+                if (groupByNumPo.getId() == 2) {
+                    result.setNotNotifiedNum(groupByNumPo.getNum());
+                    sum += groupByNumPo.getNum();
+                } else if (groupByNumPo.getId() == 3) {
+                    result.setNotifiedNum(groupByNumPo.getNum());
+                    sum += groupByNumPo.getNum();
+                }
+            }
+        }
+
+        result.setAllNum(sum);
 
         return CommonResult.success(result);
     }
