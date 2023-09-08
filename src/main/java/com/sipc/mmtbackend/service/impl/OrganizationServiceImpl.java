@@ -995,7 +995,6 @@ public class OrganizationServiceImpl implements OrganizationService {
         }
 
 
-
         return getMessageTemplate();
     }
 
@@ -1016,16 +1015,14 @@ public class OrganizationServiceImpl implements OrganizationService {
                 data.setMessageTemplate(messageTemplate.getMessageTemplate());
 
                 result.setInterviewNotice(data);
-            }
-            else if (messageTemplate.getType() == 2) {
+            } else if (messageTemplate.getType() == 2) {
                 MessageTemplateData data = new MessageTemplateData();
                 data.setId(messageTemplate.getId());
                 data.setType(messageTemplate.getType());
                 data.setMessageTemplate(messageTemplate.getMessageTemplate());
 
                 result.setResultSuccessNotice(data);
-            }
-            else if (messageTemplate.getType() == 3) {
+            } else if (messageTemplate.getType() == 3) {
                 MessageTemplateData data = new MessageTemplateData();
                 data.setId(messageTemplate.getId());
                 data.setType(messageTemplate.getType());
@@ -1500,24 +1497,24 @@ public class OrganizationServiceImpl implements OrganizationService {
                 /*
               在admission_question表中插入社团纳新报名表相关的问题信息
              */
-                    AdmissionQuestion admissionQuestion = new AdmissionQuestion();
-                    admissionQuestion.setAdmissionId(admissionId);
-                    //如果是部门问题，设置对于的部门id
+                AdmissionQuestion admissionQuestion = new AdmissionQuestion();
+                admissionQuestion.setAdmissionId(admissionId);
+                //如果是部门问题，设置对于的部门id
 
                 admissionQuestion.setDepartmentId(departmentQuestionData.getDepartmentId());
 
-                    admissionQuestion.setQuestionId(questionData.getId());
-                    admissionQuestion.setQuestionType(questionType);
-                    admissionQuestion.setOrder(order);
-                    admissionQuestion.setIsDeleted((byte) 0);
+                admissionQuestion.setQuestionId(questionData.getId());
+                admissionQuestion.setQuestionType(questionType);
+                admissionQuestion.setOrder(order);
+                admissionQuestion.setIsDeleted((byte) 0);
 
-                    int insertNum = admissionQuestionMapper.insert(admissionQuestion);
-                    if (insertNum != 1) {
-                        log.error("发布纳新接口异常，插入admission_question表数据数错误，插入admission_question表数据数：{}，插入社团id：{}，插入社团报名表问题信息：{}",
-                                insertNum, organizationId, admissionQuestion);
-                        throw new DateBaseException("插入数据库操作异常");
-                    }
+                int insertNum = admissionQuestionMapper.insert(admissionQuestion);
+                if (insertNum != 1) {
+                    log.error("发布纳新接口异常，插入admission_question表数据数错误，插入admission_question表数据数：{}，插入社团id：{}，插入社团报名表问题信息：{}",
+                            insertNum, organizationId, admissionQuestion);
+                    throw new DateBaseException("插入数据库操作异常");
                 }
+            }
 
 
         }

@@ -542,7 +542,7 @@ public class InterviewReviewServiceImpl implements InterviewReviewService {
         InfoAllResult result = new InfoAllResult();
         result.setTitle(title);
         result.setTableData(tableData);
-        int count = interviewQuestions.size();
+        int count = irInterviewStatusPos.size();
         result.setAllNum(count);
         result.setPage(siftParam.getPage());
         if (count % 10 != 0) {
