@@ -62,7 +62,7 @@ public class InterviewArrangementController {
         return interviewArrangementService.all(page, pageNum, round);
     }
 
-    @GetMapping("/sift")
+    @PostMapping("/sift")
     public CommonResult<IAAllResult> sift(@RequestParam Integer page, @RequestParam Integer pageNum, @RequestParam Integer round, @RequestBody SiftParam siftParam) {
         return interviewArrangementService.sift(page, pageNum, round, siftParam);
     }
