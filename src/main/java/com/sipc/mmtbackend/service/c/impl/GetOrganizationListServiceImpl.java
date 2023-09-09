@@ -25,6 +25,7 @@ import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class GetOrganizationListServiceImpl implements GetOrganizationListService {
@@ -88,6 +89,12 @@ public class GetOrganizationListServiceImpl implements GetOrganizationListServic
 
 
         OrganizationListResult organizationListResult = new OrganizationListResult();
+
+        Object getOrganizationListMethod = redisUtil.get("getOrganizationListMethod");
+
+        if (getOrganizationListMethod != null) {
+            return (OrganizationListResult) getOrganizationListMethod;
+        }
 
         List<OrganizationListData> organizationListDataList = new ArrayList<>();
 
@@ -165,6 +172,9 @@ public class GetOrganizationListServiceImpl implements GetOrganizationListServic
         }
         organizationListResult.setOrganizationListDataList(organizationListDataList);
         organizationListResult.setTotalNum(totalNum);
+
+        redisUtil.set("getOrganizationListMethod", organizationListResult, 1L, TimeUnit.HOURS);
+
         return organizationListResult;
     }
 

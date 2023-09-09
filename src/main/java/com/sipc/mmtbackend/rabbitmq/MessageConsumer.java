@@ -9,6 +9,7 @@ import com.sipc.mmtbackend.pojo.c.domain.RegistrationFormJson;
 import com.sipc.mmtbackend.pojo.c.domain.UserDepartmentRegistration;
 import com.sipc.mmtbackend.pojo.c.param.AnswerData;
 import com.sipc.mmtbackend.pojo.c.param.RegistrationFormParam;
+import com.sipc.mmtbackend.pojo.c.param.RegistrationFormParamPo;
 import com.sipc.mmtbackend.pojo.domain.RegistrationFromData;
 import com.sipc.mmtbackend.pojo.domain.UserInfo;
 import com.sipc.mmtbackend.utils.JsonUtil;
@@ -52,31 +53,41 @@ public class MessageConsumer {
 
 //    @RabbitListener(queues = DirectRabbitConfig.QUEUE_NAME, concurrency = "1")
     @RabbitListener(queues = DirectRabbitConfig.QUEUE_NAME)
-    public void setRegistrationForm(RegistrationFormParam registrationFormParam, Integer userId) {
+    public void setRegistrationForm(RegistrationFormParamPo registrationFormParamPo) {
 
-        rwLock.readLock().lock();
+        Integer userId = registrationFormParamPo.getUserId();
+        RegistrationFormParam registrationFormParam = registrationFormParamPo.getRegistrationFormParam();
+
+        log.info("开始消费，userId:{}", userId);
+
+//        rwLock.readLock().lock();
 
         //存入Registration_from_json表
         RegistrationFormJson registrationFormJson = new RegistrationFormJson();
         String jsonStr = jsonUtil.serializationJson(registrationFormParam);
         Date date = new Date();
-        registrationFormJson.setUserId(userId);
+
         registrationFormJson.setAdmissionId(registrationFormParam.getAdmissionId());
         registrationFormJson.setJson(jsonStr);
         registrationFormJson.setTime(date.getTime() / 1000);
         registrationFormJson.setIsReallocation(registrationFormParam.getAllowReallocation());
-        if (registrationFromJsonMapper.selectByAdmissionIdAndUserId(registrationFormParam.getAdmissionId(),
-                userId) != 0) {
-            registrationFromJsonMapper.updateByUserIdAndAdmissionId(registrationFormJson);
-        } else {
-            try {
-                rwLock.readLock().unlock();
-                rwLock.writeLock().lock();
+        try {
+            rwLock.writeLock().lock();
+
+            registrationFormJson.setUserId(userId);
+
+            if (registrationFromJsonMapper.selectByAdmissionIdAndUserId(
+                    registrationFormParam.getAdmissionId(), userId) != 0
+            ) {
+                registrationFromJsonMapper.updateByUserIdAndAdmissionId(registrationFormJson);
+            } else {
+
                 registrationFromJsonMapper.insert(registrationFormJson);
-            } finally {
-                rwLock.writeLock().unlock();
-                rwLock.readLock().lock();
+
             }
+        } finally {
+            rwLock.writeLock().unlock();
+
         }
         //存入用户基本信息
         UserInfo userInfo = new UserInfo();
@@ -123,6 +134,8 @@ public class MessageConsumer {
         } finally {
             rwLock.writeLock().unlock();
         }
+
+        log.info("消费成功，userId:{}", userId);
 
     }
 
