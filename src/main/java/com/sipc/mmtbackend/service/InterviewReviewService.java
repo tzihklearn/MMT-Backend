@@ -6,7 +6,6 @@ import com.sipc.mmtbackend.pojo.dto.param.interviewreview.SendParam;
 import com.sipc.mmtbackend.pojo.dto.param.interviewreview.SiftParam;
 import com.sipc.mmtbackend.pojo.dto.result.interviewreview.*;
 import com.sipc.mmtbackend.pojo.exceptions.DateBaseException;
-import org.springframework.web.bind.annotation.RequestParam;
 
 public interface InterviewReviewService {
 

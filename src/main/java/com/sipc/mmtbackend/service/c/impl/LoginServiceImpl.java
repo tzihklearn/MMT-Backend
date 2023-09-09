@@ -1,8 +1,6 @@
 package com.sipc.mmtbackend.service.c.impl;
 
 import com.sipc.mmtbackend.common.Constant;
-import com.sipc.mmtbackend.mapper.AdmissionMapper;
-import com.sipc.mmtbackend.mapper.OrganizationMapper;
 import com.sipc.mmtbackend.mapper.UserInfoMapper;
 import com.sipc.mmtbackend.mapper.c.LoginStatusMapper;
 import com.sipc.mmtbackend.mapper.c.UserCMapper;

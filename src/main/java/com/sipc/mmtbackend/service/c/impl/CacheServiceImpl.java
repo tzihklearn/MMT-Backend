@@ -3,7 +3,6 @@ package com.sipc.mmtbackend.service.c.impl;
 import com.sipc.mmtbackend.mapper.*;
 import com.sipc.mmtbackend.pojo.c.result.DepartmentResult;
 import com.sipc.mmtbackend.pojo.domain.Admission;
-import com.sipc.mmtbackend.pojo.domain.MessageTemplate;
 
 import com.sipc.mmtbackend.service.c.CacheService;
 import lombok.extern.slf4j.Slf4j;
