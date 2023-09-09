@@ -104,20 +104,20 @@ public class COrganizationInterviewImpl implements COrganizationInterviewService
                                                                                 HttpServletResponse response) {
         log.info("数据校验成功");
 //        C 端登录检测
-//        CheckResultParam check = CheckRole.check(request, response, Constant.C_END, null);
-//        if (!check.isResult()) {
-//            return CommonResult.fail(check.getErrcode(), check.getErrmsg());
-//        }
-//        String openId = check.getData();
+        CheckResultParam check = CheckRole.check(request, response, Constant.C_END, null);
+        if (!check.isResult()) {
+            return CommonResult.fail(check.getErrcode(), check.getErrmsg());
+        }
+        String openId = check.getData();
 
-        String openId = "asdas";
+//        String openId = "asdas";
 //      用 openid 获得 userId
-//        Integer userId = userCMapper.selectIdByOpenId(openId);
+        Integer userId = userCMapper.selectIdByOpenId(openId);
 //
 //        userId = 303;
 //
 //        openId ="asd";
-        int userId = atomicInteger.get();
+//        int userId = atomicInteger.get();
 
 
         if (openId != null) {
@@ -205,7 +205,7 @@ public class COrganizationInterviewImpl implements COrganizationInterviewService
                         return message;
                     }
             );
-            atomicInteger.incrementAndGet();
+//            atomicInteger.incrementAndGet();
             return CommonResult.success();
         } else {
             //用户鉴权失败
