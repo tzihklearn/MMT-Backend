@@ -127,8 +127,7 @@ public class MessageServiceImpl implements MessageService {
                 case 1:
                 case 2:
                     result.setAvatarUrl(
-                            pictureUtil.getPictureURL(organization.getAvatarId(),
-                            organization.getAvatarId() == null || (organization.getAvatarId().length() == 0)));
+                            organization.getAvatarId());
                     break;
                 case 3:
                     result.setAvatarUrl(userInfo.getAvatarUrl());
