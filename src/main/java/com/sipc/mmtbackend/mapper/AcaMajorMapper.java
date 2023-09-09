@@ -15,4 +15,6 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface AcaMajorMapper extends BaseMapper<AcaMajor> {
 
+    AcaMajor selectByAcaIdAndMajorId(Integer academyId, Integer majorId);
+
 }

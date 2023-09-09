@@ -1,5 +1,6 @@
 package com.sipc.mmtbackend.service.c.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.sipc.mmtbackend.mapper.*;
 import com.sipc.mmtbackend.pojo.c.param.ShowOrganizationData.OrganizationOrDepartmentIntroduceData;
 import com.sipc.mmtbackend.pojo.c.result.ShowOrganization.DepartmentAdmissionResult;
@@ -88,11 +89,18 @@ public class ShowOrganizationServiceImpl implements ShowOrganizationService {
             avatarUrl = pictureUtil.getPictureURL(organization.getAvatarId(), false);
         }
 
+        //TODO:更改图像链接
+        avatarUrl = organization.getAvatarId();
+
         String name = organization.getName();
 
 //        OrganizationRecruit organizationRecruit = cacheService.getOrganizationRecruit(organizationId);
 
-        OrganizationRecruit organizationRecruit = organizationRecruitMapper.selectById(organizationId);
+        OrganizationRecruit organizationRecruit = organizationRecruitMapper.selectOne(new QueryWrapper<OrganizationRecruit>().eq("organization_id", organizationId));
+
+        if (organizationRecruit == null) {
+            return CommonResult.success(organizationIntroduceResult);
+        }
 
         List<OrganizationOrDepartmentIntroduceData> organizationIntroduceDataList = new ArrayList<>();
         if (organizationRecruit.getDescription() != null) {
