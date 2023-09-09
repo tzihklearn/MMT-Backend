@@ -212,16 +212,12 @@ public class COrganizationInterviewImpl implements COrganizationInterviewService
                 questionDataTemp.setQuestionOrder(amount.getOrder());
                 questionDataTemp.setQuestionId(amount.getId());
 
-                switch (questionData.getType()) {
-                    case 1:
-                        questionDataTemp.setType(String.valueOf(-1));
-                        break;
-                    case 3:
-                        questionDataTemp.setType(String.valueOf(0));
-                        break;
-                    case 2:
-                        questionDataTemp.setType(String.valueOf(amount.getDepartmentId()));
-                        break;
+                if (questionData.getType() == 1) {
+                    questionDataTemp.setType(String.valueOf(-1));
+                } else if (questionData.getType() == 3) {
+                    questionDataTemp.setType(String.valueOf(0));
+                } else if (questionData.getType() == 2) {
+                    questionDataTemp.setType(String.valueOf(amount.getDepartmentId()));
                 }
 
 //                questionDataTemp.setType(String.valueOf(amount.getRemark()));

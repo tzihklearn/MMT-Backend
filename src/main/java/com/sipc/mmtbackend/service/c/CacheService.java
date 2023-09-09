@@ -2,8 +2,6 @@ package com.sipc.mmtbackend.service.c;
 
 import com.sipc.mmtbackend.pojo.c.result.DepartmentResult;
 import com.sipc.mmtbackend.pojo.domain.Admission;
-import com.sipc.mmtbackend.pojo.domain.MessageTemplate;
-
 
 import java.util.List;
 

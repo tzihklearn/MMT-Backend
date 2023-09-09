@@ -6,7 +6,6 @@ import com.sipc.mmtbackend.pojo.dto.CommonResult;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.security.NoSuchAlgorithmException;
 
 public interface LoginService {
 
