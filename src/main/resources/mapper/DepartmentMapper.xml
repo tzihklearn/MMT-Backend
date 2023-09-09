@@ -2,4 +2,14 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.sipc.mmtbackend.mapper.DepartmentMapper">
 
+    <select id="selectOrganizationIdById" resultType="java.lang.Integer">
+        select d.organization_id as organizationId
+        from department d
+        where d.id = #{departmentId}
+    </select>
+    <select id="selectRelationByAdmissionId" resultType="com.sipc.mmtbackend.pojo.c.result.DepartmentResult">
+        select department.id, department.name
+        from department
+        where organization_id = #{admissionId,jdbcType=INTEGER};
+    </select>
 </mapper>

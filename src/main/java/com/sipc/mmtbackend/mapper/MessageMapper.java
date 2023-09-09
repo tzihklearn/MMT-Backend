@@ -15,4 +15,7 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface MessageMapper extends BaseMapper<Message> {
 
+    Boolean insertMessage(String message, Long time, Integer state, Integer isRead, Integer organizationId,
+                          Integer userId, Integer type, Integer interviewStatusId);
+
 }

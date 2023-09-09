@@ -2,4 +2,14 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.sipc.mmtbackend.mapper.TagMapper">
 
+    <select id="selectNameByTagIds" resultType="java.lang.String">
+        select name
+        from tag
+        <if test="tagIds != null and tagIds.size()>0">
+            where id in
+            <foreach collection="tagIds" item="tagId" separator="," open="(" close=")">
+                #{tagId}
+            </foreach>
+        </if>
+    </select>
 </mapper>

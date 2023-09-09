@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.sipc.mmtbackend.pojo.domain.Organization;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.List;
+
 /**
  * <p>
  * Mapper 接口
@@ -14,5 +16,7 @@ import org.apache.ibatis.annotations.Mapper;
  */
 @Mapper
 public interface OrganizationMapper extends BaseMapper<Organization> {
+
+    List<Organization> selectAll();
 
 }

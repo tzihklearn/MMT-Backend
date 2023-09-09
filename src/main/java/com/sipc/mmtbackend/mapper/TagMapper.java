@@ -3,6 +3,9 @@ package com.sipc.mmtbackend.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.sipc.mmtbackend.pojo.domain.Tag;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * <p>
@@ -14,5 +17,7 @@ import org.apache.ibatis.annotations.Mapper;
  */
 @Mapper
 public interface TagMapper extends BaseMapper<Tag> {
+
+    List<String> selectNameByTagIds(@Param("tagIds") List<Integer> tagIds);
 
 }

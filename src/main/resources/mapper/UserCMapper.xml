@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sipc.mmtbackend.mapper.c.UserCMapper">
+
+    <resultMap id="BaseResultMap" type="com.sipc.mmtbackend.pojo.c.domain.UserC">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="student_id" jdbcType="INTEGER" property="studentId"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="password" jdbcType="VARCHAR" property="password"/>
+        <result column="phone" jdbcType="VARCHAR" property="phone"/>
+        <result column="openid" jdbcType="VARCHAR" property="openid"/>
+    </resultMap>
+
+    <insert id="insertSelective" parameterType="com.sipc.mmtbackend.pojo.c.domain.UserC">
+        insert into user_c
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="studentId != null">
+                student_id,
+            </if>
+            <if test="name != null">
+                name,
+            </if>
+            <if test="password != null">
+                password,
+            </if>
+            <if test="phone != null">
+                phone,
+            </if>
+            <if test="openid != null">
+                openid,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="studentId != null">
+                #{studentId,jdbcType=INTEGER},
+            </if>
+            <if test="name != null">
+                #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="password != null">
+                #{password,jdbcType=VARCHAR},
+            </if>
+            <if test="phone != null">
+                #{phone,jdbcType=VARCHAR},
+            </if>
+            <if test="openid != null">
+                #{openid,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <insert id="insertAll">
+        insert into user_c
+        set student_id=#{studentId},
+            `name`=#{name},
+            phone=#{phone},
+            openid=#{openid}
+    </insert>
+
+    <update id="updateSelective" parameterType="com.sipc.mmtbackend.pojo.c.domain.UserC">
+        update user_c
+        <set>
+            <if test="studentId != null">
+                student_id = #{studentId,jdbcType=INTEGER},
+            </if>
+            <if test="name != null">
+                name = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="password != null">
+                password = #{password,jdbcType=VARCHAR},
+            </if>
+            <if test="phone != null">
+                phone = #{phone,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where openid = #{openid,jdbcType=VARCHAR}
+    </update>
+
+    <update id="updateByStudentIdSelective" parameterType="com.sipc.mmtbackend.pojo.domain.User">
+        update user_c
+        <set>
+            <if test="name != null">
+                name = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="password != null">
+                password = #{password,jdbcType=VARCHAR},
+            </if>
+            <if test="phone != null">
+                phone = #{phone,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where student_id = #{studentId,jdbcType=INTEGER}
+    </update>
+
+    <update id="updateByPrimaryKey" parameterType="com.sipc.mmtbackend.pojo.domain.User">
+        update user_c
+        <set>
+            <if test="studentId != null">
+                student_id = #{studentId,jdbcType=INTEGER},
+            </if>
+            <if test="name != null">
+                name = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="password != null">
+                password = #{password,jdbcType=VARCHAR},
+            </if>
+            <if test="phone != null">
+                phone = #{phone,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+
+    <select id="getUserByOpenid" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select *
+        from user_c
+        where openid = #{openid,jdbcType=VARCHAR}
+    </select>
+
+    <select id="selectByOpenid" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select *
+        from user_c
+        where openid = #{openid,jdbcType=VARCHAR}
+    </select>
+
+    <select id="selectByStudentIdAndPassword" parameterType="com.sipc.mmtbackend.pojo.dto.param.LoginParam"
+            resultMap="BaseResultMap">
+        select *
+        from user_c
+        where student_id = #{studentId,jdbcType=INTEGER}
+          and password = #{password,jdbcType=VARCHAR}
+    </select>
+
+    <select id="selectByStudentId" resultMap="BaseResultMap">
+        select *
+        from user_c
+        where student_id = #{record,jdbcType=INTEGER}
+    </select>
+
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap">
+        select *
+        from user_c
+        where id = #{record,jdbcType=INTEGER}
+    </select>
+
+    <select id="selectIdByOpenId" resultType="java.lang.Integer">
+        select id
+        from user_c
+        where openid = #{openId, jdbcType=VARCHAR};
+    </select>
+
+    <select id="selectIdByStudentId" resultType="java.lang.Integer">
+        select id
+        from user_c
+        where student_id = #{studentId};
+    </select>
+
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        delete
+        from user_c
+        where id = #{id,jdbcType=INTEGER}
+    </delete>
+    <update id="updateOpenidByPrimaryKey">
+        update user_c
+        SET openid = #{openid}
+        where id = #{key}
+    </update>
+
+    <select id="selectNameById" parameterType="java.lang.Integer" resultType="java.lang.String">
+        select name
+        from user_c
+        where id = #{id, jdbcType = INTEGER}
+    </select>
+
+    <select id="selectById" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select *
+        from user_c
+        where id = #{id, jdbcType=INTEGER}
+    </select>
+    <select id="selectAllByStudentIdUser" resultType="com.sipc.mmtbackend.pojo.domain.User">
+        select *
+        from user_c
+        where student_id = #{studentId,jdbcType=INTEGER}
+    </select>
+
+</mapper>
+

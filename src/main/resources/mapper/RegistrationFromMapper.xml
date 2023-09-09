@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sipc.mmtbackend.mapper.c.RegistrationFromMapper">
+    <resultMap id="BaseResultMap" type="com.sipc.mmtbackend.pojo.c.domain.RegistrationForm">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <id column="admission_id" jdbcType="INTEGER" property="admissionId"/>
+        <id column="question_id" jdbcType="INTEGER" property="questionOrder"/>
+        <id column="question_order" jdbcType="INTEGER" property="questionOrder"/>
+        <id column="question" jdbcType="VARCHAR" property="question"/>
+        <id column="type" jdbcType="VARCHAR" property="type"/>
+        <id column="remark" jdbcType="INTEGER" property="remark"/>
+    </resultMap>
+
+    <select id="selectIdByAdmissionIdAndQuestion" resultType="java.lang.Integer">
+        SELECT id
+        FROM registration_form
+        WHERE registration_form.admission_id = #{admissionId, jdbcType = INTEGER}
+          AND registration_form.question = #{question, jdbcType = VARCHAR}
+    </select>
+    <select id="selectIdByAdmissionId" resultType="com.sipc.mmtbackend.pojo.c.domain.RegistrationForm">
+        select *
+        from registration_form
+        where admission_id = #{admissionId, jdbcType = INTEGER}
+    </select>
+
+    <insert id="insert" parameterType="com.sipc.mmtbackend.pojo.c.domain.RegistrationForm">
+        insert into registration_form (id, admission_id, question_order,
+                                       question, type,
+                                       remark)
+        values (#{id,jdbcType=INTEGER}, #{admissionId,jdbcType=INTEGER}, #{questionOrder,jdbcType=INTEGER},
+                #{question,jdbcType=VARCHAR}, #{type,jdbcType=INTEGER},
+                #{remark,jdbcType=INTEGER})
+    </insert>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Integer"
+            resultType="com.sipc.mmtbackend.pojo.c.domain.RegistrationForm">
+        select *
+        from registration_form
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+
+    <update id="updateByPrimaryKey" parameterType="com.sipc.mmtbackend.pojo.c.domain.RegistrationForm">
+        update registration_form
+        set admission_id   = #{admissionId,jdbcType=INTEGER},
+            question_order = #{questionOrder,jdbcType=INTEGER},
+            question       = #{question,jdbcType=VARCHAR},
+            type           = #{type,jdbcType=VARCHAR},
+            remark         = #{remark,jdbcType=INTEGER}
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        delete
+        from registration_form
+        where id = #{id,jdbcType=INTEGER}
+    </delete>
+
+    <select id="selectByAdmissionId" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select *
+        from registration_form
+        where admission_id = #{admissionId,jdbcType=INTEGER}
+        order by registration_form.type
+    </select>
+
+    <delete id="deleteByAdmissionId" parameterType="java.lang.Integer">
+        delete
+        from registration_form
+        where admission_id = #{admissionId,jdbcType=INTEGER}
+    </delete>
+
+</mapper>

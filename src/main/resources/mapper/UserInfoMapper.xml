@@ -1,5 +1,82 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.sipc.mmtbackend.mapper.UserInfoMapper">
+    <update id="updateSecondInfo">
+        update user_info
+        set
+        <if test="phoneNum!=null">
+            phone = #{phoneNum},
+        </if>
+        <if test="email!=null">
+            email = #{email},
+        </if>
+        <if test="qqNum!=null">
+            qq = #{qqNum}
+        </if>
+        where student_id = #{studentId}
+    </update>
+    <update id="updateAll">
+        update user_info
+        set student_id       = #{studentId,jdbcType=INTEGER},
+            name     = #{name,jdbcType=VARCHAR},
+            gander           = #{gender,jdbcType=TINYINT},
+            phone            =#{phoneNum,jdbcType=VARCHAR},
+            class_num        = #{classNum,jdbcType=CHAR},
+            email            = #{email,jdbcType=VARCHAR},
+            qq               = #{qqNum,jdbcType=VARCHAR},
+            is_certification = #{isCertification,jdbcType=TINYINT},
+            aca_major_id     = (select id
+                                from aca_major
+                                where academy = #{academy,jdbcType=VARCHAR}
+                                  and major = #{major,jdbcType=VARCHAR})
+        where id = #{userId,jdbcType=INTEGER}
+    </update>
 
+    <select id="selectStudentIdForInject" resultType="java.lang.Integer">
+        select #{studentId,jdbcType=INTEGER} in (SELECT student_id from user_info) as test
+    </select>
+    <select id="selectAllByStudentId" resultType="com.sipc.mmtbackend.pojo.c.result.UserInfoResult">
+        select u.student_id   as studentId,
+               u.name as `name`,
+               u.gander       as gender,
+               am.academy     as academy,
+               am.major       as major,
+               u.class_num    as classNum,
+               u.phone        as phoneNum,
+               u.email        as email,
+               u.qq           as qqNum
+        from user_info u
+                 left join aca_major am on u.aca_major_id = am.id
+        where u.student_id = #{studentId,jdbcType=INTEGER}
+    </select>
+    <select id="selectUserIdByStudentId" resultType="com.sipc.mmtbackend.pojo.domain.UserInfo">
+        select id as userId
+        from user_info
+        where student_id = #{studentId,jdbcType=INTEGER}
+    </select>
+    <select id="selectByStudentId" resultType="com.sipc.mmtbackend.pojo.domain.UserInfo">
+        select *
+        from user_info
+        where student_id = #{studentId,jdbcType=INTEGER}
+    </select>
+    <select id="selectCertificationByUserId"
+            resultType="com.sipc.mmtbackend.pojo.c.param.IsCertificationParam">
+        select u.student_id   as studentId,
+               u.name as `name`,
+               u.gander       as gender,
+               am.academy     as academy,
+               am.major       as major,
+               u.class_num    as classNum,
+               u.height       as height,
+               u.weight       as weight,
+               u.birthday     as birthday
+        from user_info u
+                 left join aca_major am on u.aca_major_id = am.id
+        where u.id = #{userId,jdbcType=INTEGER}
+    </select>
+    <select id="selectIsCertification" resultType="java.lang.Integer">
+        select is_certification as is_certification
+        from user_info
+        where id = #{userId,jdbcType=INTEGER}
+    </select>
 </mapper>

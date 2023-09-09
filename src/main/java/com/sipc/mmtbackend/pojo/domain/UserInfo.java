@@ -51,6 +51,36 @@ public class UserInfo implements Serializable {
     @TableField("email")
     private String email;
 
+    @TableField("wechat")
+    private String wechat;
+
+    @TableField("birthday")
+    private String birthday;
+
+    @TableField("weight")
+    private Double weight;
+
+    @TableField("height")
+    private Double height;
+
+    @TableField("is_certification")
+    private Boolean isCertification;
+
+    @TableField("tag")
+    private Boolean tag;
+
+    @TableField("aca_major_id")
+    private Integer acaMajorId;
+
+    @TableField("class_num")
+    private String classNum;
+
+    @TableField("avatar_url")
+    private String avatarUrl;
+
+    @TableField("nickname")
+    private String nickname;
+
     @TableField("is_deleted")
     @TableLogic
     private Byte isDeleted;
