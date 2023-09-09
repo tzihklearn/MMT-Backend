@@ -1159,6 +1159,8 @@ public class OrganizationServiceImpl implements OrganizationService {
                 throw new DateBaseException("删除数据库操作异常");
             }
 
+            admission = new Admission();
+
             int insertNum = admissionMapper.insert(admission);
             if (insertNum != 1) {
                 log.error("发布纳新或保存报名表接口异常，新增admission表数据数错误，新增admission表数据数：{}，插入社团id：{}，更新信息：{}",
