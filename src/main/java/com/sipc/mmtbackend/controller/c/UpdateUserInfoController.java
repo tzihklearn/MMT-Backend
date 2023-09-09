@@ -17,7 +17,7 @@ public class UpdateUserInfoController {
     @Resource
     UpdateUserInfoService updateUserInfoService;
 
-    @PostMapping("/student/info/all")
+    @PostMapping("/c/student/info/all")
     public CommonResult<IsCertificationParam> updateUserInfo(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         return updateUserInfoService.updateUserInfo(httpServletRequest, httpServletResponse);
     }

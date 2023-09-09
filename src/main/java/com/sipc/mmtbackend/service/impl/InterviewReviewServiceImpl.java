@@ -369,6 +369,10 @@ public class InterviewReviewServiceImpl implements InterviewReviewService {
                         .last("limit 1")
         );
 
+        if (admissionDepartmentMerge == null) {
+            return CommonResult.fail("该社团没有部门参与纳新");
+        }
+
         AdmissionSchedule admissionSchedule = admissionScheduleMapper.selectOne(
                 new QueryWrapper<AdmissionSchedule>()
                         .eq("admission_department_id", admissionDepartmentMerge.getId())
@@ -788,6 +792,10 @@ public class InterviewReviewServiceImpl implements InterviewReviewService {
                         .eq("admission_id", admissionId)
                         .last("limit 1")
         );
+
+        if (admissionDepartmentMerge == null) {
+            return CommonResult.fail("该社团没有部门参与纳新");
+        }
 
         AdmissionSchedule admissionSchedule = admissionScheduleMapper.selectOne(
                 new QueryWrapper<AdmissionSchedule>()

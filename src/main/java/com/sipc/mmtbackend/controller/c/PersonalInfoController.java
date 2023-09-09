@@ -26,27 +26,27 @@ public class PersonalInfoController {
         this.personalInfoService = service;
     }
 
-    @GetMapping("/personal-info/head/url")
+    @GetMapping("/c/personal-info/head/url")
     public CommonResult<String> getUrl(HttpServletRequest request, HttpServletResponse response) throws IOException {
         return personalInfoService.getUrl(request, response);
     }
 
-    @PostMapping("/personal-info/all")
+    @PostMapping("/c/personal-info/all")
     public CommonResult<UserInfoResult> getPersonalInfo(HttpServletRequest request, HttpServletResponse response) {
         return personalInfoService.getPersonalInfo(request, response);
     }
 
-    @PostMapping("/personal-info/arrange")
+    @PostMapping("/c/personal-info/arrange")
     public CommonResult<PersonalInfoArrangeBackResult> getPersonalArrangeInfo(HttpServletRequest request, HttpServletResponse response) throws IOException {
         return personalInfoService.getPersonalArrangeInfo(request, response);
     }
 
-    @PostMapping("/personal-info/second")
+    @PostMapping("/c/personal-info/second")
     public CommonResult<String> updatePersonalInfo(@RequestBody SecondUpdateParam secondUpdateParam, HttpServletRequest request, HttpServletResponse response) {
         return personalInfoService.updatePersonalInfo(request, response, secondUpdateParam);
     }
 
-    @PostMapping("/personal-info/insert")
+    @PostMapping("/c/personal-info/insert")
     public CommonResult<String> insertPersonalInfo(@RequestBody UserInfoResult userInfoResult, HttpServletRequest request, HttpServletResponse response) {
         return personalInfoService.insertPersonalInfo(request, response, userInfoResult);
     }

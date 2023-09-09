@@ -7,7 +7,7 @@ import com.sipc.mmtbackend.pojo.c.result.OrganizationQuestionAnswerResult;
 import com.sipc.mmtbackend.pojo.c.result.OrganizationQuestionResult;
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
 import com.sipc.mmtbackend.pojo.dto.resultEnum.ResultEnum;
-import com.sipc.mmtbackend.service.c.OrganizationInterviewService;
+import com.sipc.mmtbackend.service.c.COrganizationInterviewService;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
@@ -21,13 +21,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @RestController
-public class OrganizationController {
+public class COrganizationController {
 
     //设置log记录
     Logger log = Logger.getLogger("CommonControllerLog");
 
     @Resource
-    private OrganizationInterviewService organizationInterviewService;
+    private COrganizationInterviewService COrganizationInterviewService;
 
     @Resource
     private HttpServletRequest httpServletRequest;
@@ -42,13 +42,13 @@ public class OrganizationController {
      * @param registrationFormParam 社团报名信息体
      * @return 通用返回
      */
-    @RequestMapping(value = "/organization/sign/c", method = RequestMethod.PUT)
+    @RequestMapping(value = "/c/organization/sign", method = RequestMethod.PUT)
     public CommonResult<RegistrationFormParam> setRegistrationForm(@RequestBody @Valid RegistrationFormParam registrationFormParam, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, BindingResult result) {
         log.setLevel(Level.INFO);
         String message = CheckData(result);
         if (message != null) return CommonResult.fail(message);
         try {
-            return organizationInterviewService.setRegistrationForm(registrationFormParam, httpServletRequest,
+            return COrganizationInterviewService.setRegistrationForm(registrationFormParam, httpServletRequest,
                     httpServletResponse);
         } catch (Exception e) {
             e.printStackTrace();
@@ -61,11 +61,11 @@ public class OrganizationController {
     /**
      * 判断是否可报名该组织
      */
-    @GetMapping("/organization/check")
+    @GetMapping("/c/organization/check")
     public CommonResult<Boolean> checkSign(
             @RequestParam(value = "admissionId") Integer admissionId
     ) {
-        return organizationInterviewService.check(httpServletRequest, httpServletResponse, admissionId);
+        return COrganizationInterviewService.check(httpServletRequest, httpServletResponse, admissionId);
     }
 
     /**
@@ -74,7 +74,7 @@ public class OrganizationController {
      * @param admissionID 纳新id
      * @return 社团面试轮次返回体
      */
-    @RequestMapping(value = "/organization/question", method = RequestMethod.GET)
+    @RequestMapping(value = "/c/organization/question", method = RequestMethod.GET)
     public CommonResult<OrganizationQuestionResult> getOrganizationQuestion(@RequestParam("admissionId") Integer admissionID,
                                                                             HttpServletRequest request,
                                                                             HttpServletResponse response) {
@@ -82,7 +82,7 @@ public class OrganizationController {
         //确保是正数
         if (admissionID <= 0) return CommonResult.fail("传入数据格式错误");
         try {
-            return organizationInterviewService.getOrganizationQuestion(admissionID, request, response);
+            return COrganizationInterviewService.getOrganizationQuestion(admissionID, request, response);
         } catch (Exception e) {
             e.printStackTrace();
             if ("Cannot parse null string".equals(e.getMessage()) || "null".equals(e.getMessage()))
@@ -97,7 +97,7 @@ public class OrganizationController {
      * @param admissionID 纳新id
      * @return 社团面试轮次返回体
      */
-    @RequestMapping(value = "/organization/basic-sign", method = RequestMethod.GET)
+    @RequestMapping(value = "/c/organization/basic-sign", method = RequestMethod.GET)
     public CommonResult<OrganizationBasicQuestionResult> getAdmissionBasicSign(@RequestParam("admissionId") Integer admissionID,
                                                                                HttpServletRequest request,
                                                                                HttpServletResponse response) {
@@ -105,7 +105,7 @@ public class OrganizationController {
         //确保是正数
         if (admissionID <= 0) return CommonResult.fail("传入数据格式错误");
         try {
-            return organizationInterviewService.getAdmissionBasicSign(admissionID, request, response);
+            return COrganizationInterviewService.getAdmissionBasicSign(admissionID, request, response);
         } catch (Exception e) {
             e.printStackTrace();
             if ("Cannot parse null string".equals(e.getMessage()) || "null".equals(e.getMessage()))
@@ -128,7 +128,7 @@ public class OrganizationController {
         //确保是正数
         if (admissionID <= 0) return CommonResult.fail("传入数据格式错误");
         try {
-            return organizationInterviewService.getOrganizationQuestionAnswer(admissionID, request, response);
+            return COrganizationInterviewService.getOrganizationQuestionAnswer(admissionID, request, response);
         } catch (Exception e) {
             e.printStackTrace();
             if ("Cannot parse null string".equals(e.getMessage()) || "null".equals(e.getMessage()))
@@ -143,14 +143,14 @@ public class OrganizationController {
      * @param admissionID 纳新id
      * @return 通用返回
      */
-    @RequestMapping(value = "/organization/interview/message/c", method = RequestMethod.POST)
+    @RequestMapping(value = "/c/organization/interview/message", method = RequestMethod.POST)
     public CommonResult<NoData> InterviewMessageC(@RequestParam("admissionId") Integer admissionID,
                                                   HttpServletRequest request, HttpServletResponse response) {
         log.setLevel(Level.INFO);
         //确保是正数
         if (admissionID <= 0) return CommonResult.fail("传入数据格式错误");
         try {
-            return organizationInterviewService.interviewMessageC(admissionID, request, response);
+            return COrganizationInterviewService.interviewMessageC(admissionID, request, response);
         } catch (Exception e) {
             e.printStackTrace();
             if ("Cannot parse null string".equals(e.getMessage()) || "null".equals(e.getMessage()))

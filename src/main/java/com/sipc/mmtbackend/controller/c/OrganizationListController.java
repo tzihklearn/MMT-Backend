@@ -14,7 +14,7 @@ import javax.validation.Valid;
  */
 
 @RestController
-@RequestMapping(value = "/organization-list", method = RequestMethod.GET)
+@RequestMapping(value = "/c/organization-list", method = RequestMethod.GET)
 public class OrganizationListController {
 
     private final GetOrganizationListService getOrganizationListService;
