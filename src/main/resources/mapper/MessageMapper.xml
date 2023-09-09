@@ -45,7 +45,6 @@
             )) AS result
         ORDER BY
             result.`time` DESC;
-        ORDER BY time DESC;
     </select>
     <select id="selectCountForUnreadMessage" resultType="java.lang.Integer">
         select COUNT(m.id)
