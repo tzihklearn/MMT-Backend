@@ -21,6 +21,8 @@ public interface InterviewStatusMapper extends BaseMapper<InterviewStatus> {
 
     Integer deleteByUserIdAndAdmissionId(Integer userId, Integer admissionId);
 
-    Integer insertUserIdAndUserIdAndRoundAndAdmissionIdAndDepartmentId(Integer userId, Integer round, Integer admissionId, Integer departmentId);
+    Integer insertUserIdAndUserIdAndRoundAndAdmissionIdAndDepartmentId(
+            Integer userId, Integer round, Integer admissionId, Integer departmentId, Integer organizationOrder, Integer departmentOrder
+    );
 
 }

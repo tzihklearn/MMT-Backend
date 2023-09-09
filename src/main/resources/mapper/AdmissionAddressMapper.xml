@@ -3,7 +3,7 @@
 <mapper namespace="com.sipc.mmtbackend.mapper.AdmissionAddressMapper">
 
     <select id="selectAddressById" resultType="java.lang.String">
-        select address
+        select name
         from admission_address
         where id = #{id, jdbcType=INTEGER}
     </select>

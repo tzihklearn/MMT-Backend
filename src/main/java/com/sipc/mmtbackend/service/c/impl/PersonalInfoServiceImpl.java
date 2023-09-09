@@ -1,6 +1,7 @@
 package com.sipc.mmtbackend.service.c.impl;
 
 import cn.hutool.core.codec.Base64Encoder;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.sipc.mmtbackend.common.Constant;
 import com.sipc.mmtbackend.mapper.*;
 import com.sipc.mmtbackend.mapper.c.UserCMapper;
@@ -9,10 +10,7 @@ import com.sipc.mmtbackend.pojo.c.param.SecondUpdateParam;
 import com.sipc.mmtbackend.pojo.c.result.PersonalInfoArrangeBackResult;
 import com.sipc.mmtbackend.pojo.c.result.PersonalInfoArrangeResult;
 import com.sipc.mmtbackend.pojo.c.result.UserInfoResult;
-import com.sipc.mmtbackend.pojo.domain.Department;
-import com.sipc.mmtbackend.pojo.domain.InterviewStatus;
-import com.sipc.mmtbackend.pojo.domain.Organization;
-import com.sipc.mmtbackend.pojo.domain.UserInfo;
+import com.sipc.mmtbackend.pojo.domain.*;
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
 import com.sipc.mmtbackend.service.c.PersonalInfoService;
 import com.sipc.mmtbackend.utils.PictureUtil.PictureUtil;
@@ -48,6 +46,12 @@ public class PersonalInfoServiceImpl implements PersonalInfoService {
     DepartmentMapper departmentMapper;
     @Resource
     OrganizationMapper organizationMapper;
+
+    @Resource
+    AcaMajorMapper acaMajorMapper;
+
+    @Resource
+    MajorClassMapper majorClassMapper;
 
     @Resource
     PictureUtil pictureUtil;
@@ -143,7 +147,24 @@ public class PersonalInfoServiceImpl implements PersonalInfoService {
         if (gender.equals("男")) gender = String.valueOf(1);
         if (gender.equals("女")) gender = String.valueOf(0);
         try {
-            boolean ret = userInfoMapper.updateAll(userId, name, studentId, Integer.valueOf(gender), academy, major, classNum, phoneNum, email, qqNum, 1);
+
+            AcaMajor acaMajor = acaMajorMapper.selectOne(
+                    new QueryWrapper<AcaMajor>()
+                            .eq("academy", academy)
+                            .eq("major", major)
+                            .last("limit 1")
+            );
+
+            MajorClass majorClass = majorClassMapper.selectOne(
+                    new QueryWrapper<MajorClass>()
+                            .eq("major_id", acaMajor.getId())
+                            .eq("class_num", classNum)
+                            .last("limit 1")
+            );
+
+//            boolean ret = userInfoMapper.updateAll(userId, name, studentId, Integer.valueOf(gender), academy, major, classNum, phoneNum, email, qqNum, 1);
+
+            boolean ret = userInfoMapper.updateAll(userId, name, studentId, Integer.valueOf(gender), acaMajor.getId(), majorClass.getId(), classNum, phoneNum, email, qqNum, 1);
             //更新User表 yuleng
             UserC temp = new UserC();
             temp.setId(userId);
@@ -197,6 +218,9 @@ public class PersonalInfoServiceImpl implements PersonalInfoService {
                 } else {
                     avatarUrl = pictureUtil.getPictureURL(organization.getAvatarId(), false);
                 }
+
+                //TODO:社团头像临时处理
+                avatarUrl = organization.getAvatarId();
 
                 organizationLogoUrl = avatarUrl;
                 if (Objects.isNull(organizationLogoUrl)) continue;

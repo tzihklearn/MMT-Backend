@@ -61,7 +61,7 @@
         where organization_id = #{id}
           and user_id = #{userId}
           and is_deleted != 1
-        order by message.time;
+        order by message.time
     </select>
     <select id="selectByPrimaryId" resultType="com.sipc.mmtbackend.pojo.domain.Message">
         select *
