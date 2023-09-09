@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sipc.mmtbackend.mapper.c.CheckInMapper">
+
+    <update id="checkInUser">
+        UPDATE interview_status i
+        SET i.state = 5
+        WHERE
+            i.is_deleted != 1
+            AND i.state = 4
+            AND DATE ( i.start_time ) = CURDATE()
+            AND i.user_id = #{userId,jdbcType=INTEGER}
+            AND i.organization_id = #{organizationId,jdbcType=INTEGER}
+    </update>
+</mapper>
