@@ -1,6 +1,5 @@
 package com.sipc.mmtbackend.service.c.impl;
 
-import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -20,6 +19,7 @@ import com.sipc.mmtbackend.pojo.dto.CommonResult;
 import com.sipc.mmtbackend.pojo.dto.resultEnum.ResultEnum;
 import com.sipc.mmtbackend.service.c.CacheService;
 import com.sipc.mmtbackend.service.c.OrganizationInterviewService;
+import com.sipc.mmtbackend.utils.JsonUtil;
 import com.sipc.mmtbackend.utils.checkRoleUtils.CheckRole;
 import com.sipc.mmtbackend.utils.checkRoleUtils.param.CheckResultParam;
 import org.springframework.stereotype.Service;
@@ -72,9 +72,11 @@ public class OrganizationInterviewImpl implements OrganizationInterviewService {
     private QuestionDataMapper questionDataMapper;
 
     @Resource
-    UpdateUserInfoController updateUserInfoController;
+    private UpdateUserInfoController updateUserInfoController;
     @Resource
     private CacheService cacheService;
+    @Resource
+    private JsonUtil jsonUtil;
 
     /**
      * 报名表提交
@@ -98,7 +100,7 @@ public class OrganizationInterviewImpl implements OrganizationInterviewService {
         if (openId != null) {
             //存入Registration_from_json表
             RegistrationFormJson registrationFormJson = new RegistrationFormJson();
-            String jsonStr = JSON.toJSONString(registrationFormParam);
+            String jsonStr = jsonUtil.serializationJson(registrationFormParam);
             Date date = new Date();
             registrationFormJson.setUserId(userId);
             registrationFormJson.setAdmissionId(registrationFormParam.getAdmissionId());
