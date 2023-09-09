@@ -4,6 +4,8 @@ import com.sipc.mmtbackend.pojo.domain.AcaMajor;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.List;
+
 /**
  * <p>
  *  Mapper 接口
@@ -16,5 +18,7 @@ import org.apache.ibatis.annotations.Mapper;
 public interface AcaMajorMapper extends BaseMapper<AcaMajor> {
 
     AcaMajor selectByAcaIdAndMajorId(Integer academyId, Integer majorId);
+
+    List<AcaMajor> selectAllAcademy();
 
 }

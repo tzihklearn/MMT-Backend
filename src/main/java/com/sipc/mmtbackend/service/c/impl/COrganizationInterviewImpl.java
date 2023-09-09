@@ -96,8 +96,15 @@ public class COrganizationInterviewImpl implements COrganizationInterviewService
             return CommonResult.fail(check.getErrcode(), check.getErrmsg());
         }
         String openId = check.getData();
+
+//        String openId = "asdas";
 //      用 openid 获得 userId
         Integer userId = userCMapper.selectIdByOpenId(openId);
+
+//        userId = 303;
+//
+//        openId ="asd";
+
         if (openId != null) {
             //存入Registration_from_json表
             RegistrationFormJson registrationFormJson = new RegistrationFormJson();

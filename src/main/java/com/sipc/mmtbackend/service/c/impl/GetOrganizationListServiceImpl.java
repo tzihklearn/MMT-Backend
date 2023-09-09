@@ -14,8 +14,10 @@ import com.sipc.mmtbackend.service.c.CacheService;
 import com.sipc.mmtbackend.service.c.GetOrganizationListService;
 import com.sipc.mmtbackend.utils.PictureUtil.PictureUtil;
 import com.sipc.mmtbackend.utils.PictureUtil.pojo.DefaultPictureIdEnum;
+import com.sipc.mmtbackend.utils.RedisUtil;
 import com.sipc.mmtbackend.utils.time.TimeUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -33,16 +35,19 @@ public class GetOrganizationListServiceImpl implements GetOrganizationListServic
     private final TagMapper tagMapper;
 
     private final PictureUtil pictureUtil;
+
+    private final RedisUtil redisUtil;
     @Resource
     private CacheService cacheService;
 
     @Autowired
-    public GetOrganizationListServiceImpl(AdmissionMapper admissionMapper, OrganizationMapper organizationMapper, OrganizationTagMergeMapper organizationTagMergeMapper, TagMapper tagMapper, PictureUtil pictureUtil) {
+    public GetOrganizationListServiceImpl(AdmissionMapper admissionMapper, OrganizationMapper organizationMapper, OrganizationTagMergeMapper organizationTagMergeMapper, TagMapper tagMapper, PictureUtil pictureUtil, RedisUtil redisUtil) {
         this.admissionMapper = admissionMapper;
         this.organizationMapper = organizationMapper;
         this.organizationTagMergeMapper = organizationTagMergeMapper;
         this.tagMapper = tagMapper;
         this.pictureUtil = pictureUtil;
+        this.redisUtil = redisUtil;
     }
 
 
@@ -78,7 +83,10 @@ public class GetOrganizationListServiceImpl implements GetOrganizationListServic
 
     }
 
-    private OrganizationListResult getOrganizationListMethod() {
+    @Cacheable(value = "getOrganizationListMethod")
+    public OrganizationListResult getOrganizationListMethod() {
+
+
         OrganizationListResult organizationListResult = new OrganizationListResult();
 
         List<OrganizationListData> organizationListDataList = new ArrayList<>();
@@ -106,8 +114,8 @@ public class GetOrganizationListServiceImpl implements GetOrganizationListServic
                 avatarUrl = pictureUtil.getPictureURL(organization.getAvatarId(), false);
             }
 
-            //TODO:更改图像链接
-            avatarUrl = organization.getAvatarId();
+//
+//            avatarUrl = organization.getAvatarId();
 
             if (admission == null) {
                 String registrationTime = "未开始";
@@ -159,4 +167,5 @@ public class GetOrganizationListServiceImpl implements GetOrganizationListServic
         organizationListResult.setTotalNum(totalNum);
         return organizationListResult;
     }
+
 }

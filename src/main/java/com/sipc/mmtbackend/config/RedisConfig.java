@@ -113,6 +113,7 @@ public class RedisConfig {
     private Map<String, RedisCacheConfiguration> getRedisCacheConfigurationMap() {
         Map<String, RedisCacheConfiguration> redisCacheConfigurationMap = new HashMap<>();
         redisCacheConfigurationMap.put("SpecifyTheKeyPolicy", this.getRedisCacheConfigurationWithTtl(30));
+        redisCacheConfigurationMap.put("getOrganizationListMethod", this.getRedisCacheConfigurationWithTtl(10));
 
         return redisCacheConfigurationMap;
     }
