@@ -1291,7 +1291,7 @@ public class OrganizationServiceImpl implements OrganizationService {
                 questionData = questionDataMapper.selectOne(
                         new QueryWrapper<QuestionData>()
 //                                .eq("type", true)
-                                .eq("select_type_id", questionPoData.getType())
+                                .eq("selectTypeId", questionPoData.getType())
                                 .eq("question", questionPoData.getContent())
                 );
                 if (questionData == null) {
@@ -1435,7 +1435,7 @@ public class OrganizationServiceImpl implements OrganizationService {
                     questionData = questionDataMapper.selectOne(
                             new QueryWrapper<QuestionData>()
 //                                .eq("type", true)
-                                    .eq("select_type_id", questionPoData.getType())
+                                    .eq("selectTypeId", questionPoData.getType())
                                     .eq("question", questionPoData.getContent())
                     );
                     if (questionData == null) {
