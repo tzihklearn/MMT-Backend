@@ -106,6 +106,9 @@ public class GetOrganizationListServiceImpl implements GetOrganizationListServic
                 avatarUrl = pictureUtil.getPictureURL(organization.getAvatarId(), false);
             }
 
+            //TODO:更改图像链接
+            avatarUrl = organization.getAvatarId();
+
             if (admission == null) {
                 String registrationTime = "未开始";
                 String tagStatus = "未开始";
