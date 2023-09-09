@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sipc.mmtbackend.mapper.c.UserDepartmentRegistrationMapper">
+
+<!--    <resultMap id="OrganizationResultMap" type="com.sipc.mmtbackend.pojo.po.DataPanel.OrganizationOrderPo">-->
+<!--        <id column="organization_order" jdbcType="INTEGER" property="organizationOder"/>-->
+<!--        <id column="num" jdbcType="INTEGER" property="num"/>-->
+<!--    </resultMap>-->
+
+<!--    <resultMap id="DepartmentResultMap" type="com.sipc.mmtbackend.pojo.po.DataPanel.DepartmentOrderPo">-->
+<!--        <id column="department_order" jdbcType="INTEGER" property="departmentOrder"/>-->
+<!--        <id column="num" jdbcType="INTEGER" property="num"/>-->
+<!--    </resultMap>-->
+
+<!--    <resultMap id="UserDepartmentRegistrationMap" type="com.sipc.mmtbackend.pojo.domain.UserDepartmentRegistration">-->
+<!--        <id column="id" jdbcType="INTEGER" property="id"/>-->
+<!--        <id column="user_id" jdbcType="INTEGER" property="userId"/>-->
+<!--        <id column="admission_id" jdbcType="INTEGER" property="admissionId"/>-->
+<!--        <id column="department_id" jdbcType="INTEGER" property="departmentId"/>-->
+<!--        <id column="organization_order" jdbcType="INTEGER" property="organizationOrder"/>-->
+<!--        <id column="department_order" jdbcType="INTEGER" property="departmentOrder"/>-->
+<!--    </resultMap>-->
+
+    <insert id="insertByExample" parameterType="com.sipc.mmtbackend.pojo.c.domain.UserDepartmentRegistration">
+        insert into user_department_registration(user_id, admission_id, department_id, organization_order,
+                                                 department_order)
+        values (#{userId,jdbcType=INTEGER},
+                #{admissionId,jdbcType=INTEGER},
+                #{departmentId,jdbcType=INTEGER},
+                #{organizationOrder,jdbcType=INTEGER},
+                #{departmentOrder,jdbcType=INTEGER})
+    </insert>
+
+    <delete id="deleteByUserIdAndAdmissionId" parameterType="java.lang.Integer">
+        delete
+        from user_department_registration
+        where user_id = #{userId,jdbcType=INTEGER}
+          and admission_id = #{admissionId, jdbcType=INTEGER}
+    </delete>
+
+<!--    <select id="selectOrganizationOderByAdmissionId" resultMap="OrganizationResultMap">-->
+<!--        select udr.organization_order as organization_order, COUNT(ins.user_id) as num-->
+<!--        from user_department_registration as udr-->
+<!--                 left join interview_status as ins-->
+<!--                           on ins.user_id = udr.user_id and ins.department_id = udr.department_id-->
+<!--        where ins.admission_id = #{admissionId, jdbcType=INTEGER}-->
+<!--        group by udr.organization_order-->
+<!--    </select>-->
+
+<!--    <select id="selectUserIdByAdmissionIdAndOrganizationOrder" resultType="java.lang.Integer">-->
+<!--        select user_id-->
+<!--        from user_department_registration-->
+<!--        where admission_id = #{admissionId, jdbcType=INTEGER}-->
+<!--        <if test="organizationOrders != null and organizationOrders.size()>0">-->
+<!--            and organization_order in-->
+<!--            <foreach collection="organizationOrders" item="organizationOrder" separator="," open="(" close=")">-->
+<!--                #{organizationOrder}-->
+<!--            </foreach>-->
+<!--        </if>-->
+<!--    </select>-->
+
+<!--    <select id="selectUserIdByAdmissionIdAndDepartmentOrder" resultType="java.lang.Integer">-->
+<!--        select user_id-->
+<!--        from user_department_registration-->
+<!--        where admission_id = #{admissionId, jdbcType=INTEGER}-->
+<!--        <if test="departmentOrders != null and departmentOrders.size()>0">-->
+<!--            and department_order in-->
+<!--            <foreach collection="departmentOrders" item="departmentOrder" separator="," open="(" close=")">-->
+<!--                #{departmentOrder}-->
+<!--            </foreach>-->
+<!--        </if>-->
+<!--    </select>-->
+
+<!--    <select id="selectDepartmentOdersByAdmissionId" parameterType="java.lang.Integer"-->
+<!--            resultType="com.sipc.mmtbackend.pojo.po.DataPanel.DepartmentOrderPo">-->
+<!--        select udr.department_order as departmentOrder, COUNT(ins.user_id) as num-->
+<!--        from user_department_registration as udr-->
+<!--                 left join interview_status as ins-->
+<!--                           on ins.user_id = udr.user_id and ins.department_id = udr.department_id-->
+<!--        where ins.admission_id = #{admissionId, jdbcType=INTEGER}-->
+<!--        group by udr.department_order-->
+<!--    </select>-->
+
+<!--    <select id="selectUserIdsGroupByAdmissionIdAndOrganizationId1" parameterType="java.lang.Integer"-->
+<!--            resultType="java.lang.Integer">-->
+<!--        select user_id-->
+<!--        from user_department_registration-->
+<!--        where admission_id = #{admissionId, jdbcType=INTEGER}-->
+<!--          and organization_order = 1-->
+<!--        group by user_id-->
+<!--    </select>-->
+
+<!--    <select id="selectUserIdsByAdmissionIdAndDepartmentAndOrganizationOrderAndDepartmentOrder1"-->
+<!--            parameterType="java.lang.Integer" resultType="java.lang.Integer">-->
+<!--        select user_id-->
+<!--        from user_department_registration-->
+<!--        where admission_id = #{admissionId, jdbcType=INTEGER}-->
+<!--          and department_id = #{departmentId, jdbcType=INTEGER}-->
+<!--          and organization_order = 1-->
+<!--          and department_order = 1-->
+<!--    </select>-->
+
+    <select id="selectUserIdsByAdmissionId" resultType="java.lang.Integer">
+        select user_id
+        from user_department_registration
+        where admission_id = #{admissionId, jdbcType=INTEGER}
+    </select>
+
+<!--    <select id="selectOrderByUserIdAndAdmissionIdAndDepartmentId" parameterType="java.lang.Integer"-->
+<!--            resultType="com.sipc.mmtbackend.pojo.po.DataPanel.OrderPo">-->
+<!--        select organization_order as organizationOrder, department_order as departmentOrder-->
+<!--        from user_department_registration-->
+<!--        where user_id = #{userId, jdbcType=INTEGER}-->
+<!--          and admission_id = #{admissionId, jdbcType=INTEGER}-->
+<!--          and department_id = #{departmentId, jdbcType=INTEGER}-->
+<!--        limit 1-->
+<!--    </select>-->
+
+<!--    <select id="selectUserIdsByAdmissionIdAndDepartmentIdAndDepartmentOrder" parameterType="java.lang.Integer"-->
+<!--            resultType="java.lang.Integer">-->
+<!--        select user_id-->
+<!--        from user_department_registration-->
+<!--        where admission_id = #{admissionId, jdbcType=INTEGER}-->
+<!--          and department_id = #{departmentId, jdbcType=INTEGER}-->
+<!--          and organization_order = 1-->
+<!--          and department_order = #{departmentOrder, jdbcType=INTEGER}-->
+<!--    </select>-->
+
+<!--    <select id="selectUserIdsByAdmissionIdAndDepartmentId" parameterType="java.lang.Integer"-->
+<!--            resultType="java.lang.Integer">-->
+<!--        select user_id-->
+<!--        from user_department_registration-->
+<!--        where admission_id = #{admissionId, jdbcType=INTEGER}-->
+<!--          and department_id = #{departmentId, jdbcType=INTEGER}-->
+<!--    </select>-->
+
+<!--    <select id="selectDepartmentOrderByAdmissionIdAndUserIdAndDepartmentId" parameterType="java.lang.Integer"-->
+<!--            resultType="java.lang.Integer">-->
+<!--        select department_order-->
+<!--        from user_department_registration-->
+<!--        where admission_id = #{admissionId, jdbcType=INTEGER}-->
+<!--          and user_id = #{userId, jdbcType=INTEGER}-->
+<!--          and department_id = #{departmentId, jdbcType=INTEGER}-->
+<!--    </select>-->
+
+<!--    <select id="selectDepartmentOrderPoByAdmissionIdAndDepartmentIdAndOrganizationOrder1"-->
+<!--            parameterType="java.lang.Integer"-->
+<!--            resultType="com.sipc.mmtbackend.pojo.po.InterviewData.DepartmentOrderNumPo">-->
+<!--        select department_order as departmentOrder, COUNT(user_id) as num-->
+<!--        from user_department_registration-->
+<!--        where admission_id = #{admissionId, jdbcType=INTEGER}-->
+<!--          and department_id = #{departmentId, jdbcType=INTEGER}-->
+<!--          and organization_order = 1-->
+<!--        group by department_order-->
+<!--        order by department_order-->
+<!--    </select>-->
+
+<!--    <select id="selectUserIdsByAdmissionIdAndDepartmentIds" resultType="java.lang.Integer">-->
+<!--        select user_id-->
+<!--        from user_department_registration-->
+<!--        where admission_id = #{admissionId, jdbcType=INTEGER}-->
+<!--        <if test="departmentIds != null and departmentIds.size()>0">-->
+<!--            and department_id in-->
+<!--            <foreach collection="departmentIds" item="departmentId" separator="," open="(" close=")">-->
+<!--                #{departmentId}-->
+<!--            </foreach>-->
+<!--        </if>-->
+<!--    </select>-->
+<!--    <select id="selectDepartmentOrderGroupPoByUserIds"-->
+<!--            resultType="com.sipc.mmtbackend.pojo.po.DataPanel.DepartmentOrderGroupPo">-->
+<!--        select department_order as departmentOrder, count(id) as num-->
+<!--        from user_department_registration-->
+<!--        <where>-->
+<!--            admission_id = #{admissionId, jdbcType=INTEGER}-->
+<!--            and department_id = #{departmentId, jdbcType=INTEGER}-->
+<!--            and organization_order = 1-->
+<!--            <if test="userIds != null and userIds.size() > 0">-->
+<!--                and user_id in-->
+<!--                <foreach collection="userIds" item="userId" separator="," open="(" close=")">-->
+<!--                    #{userId}-->
+<!--                </foreach>-->
+<!--            </if>-->
+<!--        </where>-->
+<!--        group by department_order-->
+<!--        order by department_order-->
+<!--    </select>-->
+
+<!--    <select id="selectUserIdsByAdmissionIdAndDepartmentIdAndFirstDepartmentOrder" parameterType="java.lang.Integer"-->
+<!--            resultType="java.lang.Integer">-->
+<!--        select user_id-->
+<!--        from user_department_registration-->
+<!--        where admission_id = #{admissionId, jdbcType=INTEGER}-->
+<!--          and department_id = #{departmentId, jdbcType=INTEGER}-->
+<!--          and organization_order = 1-->
+<!--          and department_order = #{departmentOrder, jdbcType=INTEGER}-->
+<!--    </select>-->
+
+</mapper>

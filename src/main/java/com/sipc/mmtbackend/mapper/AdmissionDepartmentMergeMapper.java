@@ -4,6 +4,8 @@ import com.sipc.mmtbackend.pojo.domain.AdmissionDepartmentMerge;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.List;
+
 /**
  * <p>
  *  Mapper 接口
@@ -14,5 +16,7 @@ import org.apache.ibatis.annotations.Mapper;
  */
 @Mapper
 public interface AdmissionDepartmentMergeMapper extends BaseMapper<AdmissionDepartmentMerge> {
+
+    List<Integer> selectDepartmentIdByAdmissionId(Integer admissionId);
 
 }

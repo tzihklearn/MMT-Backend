@@ -15,4 +15,6 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface AdmissionAddressMapper extends BaseMapper<AdmissionAddress> {
 
+    String selectAddressById(Integer id);
+
 }

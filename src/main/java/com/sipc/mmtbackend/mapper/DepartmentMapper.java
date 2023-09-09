@@ -1,8 +1,11 @@
 package com.sipc.mmtbackend.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.sipc.mmtbackend.pojo.c.result.DepartmentResult;
 import com.sipc.mmtbackend.pojo.domain.Department;
 import org.apache.ibatis.annotations.Mapper;
+
+import java.util.List;
 
 /**
  * <p>
@@ -14,5 +17,9 @@ import org.apache.ibatis.annotations.Mapper;
  */
 @Mapper
 public interface DepartmentMapper extends BaseMapper<Department> {
+
+    Integer selectOrganizationIdById(Integer departmentId);
+
+    List<DepartmentResult> selectRelationByAdmissionId(Integer admissionId);
 
 }

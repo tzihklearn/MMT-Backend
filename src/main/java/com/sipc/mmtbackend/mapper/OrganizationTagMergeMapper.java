@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.sipc.mmtbackend.pojo.domain.OrganizationTagMerge;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.List;
+
 /**
  * <p>
  * Mapper 接口
@@ -14,5 +16,7 @@ import org.apache.ibatis.annotations.Mapper;
  */
 @Mapper
 public interface OrganizationTagMergeMapper extends BaseMapper<OrganizationTagMerge> {
+
+    List<Integer> selectTagIdByOrganizationI(Integer organizationId);
 
 }
