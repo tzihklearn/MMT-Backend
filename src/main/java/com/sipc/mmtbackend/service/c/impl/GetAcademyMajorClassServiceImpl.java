@@ -11,6 +11,7 @@ import com.sipc.mmtbackend.pojo.domain.AcaMajor;
 import com.sipc.mmtbackend.pojo.domain.MajorClass;
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
 import com.sipc.mmtbackend.service.c.GetAcademyMajorClassService;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -28,8 +29,9 @@ public class GetAcademyMajorClassServiceImpl implements GetAcademyMajorClassServ
      * @apiNote 获取学院信息 B-member
      */
     @Override
+    @Cacheable(value = "getAcademy")
     public CommonResult<GetAcademyResult> getAcademy() {
-        List<AcaMajor> acaMajors = acaMajorMapper.selectList(new QueryWrapper<>());
+        List<AcaMajor> acaMajors = acaMajorMapper.selectAllAcademy();
         if (acaMajors == null)
             return CommonResult.fail("服务器数据有误");
         GetAcademyResult result = new GetAcademyResult();
@@ -47,6 +49,7 @@ public class GetAcademyMajorClassServiceImpl implements GetAcademyMajorClassServ
      * @apiNote 获取专业信息 B-member
      */
     @Override
+    @Cacheable(value = "getMajor", key = "#root.args")
     public CommonResult<GetMajorResult> getMajor(Integer academyId) {
         List<AcaMajor> acaMajors = acaMajorMapper.selectList(new QueryWrapper<AcaMajor>().eq("aca_id", academyId));
         if (acaMajors == null)
@@ -66,6 +69,7 @@ public class GetAcademyMajorClassServiceImpl implements GetAcademyMajorClassServ
      * @apiNote 获取专业的所有班级 B-member
      */
     @Override
+    @Cacheable(value = "getClassNum", key = "#root.args")
     public CommonResult<GetClassNumResult> getClassNum(Integer academyId, Integer majorId) {
         if (acaMajorMapper.selectByAcaIdAndMajorId(academyId, majorId) == null)
             return CommonResult.fail("学院专业有误");

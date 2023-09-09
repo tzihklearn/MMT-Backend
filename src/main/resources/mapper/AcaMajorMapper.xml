@@ -8,4 +8,8 @@
         where aca_id = #{academyId,jdbcType=INTEGER}
           and id = #{majorId,jdbcType=INTEGER}
     </select>
+    <select id="selectAllAcademy" resultType="com.sipc.mmtbackend.pojo.domain.AcaMajor">
+        select distinct 0 as id, aca_id, academy, null as `major`
+        from aca_major
+    </select>
 </mapper>

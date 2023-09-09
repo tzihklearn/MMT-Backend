@@ -4,14 +4,12 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sipc.mmtbackend.common.Constant;
+import com.sipc.mmtbackend.config.DirectRabbitConfig;
 import com.sipc.mmtbackend.controller.c.UpdateUserInfoController;
 import com.sipc.mmtbackend.mapper.*;
 import com.sipc.mmtbackend.mapper.c.*;
 import com.sipc.mmtbackend.pojo.c.domain.*;
-import com.sipc.mmtbackend.pojo.c.param.AnswerData;
-import com.sipc.mmtbackend.pojo.c.param.IsCertificationParam;
-import com.sipc.mmtbackend.pojo.c.param.OptionData;
-import com.sipc.mmtbackend.pojo.c.param.RegistrationFormParam;
+import com.sipc.mmtbackend.pojo.c.param.*;
 import com.sipc.mmtbackend.pojo.c.result.*;
 import com.sipc.mmtbackend.pojo.domain.*;
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
@@ -20,8 +18,10 @@ import com.sipc.mmtbackend.pojo.dto.resultEnum.ResultEnum;
 import com.sipc.mmtbackend.service.c.CacheService;
 import com.sipc.mmtbackend.service.c.COrganizationInterviewService;
 import com.sipc.mmtbackend.utils.JsonUtil;
+import com.sipc.mmtbackend.utils.RedisUtil;
 import com.sipc.mmtbackend.utils.checkRoleUtils.CheckRole;
 import com.sipc.mmtbackend.utils.checkRoleUtils.param.CheckResultParam;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -29,6 +29,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.logging.Logger;
 
 /**
@@ -76,6 +79,16 @@ public class COrganizationInterviewImpl implements COrganizationInterviewService
     UpdateUserInfoController updateUserInfoController;
     @Resource
     private CacheService cacheService;
+
+    @Resource
+    private RabbitTemplate rabbitTemplate;
+
+    @Resource
+    private RedisUtil redisUtil;
+
+//    private final ReentrantReadWriteLock rwLock = new ReentrantReadWriteLock();
+
+    private final AtomicInteger atomicInteger =new AtomicInteger(1000);
     @Resource
     JsonUtil jsonUtil;
 
@@ -86,74 +99,113 @@ public class COrganizationInterviewImpl implements COrganizationInterviewService
      * @return 通用返回
      */
     @Override
-    public synchronized CommonResult<RegistrationFormParam> setRegistrationForm(RegistrationFormParam registrationFormParam,
+    public CommonResult<RegistrationFormParam> setRegistrationForm(RegistrationFormParam registrationFormParam,
                                                                                 HttpServletRequest request,
                                                                                 HttpServletResponse response) {
         log.info("数据校验成功");
 //        C 端登录检测
-        CheckResultParam check = CheckRole.check(request, response, Constant.C_END, null);
-        if (!check.isResult()) {
-            return CommonResult.fail(check.getErrcode(), check.getErrmsg());
-        }
-        String openId = check.getData();
+//        CheckResultParam check = CheckRole.check(request, response, Constant.C_END, null);
+//        if (!check.isResult()) {
+//            return CommonResult.fail(check.getErrcode(), check.getErrmsg());
+//        }
+//        String openId = check.getData();
+
+        String openId = "asdas";
 //      用 openid 获得 userId
-        Integer userId = userCMapper.selectIdByOpenId(openId);
+//        Integer userId = userCMapper.selectIdByOpenId(openId);
+//
+//        userId = 303;
+//
+//        openId ="asd";
+        int userId = atomicInteger.get();
+
+
         if (openId != null) {
             //存入Registration_from_json表
-            RegistrationFormJson registrationFormJson = new RegistrationFormJson();
-            String jsonStr = jsonUtil.serializationJson(registrationFormParam);
-            Date date = new Date();
-            registrationFormJson.setUserId(userId);
-            registrationFormJson.setAdmissionId(registrationFormParam.getAdmissionId());
-            registrationFormJson.setJson(jsonStr);
-            registrationFormJson.setTime(date.getTime() / 1000);
-            registrationFormJson.setIsReallocation(registrationFormParam.getAllowReallocation());
-            if (registrationFromJsonMapper.selectByAdmissionIdAndUserId(registrationFormParam.getAdmissionId(),
-                    userId) != 0) {
-                registrationFromJsonMapper.updateByUserIdAndAdmissionId(registrationFormJson);
-            } else {
-                registrationFromJsonMapper.insert(registrationFormJson);
-            }
-            //存入用户基本信息
-            UserInfo userInfo = new UserInfo();
-            userInfo.setId(userId);
-            userInfo.setPhone(registrationFormParam.getEssentialInformation().getPhone());
-            userInfo.setEmail(registrationFormParam.getEssentialInformation().getMail());
-            userInfo.setQq(registrationFormParam.getEssentialInformation().getQq());
-            userInfo.setBirthday(registrationFormParam.getEssentialInformation().getBirthday());
-            userInfo.setHeight(registrationFormParam.getEssentialInformation().getHeight());
-            userInfo.setWeight(registrationFormParam.getEssentialInformation().getWeight());
-            userInfoMapper.updateById(userInfo);
-            //存入用户志愿信息
-            /*
-              汤子涵改动
-             */
-            userDepartmentRegistrationMapper.deleteByUserIdAndAdmissionId(userId,
-                    registrationFormParam.getAdmissionId());
-            interviewStatusMapper.deleteByUserIdAndAdmissionId(userId, registrationFormParam.getAdmissionId());
-            List<Integer> orderId = new ArrayList<>(Arrays.asList(registrationFormParam.getUserSign().getFirstOrder(),
-                    registrationFormParam.getUserSign().getSecondOrder(),
-                    registrationFormParam.getUserSign().getThirdOrder()));
-            for (int i = 0; i < 3; i++) {
-                if (orderId.get(i) != null) {
-                    setOrder(userId, registrationFormParam, orderId.get(i),
-                            registrationFormParam.getOrganizationOrder(), i);
-                    interviewStatusMapper.insertUserIdAndUserIdAndRoundAndAdmissionIdAndDepartmentId(userId, 1,
-                            registrationFormParam.getAdmissionId(), orderId.get(i), registrationFormParam.getOrganizationOrder(), i+1);
-                }
-            }
-            for (AnswerData answer : registrationFormParam.getQuestionAnswerList()) {
-                List<CRegistrationFormData> answerData = registrationFromDataMapper.selectByUserIdAndFieldId(userId,
-                        answer.getQuestionId());
-                if (answerData.size() != 0) {
-                    registrationFromDataMapper.deleteByPrimaryKey(userId, answer.getQuestionId());
-                }
-                RegistrationFromData registrationFormData = new RegistrationFromData();
-                registrationFormData.setUserId(userId);
-                registrationFormData.setAdmissionQuestionId(answer.getQuestionId());
-                registrationFormData.setData(answer.getAnswer());
-                registrationFromDataMapper.insert(registrationFormData);
-            }
+
+//            //存入Registration_from_json表
+//            RegistrationFormJson registrationFormJson = new RegistrationFormJson();
+//            String jsonStr = jsonUtil.serializationJson(registrationFormParam);
+//            Date date = new Date();
+//
+//            registrationFormJson.setAdmissionId(registrationFormParam.getAdmissionId());
+//            registrationFormJson.setJson(jsonStr);
+//            registrationFormJson.setTime(date.getTime() / 1000);
+//            registrationFormJson.setIsReallocation(registrationFormParam.getAllowReallocation());
+//            try {
+//                rwLock.writeLock().lock();
+//
+//                registrationFormJson.setUserId(userId);
+//
+//                if (registrationFromJsonMapper.selectByAdmissionIdAndUserId(
+//                        registrationFormParam.getAdmissionId(), userId) != 0
+//                ) {
+//                    registrationFromJsonMapper.updateByUserIdAndAdmissionId(registrationFormJson);
+//                } else {
+//
+//                        registrationFromJsonMapper.insert(registrationFormJson);
+//
+//                }
+//            } finally {
+//                rwLock.writeLock().unlock();
+//
+//            }
+//            //存入用户基本信息
+//            UserInfo userInfo = new UserInfo();
+//            userInfo.setId(userId);
+//            userInfo.setPhone(registrationFormParam.getEssentialInformation().getPhone());
+//            userInfo.setEmail(registrationFormParam.getEssentialInformation().getMail());
+//            userInfo.setQq(registrationFormParam.getEssentialInformation().getQq());
+//            userInfo.setBirthday(registrationFormParam.getEssentialInformation().getBirthday());
+//            userInfo.setHeight(registrationFormParam.getEssentialInformation().getHeight());
+//            userInfo.setWeight(registrationFormParam.getEssentialInformation().getWeight());
+//            userInfoMapper.updateById(userInfo);
+//            //存入用户志愿信息
+//            /*
+//              汤子涵改动
+//             */
+//            userDepartmentRegistrationMapper.deleteByUserIdAndAdmissionId(userId,
+//                    registrationFormParam.getAdmissionId());
+//            interviewStatusMapper.deleteByUserIdAndAdmissionId(userId, registrationFormParam.getAdmissionId());
+//            List<Integer> orderId = new ArrayList<>(Arrays.asList(registrationFormParam.getUserSign().getFirstOrder(),
+//                    registrationFormParam.getUserSign().getSecondOrder(),
+//                    registrationFormParam.getUserSign().getThirdOrder()));
+//            try {
+//                rwLock.writeLock().lock();
+//                for (int i = 0; i < 3; i++) {
+//                    if (orderId.get(i) != null) {
+//                        setOrder(userId, registrationFormParam, orderId.get(i),
+//                                registrationFormParam.getOrganizationOrder(), i);
+//                        interviewStatusMapper.insertUserIdAndUserIdAndRoundAndAdmissionIdAndDepartmentId(userId, 1,
+//                                registrationFormParam.getAdmissionId(), orderId.get(i), registrationFormParam.getOrganizationOrder(), i+1);
+//                    }
+//                }
+//                for (AnswerData answer : registrationFormParam.getQuestionAnswerList()) {
+//                    List<CRegistrationFormData> answerData = registrationFromDataMapper.selectByUserIdAndFieldId(userId,
+//                            answer.getQuestionId());
+//                    if (!answerData.isEmpty()) {
+//                        registrationFromDataMapper.deleteByPrimaryKey(userId, answer.getQuestionId());
+//                    }
+//                    RegistrationFromData registrationFormData = new RegistrationFromData();
+//                    registrationFormData.setUserId(userId);
+//                    registrationFormData.setAdmissionQuestionId(answer.getQuestionId());
+//                    registrationFormData.setData(answer.getAnswer());
+//                    registrationFromDataMapper.insert(registrationFormData);
+//                }
+//            } finally {
+//                ++userId;
+//                rwLock.writeLock().unlock();
+//            }
+            RegistrationFormParamPo registrationFormParamPo = new RegistrationFormParamPo(registrationFormParam, userId);
+            //将消息携带绑定键值：TestDirectRouting 发送到交换机TestDirectExchange
+            rabbitTemplate.convertAndSend(DirectRabbitConfig.EXCHANGE_NAME, DirectRabbitConfig.ROUTING_KEY, registrationFormParamPo,
+                    //配置死信队列，消息过期时间5s
+                    message -> {
+                        message.getMessageProperties().setExpiration("10000");
+                        return message;
+                    }
+            );
+            atomicInteger.incrementAndGet();
             return CommonResult.success();
         } else {
             //用户鉴权失败
@@ -179,11 +231,35 @@ public class COrganizationInterviewImpl implements COrganizationInterviewService
             return CommonResult.fail(check.getErrcode(), check.getErrmsg());
         }
         String openId = check.getData();
+//        String openId = "asd";
         if (openId != null) {
 //            List<RegistrationForm> registrationForms = registrationFromMapper.selectByAdmissionId(admissionID);
 
-            List<AdmissionQuestion> admissionQuestionList =
-                    admissionQuestionMapper.selectList(new QueryWrapper<AdmissionQuestion>().eq("admission_id", admissionID));
+            List<AdmissionQuestion> admissionQuestionList;
+            Object o = redisUtil.get("admissionQuestionList" + admissionID);
+            if (o == null) {
+                admissionQuestionList =
+                        admissionQuestionMapper.selectList(new QueryWrapper<AdmissionQuestion>().eq("admission_id", admissionID));
+                redisUtil.set("admissionQuestionList" + admissionID, admissionQuestionList, 1L, TimeUnit.HOURS);
+
+            } else {
+               admissionQuestionList = (List<AdmissionQuestion>) o;
+            }
+
+            Map<Integer, QuestionData> questionDataMap = new HashMap<>();
+            Object o1 = redisUtil.get("questionDataMap");
+            if (o1 == null) {
+                for (QuestionData questionData : questionDataMapper.selectList(new QueryWrapper<>())) {
+                    questionDataMap.put(questionData.getId(), questionData);
+                }
+
+                redisUtil.set("questionDataMap", questionDataMap, 1L, TimeUnit.HOURS);
+
+            } else {
+                questionDataMap = (Map<Integer, QuestionData>) o1;
+            }
+
+
             List<OrganizationQuestionData> organizationQuestion = new ArrayList<>();
             OrganizationQuestionResult result = new OrganizationQuestionResult();
             for (AdmissionQuestion amount : admissionQuestionList) {
@@ -191,7 +267,8 @@ public class COrganizationInterviewImpl implements COrganizationInterviewService
 //                    continue;
 //                }
 
-                QuestionData questionData = questionDataMapper.selectById(amount.getQuestionId());
+//                QuestionData questionData = questionDataMapper.selectById(amount.getQuestionId());
+                QuestionData questionData = questionDataMap.get(amount.getQuestionId().toString());
                 if (questionData == null) {
                     continue;
                 }
@@ -256,8 +333,11 @@ public class COrganizationInterviewImpl implements COrganizationInterviewService
             return CommonResult.fail(check.getErrcode(), check.getErrmsg());
         }
         String openId = check.getData();
+//        String openId = "asd";
         // 用 openid 获得 userId
         Integer userId = userCMapper.selectIdByOpenId(openId);
+
+//        Integer userId = 303;
         if (openId != null) {
 
             //置入面试基本信息
@@ -284,15 +364,35 @@ public class COrganizationInterviewImpl implements COrganizationInterviewService
             } else {
                 userBasicInformation.setGender("女");
             }
-            AcaMajor acaMajor = acaMajorMapper.selectById(userInfo.getAcaMajorId());
+
+            AcaMajor acaMajor;
+            Object o1 = redisUtil.get("acaMajor" + userInfo.getAcaMajorId());
+            if (o1 == null) {
+                acaMajor = acaMajorMapper.selectById(userInfo.getAcaMajorId());
+                redisUtil.set("acaMajor" + userInfo.getAcaMajorId(), acaMajor, 1L, TimeUnit.HOURS);
+            } else {
+                acaMajor = (AcaMajor) o1;
+            }
+
+//            AcaMajor acaMajor = acaMajorMapper.selectById(userInfo.getAcaMajorId());
             userBasicInformation.setAcademy(acaMajor.getAcademy());
             userBasicInformation.setMajor(acaMajor.getMajor());
             userBasicInformation.setClassNum(userInfo.getClassNum());
             result.setUserBasicInformation(userBasicInformation);
             //处理预设问题
             List<String> generalQuestion = new ArrayList<>();
-            DefaultQuestionState defaultQuestionState =
-                    defaultQuestionStateMapper.selectByAdmissionIdOrderById(admissionId);
+
+            DefaultQuestionState defaultQuestionState;
+            Object o = redisUtil.get("defaultQuestionState" + admissionId);
+            if (o == null) {
+                defaultQuestionState = defaultQuestionStateMapper.selectByAdmissionIdOrderById(admissionId);
+                redisUtil.set("defaultQuestionState" + admissionId, defaultQuestionState, 1L, TimeUnit.HOURS);
+            } else {
+                defaultQuestionState = (DefaultQuestionState) o;
+            }
+
+//            DefaultQuestionState defaultQuestionState =
+//                    defaultQuestionStateMapper.selectByAdmissionIdOrderById(admissionId);
             if (defaultQuestionState != null) {
                 if (defaultQuestionState.getQq() != null) {
                     generalQuestion.add("QQ");
@@ -331,14 +431,41 @@ public class COrganizationInterviewImpl implements COrganizationInterviewService
             return CommonResult.fail(check.getErrcode(), check.getErrmsg());
         }
         String openId = check.getData();
+//        String openId = "asd";
         // 用 openid 获得 userId
         Integer userId = userCMapper.selectIdByOpenId(openId);
+//        Integer userId = 303;
         int answerAmount = 0;
         if (openId != null) {
             List<OrganizationQuestionAnswerData> organizationQuestionAnswerDataList = new ArrayList<>();
 //            List<RegistrationForm> registrationForms = registrationFromMapper.selectByAdmissionId(admissionId);
 
-            List<AdmissionQuestion> admissionQuestionList = admissionQuestionMapper.selectList(new QueryWrapper<AdmissionQuestion>().eq("admission_id", admissionId));
+
+            List<AdmissionQuestion> admissionQuestionList;
+            Object o = redisUtil.get("admissionQuestionList" + admissionId);
+            if (o == null) {
+                admissionQuestionList =
+                        admissionQuestionMapper.selectList(new QueryWrapper<AdmissionQuestion>().eq("admission_id", admissionId));
+                redisUtil.set("admissionQuestionList" + admissionId, admissionQuestionList, 1L, TimeUnit.HOURS);
+
+            } else {
+                admissionQuestionList = (List<AdmissionQuestion>) o;
+            }
+
+            Map<Integer, QuestionData> questionDataMap = new HashMap<>();
+            Object o1 = redisUtil.get("questionDataMap");
+            if (o1 == null) {
+                for (QuestionData questionData : questionDataMapper.selectList(new QueryWrapper<>())) {
+                    questionDataMap.put(questionData.getId(), questionData);
+                }
+
+                redisUtil.set("questionDataMap", questionDataMap, 1L, TimeUnit.HOURS);
+
+            } else {
+                questionDataMap = (Map<Integer, QuestionData>) o1;
+            }
+
+//            List<AdmissionQuestion> admissionQuestionList = admissionQuestionMapper.selectList(new QueryWrapper<AdmissionQuestion>().eq("admission_id", admissionId));
 
             for (AdmissionQuestion admissionQuestion : admissionQuestionList) {
 
@@ -348,7 +475,9 @@ public class COrganizationInterviewImpl implements COrganizationInterviewService
                                 .eq("admission_question_id", admissionQuestion.getQuestionId())
                 );
 
-                QuestionData questionData = questionDataMapper.selectById(admissionQuestion.getQuestionId());
+//                QuestionData questionData = questionDataMapper.selectById(admissionQuestion.getQuestionId());
+
+                QuestionData questionData = questionDataMap.get(admissionQuestion.getQuestionId().toString());
 
                 if (registrationFromData.isEmpty()) continue;
                 if (registrationFromData.size() != 1) return CommonResult.serverError();
