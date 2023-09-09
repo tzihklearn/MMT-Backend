@@ -16,22 +16,35 @@
         where id = #{messageId}
     </update>
     <select id="selectNewestMessageByUserId" resultType="com.sipc.mmtbackend.pojo.c.domain.po.Message.MessagePo">
-        SELECT *
-        FROM (SELECT m.message,
-                     m.time,
-                     o.NAME,
-                     o.id         AS organizationId,
-                     o.avatar_id as avatarUrl
-              FROM message m
-                       LEFT JOIN organization o ON m.organization_id = o.id
-              WHERE m.id IN (SELECT max(m.id)
-                             FROM message m
-                                      LEFT JOIN organization o ON m.organization_id = o.id
-                             WHERE m.user_id = #{userId}
-                               and m.is_deleted != 1
-                               and o.is_deleted != 1
-              GROUP BY m.organization_id)) as result
-            and m.is_deleted != 1
+        SELECT
+            *
+        FROM
+            (
+                SELECT
+                    m.message,
+                    m.TIME,
+                    o.NAME,
+                    o.id AS organizationId,
+                    o.avatar_id AS avatarUrl
+                FROM
+                    message m
+                        LEFT JOIN organization o ON m.organization_id = o.id
+                WHERE
+                        m.id IN (
+                        SELECT
+                            max( m.id )
+                        FROM
+                            message m
+                                LEFT JOIN organization o ON m.organization_id = o.id
+                        WHERE
+                            m.user_id = #{userId,jdbcType=INTEGER}
+                          AND m.is_deleted != 1
+                  AND o.is_deleted != 1
+                GROUP BY
+                    m.organization_id
+            )) AS result
+        ORDER BY
+            result.`time` DESC;
         ORDER BY time DESC;
     </select>
     <select id="selectCountForUnreadMessage" resultType="java.lang.Integer">
