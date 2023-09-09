@@ -2,7 +2,6 @@ package com.sipc.mmtbackend.mapper.c;
 
 import com.sipc.mmtbackend.pojo.c.domain.UserDepartmentRegistration;
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 

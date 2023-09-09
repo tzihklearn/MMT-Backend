@@ -83,11 +83,11 @@ public class ShowOrganizationServiceImpl implements ShowOrganizationService {
 
         String avatarUrl;
 
-        if (organization.getAvatarId() == null || organization.getAvatarId().isEmpty()) {
-            avatarUrl = pictureUtil.getPictureURL(DefaultPictureIdEnum.ORG_AVATAR.getPictureId(), true);
-        } else {
-            avatarUrl = pictureUtil.getPictureURL(organization.getAvatarId(), false);
-        }
+//        if (organization.getAvatarId() == null || organization.getAvatarId().isEmpty()) {
+//            avatarUrl = pictureUtil.getPictureURL(DefaultPictureIdEnum.ORG_AVATAR.getPictureId(), true);
+//        } else {
+//            avatarUrl = pictureUtil.getPictureURL(organization.getAvatarId(), false);
+//        }
 
         //TODO:更改图像链接
         avatarUrl = organization.getAvatarId();

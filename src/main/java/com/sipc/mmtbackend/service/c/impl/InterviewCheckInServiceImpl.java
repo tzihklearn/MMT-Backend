@@ -1,8 +1,6 @@
 package com.sipc.mmtbackend.service.c.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.sipc.mmtbackend.controller.c.UpdateUserInfoController;
-import com.sipc.mmtbackend.mapper.InterviewStatusMapper;
 import com.sipc.mmtbackend.mapper.OrganizationMapper;
 import com.sipc.mmtbackend.mapper.c.CheckInMapper;
 import com.sipc.mmtbackend.pojo.c.param.InterviewCheckInParam;
@@ -17,7 +15,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Objects;

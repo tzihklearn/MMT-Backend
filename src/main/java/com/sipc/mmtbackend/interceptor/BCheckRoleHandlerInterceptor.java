@@ -28,7 +28,7 @@ import java.util.Objects;
 @RequiredArgsConstructor(onConstructor_ = {@Autowired})
 public class BCheckRoleHandlerInterceptor implements HandlerInterceptor {
 
-    private final CheckRoleUtil checkRoleUtil;
+//    private final CheckRoleUtil checkRoleUtil;
 
     private final JWTUtil jwtUtil;
 
