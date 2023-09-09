@@ -1,6 +1,6 @@
 package com.sipc.mmtbackend.service.c.impl;
 
-import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -16,7 +16,6 @@ import com.sipc.mmtbackend.pojo.c.param.RegistrationFormParam;
 import com.sipc.mmtbackend.pojo.c.result.*;
 import com.sipc.mmtbackend.pojo.domain.*;
 import com.sipc.mmtbackend.pojo.dto.CommonResult;
-import com.sipc.mmtbackend.pojo.dto.data.DepartmentQuestionData;
 
 import com.sipc.mmtbackend.pojo.dto.resultEnum.ResultEnum;
 import com.sipc.mmtbackend.service.c.CacheService;
