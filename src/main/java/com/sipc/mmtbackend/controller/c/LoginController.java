@@ -36,7 +36,7 @@ public class LoginController {
      * @return
      * 授权成功之后添加cookie，openid=xx
      */
-    @PostMapping("/login/c")
+    @PostMapping("/c/login")
     public CommonResult<NoData> loginC(@NotNull(message = "jsCode不能为空") @RequestBody() @Validated JsCodeParam jsCode) {
         return loginService.loginC(jsCode,httpServletRequest, httpServletResponse);
     }

@@ -6,6 +6,12 @@
         values (#{userId,jdbcType=INTEGER}, #{round,jdbcType=INTEGER}, #{admissionId,jdbcType=INTEGER},
                 #{departmentId,jdbcType=INTEGER})
     </insert>
+    <delete id="deleteByUserIdAndAdmissionId">
+        delete
+        from interview_status
+        where user_id = #{userId,jdbcType=INTEGER}
+          and admission_id = #{admissionId,jdbcType=INTEGER}
+    </delete>
 
     <select id="selectAllArrange" resultType="com.sipc.mmtbackend.pojo.domain.InterviewStatus">
         SELECT i.department_id        as departmentId,

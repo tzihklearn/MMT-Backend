@@ -10,14 +10,13 @@ import com.sipc.mmtbackend.pojo.dto.CommonResult;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.text.ParseException;
 
 /**
  * @Author yuleng
  * @Date 2022/8/11
  * @Version 3.0
  */
-public interface OrganizationInterviewService {
+public interface COrganizationInterviewService {
 
 
     CommonResult<RegistrationFormParam> setRegistrationForm(RegistrationFormParam registrationFormParam,

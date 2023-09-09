@@ -18,7 +18,7 @@ import com.sipc.mmtbackend.pojo.dto.CommonResult;
 
 import com.sipc.mmtbackend.pojo.dto.resultEnum.ResultEnum;
 import com.sipc.mmtbackend.service.c.CacheService;
-import com.sipc.mmtbackend.service.c.OrganizationInterviewService;
+import com.sipc.mmtbackend.service.c.COrganizationInterviewService;
 import com.sipc.mmtbackend.utils.JsonUtil;
 import com.sipc.mmtbackend.utils.checkRoleUtils.CheckRole;
 import com.sipc.mmtbackend.utils.checkRoleUtils.param.CheckResultParam;
@@ -36,7 +36,7 @@ import java.util.logging.Logger;
  * @Version 3.2
  */
 @Service
-public class OrganizationInterviewImpl implements OrganizationInterviewService {
+public class COrganizationInterviewImpl implements COrganizationInterviewService {
 
     Logger log = Logger.getLogger("OrganizationInterviewImpl");
 
@@ -72,11 +72,11 @@ public class OrganizationInterviewImpl implements OrganizationInterviewService {
     private QuestionDataMapper questionDataMapper;
 
     @Resource
-    private UpdateUserInfoController updateUserInfoController;
+    UpdateUserInfoController updateUserInfoController;
     @Resource
     private CacheService cacheService;
     @Resource
-    private JsonUtil jsonUtil;
+    JsonUtil jsonUtil;
 
     /**
      * 报名表提交
@@ -330,24 +330,67 @@ public class OrganizationInterviewImpl implements OrganizationInterviewService {
         int answerAmount = 0;
         if (openId != null) {
             List<OrganizationQuestionAnswerData> organizationQuestionAnswerDataList = new ArrayList<>();
-            List<RegistrationForm> registrationForms = registrationFromMapper.selectByAdmissionId(admissionId);
-            for (RegistrationForm form : registrationForms) {
-                List<CRegistrationFormData> registrationFormData =
-                        registrationFromDataMapper.selectByUserIdAndFieldId(userId, form.getId());
-                if (registrationFormData.size() == 0) continue;
-                if (registrationFormData.size() != 1) return CommonResult.serverError();
+//            List<RegistrationForm> registrationForms = registrationFromMapper.selectByAdmissionId(admissionId);
+
+            List<AdmissionQuestion> admissionQuestionList = admissionQuestionMapper.selectList(new QueryWrapper<AdmissionQuestion>().eq("admission_id", admissionId));
+
+            for (AdmissionQuestion admissionQuestion : admissionQuestionList) {
+
+                List<RegistrationFromData> registrationFromData = registrationFromDataMapper.selectList(
+                        new QueryWrapper<RegistrationFromData>()
+                                .eq("user_id", userId)
+                                .eq("admission_question_id", admissionQuestion.getQuestionId())
+                );
+
+                QuestionData questionData = questionDataMapper.selectById(admissionQuestion.getQuestionId());
+
+                if (registrationFromData.isEmpty()) continue;
+                if (registrationFromData.size() != 1) return CommonResult.serverError();
                 OrganizationQuestionAnswerData temp = new OrganizationQuestionAnswerData();
-                temp.setQuestionId(form.getId());
-                temp.setType(String.valueOf(form.getRemark()));
-                temp.setQuestionOrder(form.getQuestionOrder());
-                temp.setDescription(form.getQuestion());
-                temp.setSelection(form.getType().equals("1"));
-                temp.setAnswer(registrationFormData.get(0).getData());
+                temp.setQuestionId(admissionQuestion.getQuestionId());
+
+                switch (questionData.getType()) {
+                    case 1:
+                        temp.setType(String.valueOf(-1));
+                        break;
+                    case 3:
+                        temp.setType(String.valueOf(0));
+                        break;
+                    case 2:
+                        temp.setType(String.valueOf(admissionQuestion.getDepartmentId()));
+                        break;
+                }
+
+//                temp.setType(String.valueOf(form.getRemark()));
+                temp.setQuestionOrder(admissionQuestion.getOrder());
+                temp.setDescription(questionData.getQuestion());
+
+                temp.setSelection(questionData.getType() == 1 || questionData.getType() == 2 || questionData.getType() == 3);
+
+                temp.setSelection(questionData.getType().equals("1"));
+
+                temp.setAnswer(registrationFromData.get(0).getData());
                 organizationQuestionAnswerDataList.add(temp);
                 answerAmount++;
             }
+
+//            for (RegistrationForm form : registrationForms) {
+//                List<CRegistrationFormData> registrationFormData =
+//                        registrationFromDataMapper.selectByUserIdAndFieldId(userId, form.getId());
+//                if (registrationFormData.size() == 0) continue;
+//                if (registrationFormData.size() != 1) return CommonResult.serverError();
+//                OrganizationQuestionAnswerData temp = new OrganizationQuestionAnswerData();
+//                temp.setQuestionId(form.getId());
+//                temp.setType(String.valueOf(form.getRemark()));
+//                temp.setQuestionOrder(form.getQuestionOrder());
+//                temp.setDescription(form.getQuestion());
+//                temp.setSelection(form.getType().equals("1"));
+//                temp.setAnswer(registrationFormData.get(0).getData());
+//                organizationQuestionAnswerDataList.add(temp);
+//                answerAmount++;
+//            }
             OrganizationQuestionAnswerResult result = new OrganizationQuestionAnswerResult();
-            if (answerAmount != registrationForms.size()) {
+            if (answerAmount != admissionQuestionList.size()) {
                 result.setStatus("该用户并未完成所有回答");
             } else {
                 result.setStatus("一切正常");

@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sipc.mmtbackend.mapper.c.RegistrationFromJsonMapper">
+    <resultMap id="BaseResultMap" type="com.sipc.mmtbackend.pojo.c.domain.RegistrationFormJson">
+        <id column="user_id" jdbcType="INTEGER" property="userId"/>
+        <id column="admission_id" jdbcType="INTEGER" property="admissionId"/>
+        <result column="json" jdbcType="VARCHAR" property="json"/>
+        <result column="time" jdbcType="BIGINT" property="time"/>
+    </resultMap>
+
+<!--    <select id="selectByAdmissionId" parameterType="java.lang.Integer" resultMap="BaseResultMap">-->
+<!--        select *-->
+<!--        FROM registration_form_json-->
+<!--        WHERE admission_id = #{admissionId, jdbcType=INTEGER}-->
+<!--    </select>-->
+
+<!--    <select id="selectByUserIdAndTime" parameterType="java.lang.Long" resultMap="BaseResultMap">-->
+<!--        select *-->
+<!--        from registration_form_json-->
+<!--        where time between #{startTime, jdbcType=BIGINT} and #{endTime, jdbcType = BIGINT}-->
+<!--        <if test="userIds != null and userIds.size() > 0">-->
+<!--            and user_id in-->
+<!--            <foreach collection="userIds" item="userId" separator="," open="(" close=")">-->
+<!--                #{userId}-->
+<!--            </foreach>-->
+<!--        </if>-->
+<!--    </select>-->
+
+<!--    <select id="selectByTime" parameterType="java.lang.Long" resultMap="BaseResultMap">-->
+<!--        select *-->
+<!--        from registration_form_json-->
+<!--        where time between #{startTime, jdbcType=BIGINT}-->
+<!--                  and #{endTime, jdbcType = BIGINT}-->
+<!--    </select>-->
+
+<!--    <select id="selectUserIdByAdmissionId" parameterType="java.lang.Integer" resultType="java.lang.Integer">-->
+<!--        select user_id-->
+<!--        from registration_form_json-->
+<!--        where admission_id = #{admissionId, jdbcType=INTEGER}-->
+<!--    </select>-->
+
+<!--    <select id="selectByAdmissionIdAndUserIds" resultMap="BaseResultMap">-->
+<!--        select *-->
+<!--        from registration_form_json-->
+<!--        where admission_id = #{admissionId, jdbcType=INTEGER}-->
+<!--        <if test="userIds != null and userIds.size() > 0">-->
+<!--            and user_id in-->
+<!--            <foreach collection="userIds" item="userId" separator="," open="(" close=")">-->
+<!--                #{userId}-->
+<!--            </foreach>-->
+<!--        </if>-->
+<!--    </select>-->
+
+    <insert id="insert" parameterType="com.sipc.mmtbackend.pojo.c.domain.RegistrationFormJson">
+        insert into registration_from_json (user_id, admission_id, json, time, is_reallocation)
+        VALUES (#{userId,jdbcType=INTEGER}, #{admissionId,jdbcType=INTEGER}, #{json,jdbcType=VARCHAR},
+                #{time,jdbcType=BIGINT}, #{isReallocation,jdbcType=INTEGER})
+    </insert>
+
+    <update id="updateByUserIdAndAdmissionId" parameterType="com.sipc.mmtbackend.pojo.c.domain.RegistrationFormJson">
+        update registration_from_json
+        set user_id      = #{userId,jdbcType=INTEGER},
+            admission_id = #{admissionId,jdbcType=INTEGER},
+            json         = #{json,jdbcType=VARCHAR},
+            time         = #{time,jdbcType=BIGINT}
+        where user_id = #{userId,jdbcType=INTEGER}
+          and admission_id = #{admissionId,jdbcType=INTEGER}
+    </update>
+
+    <select id="selectByAdmissionIdAndUserId" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+        select count(*)
+        from registration_from_json
+        where user_id = #{userId,jdbcType=INTEGER}
+          and admission_id = #{admissionId,jdbcType=INTEGER}
+    </select>
+<!--    <select id="selectUserIdsByAdmissionIdAndOrder1AndTime" resultType="java.lang.Integer">-->
+<!--        select rfj.user_id-->
+<!--        from registration_form_json as rfj-->
+<!--        left join user_department_registration as udr on udr.user_id =  rfj.user_id and udr.admission_id = rfj.admission_id-->
+<!--        where rfj.admission_id = #{admissionId,jdbcType=INTEGER}-->
+<!--            and udr.department_id = #{departmentId,jdbcType=INTEGER}-->
+<!--            and udr.organization_order = 1-->
+<!--            and udr.department_order = 1-->
+<!--            and rfj.time between #{startTime, jdbcType=BIGINT} and #{endTime, jdbcType = BIGINT}-->
+<!--        group by user_id-->
+<!--    </select>-->
+<!--    <select id="selectUserIdsByAdmissionIdAndDepartmentOrderAndTime" resultType="java.lang.Integer">-->
+<!--        select rfj.user_id-->
+<!--        from registration_form_json as rfj-->
+<!--                 left join user_department_registration as udr on udr.user_id =  rfj.user_id and udr.admission_id = rfj.admission_id-->
+<!--        where rfj.admission_id = #{admissionId,jdbcType=INTEGER}-->
+<!--          and udr.department_id = #{departmentId,jdbcType=INTEGER}-->
+<!--          and udr.organization_order = 1-->
+<!--          and udr.department_order = #{departmentOrder,jdbcType=INTEGER}-->
+<!--          and rfj.time between #{startTime, jdbcType=BIGINT} and #{endTime, jdbcType = BIGINT}-->
+<!--        group by user_id-->
+<!--    </select>-->
+<!--    <select id="selectUserIdsByAdmissionIdAndDepartmentIdAndOrdder1" resultType="java.lang.Integer">-->
+<!--        select rfj.user_id-->
+<!--        from registration_form_json as rfj-->
+<!--                 left join user_department_registration as udr on udr.user_id =  rfj.user_id and udr.admission_id = rfj.admission_id-->
+<!--        where rfj.admission_id = #{admissionId,jdbcType=INTEGER}-->
+<!--          and udr.department_id = #{departmentId,jdbcType=INTEGER}-->
+<!--          and udr.organization_order = 1-->
+<!--          and udr.department_order = 1-->
+<!--        group by user_id-->
+<!--    </select>-->
+
+
+</mapper>

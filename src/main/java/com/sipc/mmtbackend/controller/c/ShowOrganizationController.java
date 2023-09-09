@@ -15,7 +15,7 @@ import java.util.List;
  */
 
 @RestController
-@RequestMapping(value = "/show-organizations", method = RequestMethod.GET)
+@RequestMapping(value = "/c/show-organizations", method = RequestMethod.GET)
 public class ShowOrganizationController {
 
     private final ShowOrganizationService showOrganizationService;

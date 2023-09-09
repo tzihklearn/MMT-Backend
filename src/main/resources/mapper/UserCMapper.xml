@@ -81,7 +81,7 @@
         where openid = #{openid,jdbcType=VARCHAR}
     </update>
 
-    <update id="updateByStudentIdSelective" parameterType="com.sipc.mmtbackend.pojo.domain.User">
+    <update id="updateByStudentIdSelective" parameterType="com.sipc.mmtbackend.pojo.c.domain.UserC">
         update user_c
         <set>
             <if test="name != null">
@@ -97,7 +97,7 @@
         where student_id = #{studentId,jdbcType=INTEGER}
     </update>
 
-    <update id="updateByPrimaryKey" parameterType="com.sipc.mmtbackend.pojo.domain.User">
+    <update id="updateByPrimaryKey" parameterType="com.sipc.mmtbackend.pojo.c.domain.UserC">
         update user_c
         <set>
             <if test="studentId != null">
@@ -128,7 +128,7 @@
         where openid = #{openid,jdbcType=VARCHAR}
     </select>
 
-    <select id="selectByStudentIdAndPassword" parameterType="com.sipc.mmtbackend.pojo.dto.param.LoginParam"
+    <select id="selectByStudentIdAndPassword" parameterType="com.sipc.mmtbackend.pojo.c.param.LoginParam"
             resultMap="BaseResultMap">
         select *
         from user_c
@@ -183,7 +183,7 @@
         from user_c
         where id = #{id, jdbcType=INTEGER}
     </select>
-    <select id="selectAllByStudentIdUser" resultType="com.sipc.mmtbackend.pojo.domain.User">
+    <select id="selectAllByStudentIdUser" resultType="com.sipc.mmtbackend.pojo.c.domain.UserC">
         select *
         from user_c
         where student_id = #{studentId,jdbcType=INTEGER}
