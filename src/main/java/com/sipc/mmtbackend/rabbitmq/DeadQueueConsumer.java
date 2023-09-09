@@ -1,8 +1,6 @@
 package com.sipc.mmtbackend.rabbitmq;
 
-import com.sipc.mmtbackend.config.DirectRabbitConfig;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.amqp.rabbit.annotation.RabbitListener;
 
 /**
  * @author tzih

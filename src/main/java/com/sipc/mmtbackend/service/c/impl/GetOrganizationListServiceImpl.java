@@ -84,7 +84,7 @@ public class GetOrganizationListServiceImpl implements GetOrganizationListServic
 
     }
 
-    @Cacheable(value = "getOrganizationListMethod")
+//    @Cacheable(value = "getOrganizationListMethod")
     public OrganizationListResult getOrganizationListMethod() {
 
 
@@ -114,15 +114,15 @@ public class GetOrganizationListServiceImpl implements GetOrganizationListServic
             List<String> tags = tagMapper.selectNameByTagIds(tagIds);
 
             String avatarUrl;
-
-            if (organization.getAvatarId() == null || organization.getAvatarId().isEmpty()) {
-                avatarUrl = pictureUtil.getPictureURL(DefaultPictureIdEnum.ORG_AVATAR.getPictureId(), true);
-            } else {
-                avatarUrl = pictureUtil.getPictureURL(organization.getAvatarId(), false);
-            }
+//
+//            if (organization.getAvatarId() == null || organization.getAvatarId().isEmpty()) {
+//                avatarUrl = pictureUtil.getPictureURL(DefaultPictureIdEnum.ORG_AVATAR.getPictureId(), true);
+//            } else {
+//                avatarUrl = pictureUtil.getPictureURL(organization.getAvatarId(), false);
+//            }
 
 //
-//            avatarUrl = organization.getAvatarId();
+            avatarUrl = organization.getAvatarId();
 
             if (admission == null) {
                 String registrationTime = "未开始";

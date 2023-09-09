@@ -1,7 +1,6 @@
 package com.sipc.mmtbackend.rabbitmq;
 
 import com.sipc.mmtbackend.config.DirectRabbitConfig;
-import com.sipc.mmtbackend.controller.c.UpdateUserInfoController;
 import com.sipc.mmtbackend.mapper.*;
 import com.sipc.mmtbackend.mapper.c.*;
 import com.sipc.mmtbackend.pojo.c.domain.CRegistrationFormData;
@@ -18,7 +17,6 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;

@@ -1,9 +1,6 @@
 package com.sipc.mmtbackend.generator;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sipc.mmtbackend.pojo.dto.data.QuestionValueListData;
-import com.sipc.mmtbackend.pojo.dto.data.QuestionValueData;
-import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;

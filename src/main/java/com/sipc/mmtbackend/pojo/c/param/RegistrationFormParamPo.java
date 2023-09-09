@@ -2,8 +2,6 @@ package com.sipc.mmtbackend.pojo.c.param;
 
 import lombok.Data;
 
-import java.util.List;
-
 /**
  * @author tzih
  * @version v1.0
