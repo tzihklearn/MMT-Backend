@@ -5,6 +5,7 @@ import com.sipc.mmtbackend.pojo.domain.Message;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,7 +19,7 @@ import java.util.List;
  */
 @Mapper
 public interface MessageMapper extends BaseMapper<Message> {
-    Boolean insertMessage(String message, Long time, Integer state, Integer isRead, Integer organizationId,
+    Boolean insertMessage(String message, LocalDateTime time, Integer state, Integer isRead, Integer organizationId,
                           Integer userId, Integer type, Integer interviewStatusId);
 
     ArrayList<MessagePo> selectNewestMessageByUserId(Integer userId);

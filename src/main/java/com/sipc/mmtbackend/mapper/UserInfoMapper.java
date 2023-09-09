@@ -19,7 +19,9 @@ public interface UserInfoMapper extends BaseMapper<UserInfo> {
 
     Boolean updateSecondInfo(String phoneNum, String email, String qqNum, Integer studentId);
 
-    Boolean updateAll(Integer userId, String name, Integer studentId, Integer gender, String academy, String major, String classNum, String phoneNum, String email, String qqNum, Integer isCertification);
+//    Boolean updateAll(Integer userId, String name, Integer studentId, Integer gender, String academy, String major, String classNum, String phoneNum, String email, String qqNum, Integer isCertification);
+
+    Boolean updateAll(Integer userId, String name, Integer studentId, Integer gender, Integer acaId, Integer majorId, String classNum, String phoneNum, String email, String qqNum, Integer isCertification);
 
     Integer selectStudentIdForInject(Integer studentId);
 

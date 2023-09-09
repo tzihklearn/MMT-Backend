@@ -27,6 +27,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.logging.Logger;
 
@@ -204,8 +205,8 @@ public class COrganizationInterviewImpl implements COrganizationInterviewService
                     ObjectMapper objectMapper = new ObjectMapper();
 
                     Object[] sArray = objectMapper.readValue(questionData.getValue(), List.class).toArray();
-                    String question = sArray[0].toString();
-                    questionDataTemp.setDescription(question);
+//                    String question = sArray[0].toString();
+                    questionDataTemp.setDescription(questionData.getQuestion());
                     questionDataTemp.setOption(sArray[1].toString());
                 } else if (questionData.getSelectTypeId() == 4) {
                     questionDataTemp.setDescription(questionData.getQuestion());
@@ -214,12 +215,16 @@ public class COrganizationInterviewImpl implements COrganizationInterviewService
                 questionDataTemp.setQuestionOrder(amount.getOrder());
                 questionDataTemp.setQuestionId(amount.getId());
 
-                if (questionData.getType() == 1) {
-                    questionDataTemp.setType(String.valueOf(-1));
-                } else if (questionData.getType() == 3) {
-                    questionDataTemp.setType(String.valueOf(0));
-                } else if (questionData.getType() == 2) {
-                    questionDataTemp.setType(String.valueOf(amount.getDepartmentId()));
+                switch (amount.getQuestionType()) {
+                    case 1:
+                        questionDataTemp.setType(String.valueOf(-1));
+                        break;
+                    case 3:
+                        questionDataTemp.setType(String.valueOf(0));
+                        break;
+                    case 2:
+                        questionDataTemp.setType(String.valueOf(amount.getDepartmentId()));
+                        break;
                 }
 
 //                questionDataTemp.setType(String.valueOf(amount.getRemark()));
@@ -349,7 +354,7 @@ public class COrganizationInterviewImpl implements COrganizationInterviewService
                 OrganizationQuestionAnswerData temp = new OrganizationQuestionAnswerData();
                 temp.setQuestionId(admissionQuestion.getQuestionId());
 
-                switch (questionData.getType()) {
+                switch (admissionQuestion.getQuestionType()) {
                     case 1:
                         temp.setType(String.valueOf(-1));
                         break;
@@ -422,7 +427,10 @@ public class COrganizationInterviewImpl implements COrganizationInterviewService
         if (openId != null) {
             Admission admission = admissionMapper.selectById(admissionId);
             Organization organization = organizationMapper.selectById(admission.getOrganizationId());
-            messageMapper.insertMessage("已将报名表信息发送给" + organization.getName(), System.currentTimeMillis() / 1000, 0,
+//            messageMapper.insertMessage("已将报名表信息发送给" + organization.getName(), System.currentTimeMillis() / 1000, 0,
+//                    -1, admission.getOrganizationId(), userId, 3, 0);
+
+            messageMapper.insertMessage("已将报名表信息发送给" + organization.getName(), LocalDateTime.now(), 0,
                     -1, admission.getOrganizationId(), userId, 3, 0);
             return CommonResult.success();
         } else {

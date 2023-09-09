@@ -15,6 +15,23 @@
         </if>
         where student_id = #{studentId}
     </update>
+<!--    <update id="updateAll">-->
+<!--        update user_info-->
+<!--        set student_id       = #{studentId,jdbcType=INTEGER},-->
+<!--            name     = #{name,jdbcType=VARCHAR},-->
+<!--            gander           = #{gender,jdbcType=TINYINT},-->
+<!--            phone            =#{phoneNum,jdbcType=VARCHAR},-->
+<!--            class_num        = #{classNum,jdbcType=CHAR},-->
+<!--            email            = #{email,jdbcType=VARCHAR},-->
+<!--            qq               = #{qqNum,jdbcType=VARCHAR},-->
+<!--            is_certification = #{isCertification,jdbcType=TINYINT},-->
+<!--            aca_major_id     = (select id-->
+<!--                                from aca_major-->
+<!--                                where academy = #{academy,jdbcType=VARCHAR}-->
+<!--                                  and major = #{major,jdbcType=VARCHAR})-->
+<!--        where id = #{userId,jdbcType=INTEGER}-->
+<!--    </update>-->
+
     <update id="updateAll">
         update user_info
         set student_id       = #{studentId,jdbcType=INTEGER},
@@ -25,10 +42,8 @@
             email            = #{email,jdbcType=VARCHAR},
             qq               = #{qqNum,jdbcType=VARCHAR},
             is_certification = #{isCertification,jdbcType=TINYINT},
-            aca_major_id     = (select id
-                                from aca_major
-                                where academy = #{academy,jdbcType=VARCHAR}
-                                  and major = #{major,jdbcType=VARCHAR})
+            aca_major_id     = #{acaId,jdbcType=INTEGER},
+            major_class_id   = #{majorId,jdbcType=INTEGER}
         where id = #{userId,jdbcType=INTEGER}
     </update>
 

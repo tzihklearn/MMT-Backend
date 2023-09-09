@@ -21,7 +21,7 @@
                      m.time,
                      o.NAME,
                      o.id         AS organizationId,
-                     o.avatar_url as avatarUrl
+                     o.avatar_id as avatarUrl
               FROM message m
                        LEFT JOIN organization o ON m.organization_id = o.id
               WHERE m.id IN (SELECT max(m.id)
