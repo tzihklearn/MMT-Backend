@@ -35,40 +35,42 @@ public class BCheckRoleHandlerInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler) {
 
-        HandlerMethod handlerMethod = (HandlerMethod) handler;
 
-        /*
+        if (handler instanceof HandlerMethod) {
+            HandlerMethod handlerMethod = (HandlerMethod) handler;
+/*
           获取token,并且解析token信息
          */
-        String token = request.getHeader("Authorization");
-        if (token != null) {
+            String token = request.getHeader("Authorization");
+            if (token != null) {
             /*
                 获取请求url，如果不存在则返回false,拒绝请求
             */
-            String requestURI = request.getRequestURI();
-            if (requestURI != null) {
-                BTokenSwapPo bTokenSwapPo = jwtUtil.verifyToken(token);
-                if (bTokenSwapPo != null) {
+                String requestURI = request.getRequestURI();
+                if (requestURI != null) {
+                    BTokenSwapPo bTokenSwapPo = jwtUtil.verifyToken(token);
+                    if (bTokenSwapPo != null) {
                     /*
                       校验B端用户权限
                      */
 
-                    boolean isPermission = CheckPermissionUtil.checkBPermission(handlerMethod, bTokenSwapPo.getPermissionId());
-                    //权限不符合，返回false
-                    if (!isPermission) {
-                        setResponse(response, CommonResult.userAuthError());
-                        return false;
+                        boolean isPermission = CheckPermissionUtil.checkBPermission(handlerMethod, bTokenSwapPo.getPermissionId());
+                        //权限不符合，返回false
+                        if (!isPermission) {
+                            setResponse(response, CommonResult.userAuthError());
+                            return false;
+                        }
+
+                        //将token解析出的用户信息放入本地线程变量
+                        ThreadLocalContextUtil.setTHREAD_LOCAL_Context(bTokenSwapPo);
+                        return true;
+
                     }
-
-                    //将token解析出的用户信息放入本地线程变量
-                    ThreadLocalContextUtil.setTHREAD_LOCAL_Context(bTokenSwapPo);
-                    return true;
-
                 }
             }
-        }
 
-        setResponse(response, CommonResult.userAuthError());
+            setResponse(response, CommonResult.userAuthError());
+        }
 
         return false;
     }
