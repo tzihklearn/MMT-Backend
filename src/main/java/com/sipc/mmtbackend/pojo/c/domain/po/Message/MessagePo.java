@@ -3,6 +3,8 @@ package com.sipc.mmtbackend.pojo.c.domain.po.Message;
 
 import lombok.Data;
 
+import java.time.LocalDateTime;
+
 @Data
 public class MessagePo {
 
@@ -29,7 +31,7 @@ public class MessagePo {
     /**
      * 用户收到最新消息的时间
      */
-    private Long time;
+    private LocalDateTime time;
 
     /**
      * 组织未读消息的数量

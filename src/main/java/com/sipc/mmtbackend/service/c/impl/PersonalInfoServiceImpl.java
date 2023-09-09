@@ -219,6 +219,9 @@ public class PersonalInfoServiceImpl implements PersonalInfoService {
                     avatarUrl = pictureUtil.getPictureURL(organization.getAvatarId(), false);
                 }
 
+                //TODO:社团头像临时处理
+                avatarUrl = organization.getAvatarId();
+
                 organizationLogoUrl = avatarUrl;
                 if (Objects.isNull(organizationLogoUrl)) continue;
             } catch (NullPointerException e) {

@@ -2,9 +2,9 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.sipc.mmtbackend.mapper.InterviewStatusMapper">
     <insert id="insertUserIdAndUserIdAndRoundAndAdmissionIdAndDepartmentId">
-        insert into interview_status(user_id, round, admission_id, department_id)
+        insert into interview_status(user_id, round, admission_id, department_id, organization_order, department_order)
         values (#{userId,jdbcType=INTEGER}, #{round,jdbcType=INTEGER}, #{admissionId,jdbcType=INTEGER},
-                #{departmentId,jdbcType=INTEGER})
+                #{departmentId,jdbcType=INTEGER}, #{organizationOrder,jdbcType=INTEGER}, #{departmentOrder,jdbcType=INTEGER})
     </insert>
     <delete id="deleteByUserIdAndAdmissionId">
         delete
@@ -13,14 +13,22 @@
           and admission_id = #{admissionId,jdbcType=INTEGER}
     </delete>
 
+<!--    <select id="selectAllArrange" resultType="com.sipc.mmtbackend.pojo.domain.InterviewStatus">-->
+<!--        SELECT i.department_id        as departmentId,-->
+<!--               i.start_time           as startTime,-->
+<!--               i.round                as round,-->
+<!--               i.state                as `status`,-->
+<!--               i.admission_address_id as admissionAddressId-->
+<!--        from user_info u-->
+<!--                 LEFT JOIN interview_status i on u.id = i.user_id-->
+<!--        where u.student_id = #{studetId}-->
+<!--    </select>-->
+
     <select id="selectAllArrange" resultType="com.sipc.mmtbackend.pojo.domain.InterviewStatus">
-        SELECT i.department_id        as departmentId,
-               i.start_time           as startTime,
-               i.round                as round,
-               i.state                as `status`,
-               i.admission_address_id as admissionAddressId
+        SELECT *
         from user_info u
                  LEFT JOIN interview_status i on u.id = i.user_id
         where u.student_id = #{studetId}
     </select>
+
 </mapper>

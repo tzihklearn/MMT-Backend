@@ -85,7 +85,7 @@ public class MessageServiceImpl implements MessageService {
             result.setOrganizationName(messagePo.getName());
             result.setMessage(message);
             result.setUnread(count);
-            result.setTime(TimeUtil.EasyRead(messagePo.getTime()));
+            result.setTime(TimeUtil.EasyRead(messagePo.getTime().toEpochSecond(ZoneOffset.of("+8"))));
             results.add(result);
         }
         return CommonResult.success(results);
@@ -141,7 +141,7 @@ public class MessageServiceImpl implements MessageService {
             result.setOrganization(organization.getName());
             result.setMessageId(message.getId());
             result.setMessage(message.getMessage());
-            result.setTime(TimeUtil.EasyRead(message.getTime().toInstant(ZoneOffset.of("+8")).toEpochMilli()));
+            result.setTime(TimeUtil.EasyRead(message.getTime().toEpochSecond(ZoneOffset.of("+8"))));
             result.setIsread(message.getIsRead().intValue());
             result.setStatus(message.getState());
             results.add(result);
@@ -204,6 +204,9 @@ public class MessageServiceImpl implements MessageService {
         if (interviewStatus == null
                 || interviewStatus.getState() != 3)
             return CommonResult.serverError();
+//        if (interviewStatus == null
+//                || interviewStatus.getState() != 0)
+//            return CommonResult.serverError();
         int result = messageMapper.updateState(param.getMessageId(), param.getState());
         if (result == 1) {
             switch (param.getState()) {

@@ -139,7 +139,7 @@ public class COrganizationInterviewImpl implements COrganizationInterviewService
                     setOrder(userId, registrationFormParam, orderId.get(i),
                             registrationFormParam.getOrganizationOrder(), i);
                     interviewStatusMapper.insertUserIdAndUserIdAndRoundAndAdmissionIdAndDepartmentId(userId, 1,
-                            registrationFormParam.getAdmissionId(), orderId.get(i));
+                            registrationFormParam.getAdmissionId(), orderId.get(i), registrationFormParam.getOrganizationOrder(), i+1);
                 }
             }
             for (AnswerData answer : registrationFormParam.getQuestionAnswerList()) {
@@ -206,8 +206,9 @@ public class COrganizationInterviewImpl implements COrganizationInterviewService
 
                     Object[] sArray = objectMapper.readValue(questionData.getValue(), List.class).toArray();
 //                    String question = sArray[0].toString();
+
                     questionDataTemp.setDescription(questionData.getQuestion());
-                    questionDataTemp.setOption(sArray[1].toString());
+                    questionDataTemp.setOption(Arrays.toString(sArray).substring(1, Arrays.toString(sArray).length() -1));
                 } else if (questionData.getSelectTypeId() == 4) {
                     questionDataTemp.setDescription(questionData.getQuestion());
                     questionDataTemp.setSelection(false);
