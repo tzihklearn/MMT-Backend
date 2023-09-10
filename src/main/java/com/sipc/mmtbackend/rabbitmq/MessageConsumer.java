@@ -112,7 +112,7 @@ public class MessageConsumer {
             for (int i = 0; i < 3; i++) {
                 if (orderId.get(i) != null) {
                     setOrder(userId, registrationFormParam, orderId.get(i),
-                            registrationFormParam.getOrganizationOrder(), i);
+                            registrationFormParam.getOrganizationOrder(), i + 1);
                     interviewStatusMapper.insertUserIdAndUserIdAndRoundAndAdmissionIdAndDepartmentId(userId, 1,
                             registrationFormParam.getAdmissionId(), orderId.get(i), registrationFormParam.getOrganizationOrder(), i+1);
                 }
