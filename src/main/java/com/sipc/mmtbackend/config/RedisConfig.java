@@ -4,7 +4,9 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
@@ -62,6 +64,10 @@ public class RedisConfig {
 
     public ObjectMapper redisObjectMapper() {
         ObjectMapper objectMapper = new ObjectMapper();
+
+        objectMapper.registerModule(new JavaTimeModule()); // 注册JavaTimeModule模块
+//通过将WRITE_DATES_AS_TIMESTAMPS设置为false，它将告诉ObjectMapper将日期时间类型序列化为ISO-8601格式的字符串。
+        objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 
         // ObjectMapper 在序列化时默认会将单个对象包装在一个包含该对象的数组中,可能会导致序列化json对象为json数组
         /*
@@ -121,6 +127,12 @@ public class RedisConfig {
     private RedisCacheConfiguration getRedisCacheConfigurationWithTtl(Integer minutes) {
         Jackson2JsonRedisSerializer<Object> jackson2JsonRedisSerializer = new Jackson2JsonRedisSerializer<>(Object.class);
         ObjectMapper om = new ObjectMapper();
+
+        om.registerModule(new JavaTimeModule()); // 注册JavaTimeModule模块
+//通过将WRITE_DATES_AS_TIMESTAMPS设置为false，它将告诉ObjectMapper将日期时间类型序列化为ISO-8601格式的字符串。
+        om.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+
+
         om.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
         om.activateDefaultTyping(
                 LaissezFaireSubTypeValidator.instance,

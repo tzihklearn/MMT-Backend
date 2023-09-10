@@ -346,6 +346,12 @@ public class COrganizationInterviewImpl implements COrganizationInterviewService
                 cacheService.deleteAdmissionCache(admissionId);
                 admission = cacheService.getAdmissionCache(admissionId);
             }
+
+            if (admission == null) {
+                log.warning("社团基本纳新问题接口异常，数据库出错，admission表异常，admissionId:" + admissionId);
+                return CommonResult.serverError();
+            }
+
             result.setAdmissionId(admissionId);
 //            result.setAllowReallocation(admission.getAllowReallocation());
             result.setAllowReallocation(admission.getRounds());
