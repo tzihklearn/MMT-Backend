@@ -22,15 +22,18 @@ import com.sipc.mmtbackend.utils.RedisUtil;
 import com.sipc.mmtbackend.utils.checkRoleUtils.CheckRole;
 import com.sipc.mmtbackend.utils.checkRoleUtils.param.CheckResultParam;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.logging.Logger;
 
 /**
@@ -85,7 +88,10 @@ public class COrganizationInterviewImpl implements COrganizationInterviewService
     @Resource
     private RedisUtil redisUtil;
 
-//    private final ReentrantReadWriteLock rwLock = new ReentrantReadWriteLock();
+    @Resource
+    private RedisTemplate<Serializable, Object> redisTemplate;
+
+    private final ReentrantReadWriteLock rwLock = new ReentrantReadWriteLock();
 
     private final AtomicInteger atomicInteger =new AtomicInteger(1000);
     @Resource
@@ -120,6 +126,8 @@ public class COrganizationInterviewImpl implements COrganizationInterviewService
 
 
         if (openId != null) {
+
+
             //存入Registration_from_json表
 
 //            //存入Registration_from_json表
@@ -195,16 +203,41 @@ public class COrganizationInterviewImpl implements COrganizationInterviewService
 //                ++userId;
 //                rwLock.writeLock().unlock();
 //            }
-            RegistrationFormParamPo registrationFormParamPo = new RegistrationFormParamPo(registrationFormParam, userId);
-            //将消息携带绑定键值：TestDirectRouting 发送到交换机TestDirectExchange
-            rabbitTemplate.convertAndSend(DirectRabbitConfig.EXCHANGE_NAME, DirectRabbitConfig.ROUTING_KEY, registrationFormParamPo,
-                    //配置死信队列，消息过期时间5s
+            try {
+//                rwLock.writeLock().lock();
+
+                Boolean isR = redisUtil.hashPutIf("registration" + registrationFormParam.getAdmissionId(), String.valueOf(userId), 1);
+
+                if (Boolean.TRUE.equals(isR)) {
+                    RegistrationFormParamPo registrationFormParamPo = new RegistrationFormParamPo(registrationFormParam, userId);
+                    //将消息携带绑定键值：TestDirectRouting 发送到交换机TestDirectExchange
+//            rabbitTemplate.convertAndSend(DirectRabbitConfig.EXCHANGE_NAME, DirectRabbitConfig.ROUTING_KEY, registrationFormParamPo,
+//                    //配置死信队列，消息过期时间5s
+//                    message -> {
+//                        message.getMessageProperties().setExpiration("10000");
+//                        return message;
+//                    }
+//            );
+
+
+                    rabbitTemplate.convertAndSend(DirectRabbitConfig.EXCHANGE_NAME, DirectRabbitConfig.ROUTING_KEY, registrationFormParamPo,
+                            //配置死信队列，消息过期时间5s
                     message -> {
-                        message.getMessageProperties().setExpiration("10000");
+                        message.getMessageProperties().setExpiration("1000000");
                         return message;
                     }
-            );
-//            atomicInteger.incrementAndGet();
+                    );
+                } else {
+                    return CommonResult.fail("您已提交,请勿重复提交");
+                }
+
+//                atomicInteger.incrementAndGet();
+                redisTemplate.opsForValue().increment("message_is_send");
+            } finally {
+//                rwLock.writeLock().unlock();
+            }
+
+
             return CommonResult.success();
         } else {
             //用户鉴权失败
@@ -579,6 +612,7 @@ public class COrganizationInterviewImpl implements COrganizationInterviewService
     @Override
     public CommonResult<Boolean> check(HttpServletRequest request, HttpServletResponse response
             , Integer admissionId) {
+
         // 验证登录状态，获取 userID
         CommonResult<IsCertificationParam> isCertificationParamCommonResult =
                 updateUserInfoController.updateUserInfo(request, response);
@@ -589,7 +623,16 @@ public class COrganizationInterviewImpl implements COrganizationInterviewService
         if (!isCertificationParamCommonResult.getData().getIs_certification())
             return CommonResult.fail("A0140", "用户未认证");
         Integer userId = isCertificationParamCommonResult.getData().getUserId();
+
         boolean result = true;
+
+        Object hash = redisUtil.getHash("registration" + admissionId, userId.toString());
+
+        if (hash != null) {
+            result = false;
+            return CommonResult.success(result);
+        }
+
         for (Integer u : userDepartmentRegistrationMapper.selectUserIdsByAdmissionId(admissionId)) {
             if (Objects.equals(u, userId)) {
                 result = false;

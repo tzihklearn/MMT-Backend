@@ -161,7 +161,7 @@ public class ShowOrganizationServiceImpl implements ShowOrganizationService {
 
         List<DepartmentAdmissionResult> departmentAdmissionResultList = new ArrayList<>();
 
-        List<Integer> departmentIds = admissionDepartmentMergeMapper.selectDepartmentIdByAdmissionId(admissionId);
+        List<Integer> departmentIds = organizationDepartmentMergeMapper.selectDepartmentIdByAdmissionId(admissionId);
 //        List<Integer> departmentIds = cacheService.getDepartmentIdByOrganizationId(organizationId);
 
         for (Integer departmentId : departmentIds) {

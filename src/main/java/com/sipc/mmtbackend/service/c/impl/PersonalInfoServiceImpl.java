@@ -65,7 +65,10 @@ public class PersonalInfoServiceImpl implements PersonalInfoService {
         UserC user = userCMapper.selectByOpenid(openId);
         Integer studentId = user.getStudentId();
 
-        if (userInfoMapper.selectStudentIdForInject(studentId) == 0) return CommonResult.fail("无相关信息");
+//        if (userInfoMapper.selectStudentIdForInject(studentId) == 0) return CommonResult.fail("无相关信息");
+
+        Integer userNum = userInfoMapper.selectStudentIdForInject(studentId);
+        if (userNum == null || userNum == 0) return CommonResult.fail("无相关信息");
 
         UserInfoResult userInfoResult;
         try {

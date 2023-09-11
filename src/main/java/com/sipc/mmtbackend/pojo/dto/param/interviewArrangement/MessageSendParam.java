@@ -15,6 +15,6 @@ public class MessageSendParam {
 
     private List<MessageSendPo> messageSendPoList;
 
-    private String message;
+
 
 }

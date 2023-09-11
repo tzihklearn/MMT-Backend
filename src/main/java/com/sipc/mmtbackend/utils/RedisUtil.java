@@ -168,4 +168,13 @@ public class RedisUtil {
     }
 
 
+    public Boolean hashPutIf(String key1, String key2, Integer num) {
+        return redisTemplate.opsForHash().putIfAbsent(key1, key2, num);
+    }
+
+    public Object getHash(String key1, String key2) {
+        return redisTemplate.opsForHash().get(key1, key2);
+    }
+
+
 }
