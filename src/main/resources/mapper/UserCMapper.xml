@@ -120,12 +120,14 @@
         select *
         from user_c
         where openid = #{openid,jdbcType=VARCHAR}
+        limit 1
     </select>
 
     <select id="selectByOpenid" parameterType="java.lang.String" resultMap="BaseResultMap">
         select *
         from user_c
         where openid = #{openid,jdbcType=VARCHAR}
+        limit 1
     </select>
 
     <select id="selectByStudentIdAndPassword" parameterType="com.sipc.mmtbackend.pojo.c.param.LoginParam"
@@ -151,7 +153,8 @@
     <select id="selectIdByOpenId" resultType="java.lang.Integer">
         select id
         from user_c
-        where openid = #{openId, jdbcType=VARCHAR};
+        where openid = #{openId, jdbcType=VARCHAR}
+        limit 1;
     </select>
 
     <select id="selectIdByStudentId" resultType="java.lang.Integer">
