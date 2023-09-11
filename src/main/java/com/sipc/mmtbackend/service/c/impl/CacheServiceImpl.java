@@ -37,6 +37,9 @@ public class CacheServiceImpl implements CacheService {
     @Resource
     private MessageTemplateMapper messageTemplateMapper;
 
+    @Resource
+    private AdmissionDepartmentMergeMapper admissionDepartmentMergeMapper;
+
 //    @Override
 //    @Cacheable(value = "roundCache", key = "#organizationId")
 //    public Integer getCacheRound(Integer organizationId) {
@@ -78,12 +81,14 @@ public class CacheServiceImpl implements CacheService {
     @Cacheable(value = "organizationDepartmentMergeCache", key = "#admissionId")
     public List<DepartmentResult> organizationDepartmentMergeCache(Integer admissionId) {
 
-        Admission admission = admissionMapper.selectById(admissionId);
-        if (admission == null) {
-            return new ArrayList<>();
-        } else {
-            return departmentMapper.selectRelationByAdmissionId(admission.getOrganizationId());
-        }
+//        Admission admission = admissionMapper.selectById(admissionId);
+//        if (admission == null) {
+//            return new ArrayList<>();
+//        } else {
+//            return departmentMapper.selectRelationByAdmissionId(admission.getOrganizationId());
+//        }
+
+        return admissionDepartmentMergeMapper.selectRelationByAdmissionId(admissionId);
 
 //        return organizationDepartmentMergeMapper.selectRelationByAdmissionId(admissionId);
     }

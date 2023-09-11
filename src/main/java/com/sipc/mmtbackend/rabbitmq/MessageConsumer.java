@@ -12,9 +12,12 @@ import com.sipc.mmtbackend.pojo.c.param.RegistrationFormParamPo;
 import com.sipc.mmtbackend.pojo.domain.RegistrationFromData;
 import com.sipc.mmtbackend.pojo.domain.UserInfo;
 import com.sipc.mmtbackend.utils.JsonUtil;
+import com.sipc.mmtbackend.utils.RedisUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -44,13 +47,19 @@ public class MessageConsumer {
     @Resource
     private InterviewStatusMapper interviewStatusMapper;
 
+    @Resource
+    private RedisTemplate redisTemplate;
+
+    private final ReentrantReadWriteLock RFJrwLock = new ReentrantReadWriteLock();
+
     private final ReentrantReadWriteLock rwLock = new ReentrantReadWriteLock();
 
     @Resource
     JsonUtil jsonUtil;
 
 //    @RabbitListener(queues = DirectRabbitConfig.QUEUE_NAME, concurrency = "1")
-    @RabbitListener(queues = DirectRabbitConfig.QUEUE_NAME)
+    @RabbitListener(queues = DirectRabbitConfig.QUEUE_NAME, containerFactory = "batchQueueRabbitListenerContainerFactory")
+    @Transactional(rollbackFor = Exception.class)
     public void setRegistrationForm(RegistrationFormParamPo registrationFormParamPo) {
 
         Integer userId = registrationFormParamPo.getUserId();
@@ -70,7 +79,7 @@ public class MessageConsumer {
         registrationFormJson.setTime(date.getTime() / 1000);
         registrationFormJson.setIsReallocation(registrationFormParam.getAllowReallocation());
         try {
-            rwLock.writeLock().lock();
+            RFJrwLock.writeLock().lock();
 
             registrationFormJson.setUserId(userId);
 
@@ -84,9 +93,9 @@ public class MessageConsumer {
 
             }
         } finally {
-            rwLock.writeLock().unlock();
-
+            RFJrwLock.writeLock().unlock();
         }
+
         //存入用户基本信息
         UserInfo userInfo = new UserInfo();
         userInfo.setId(userId);
@@ -96,7 +105,11 @@ public class MessageConsumer {
         userInfo.setBirthday(registrationFormParam.getEssentialInformation().getBirthday());
         userInfo.setHeight(registrationFormParam.getEssentialInformation().getHeight());
         userInfo.setWeight(registrationFormParam.getEssentialInformation().getWeight());
+        userInfo.setIsCertification(true);
+
         userInfoMapper.updateById(userInfo);
+
+
         //存入用户志愿信息
             /*
               汤子涵改动
@@ -134,6 +147,8 @@ public class MessageConsumer {
         }
 
         log.info("消费成功，userId:{}", userId);
+
+        redisTemplate.opsForValue().increment("message_is_end");
 
     }
 

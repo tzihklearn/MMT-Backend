@@ -867,7 +867,7 @@ public class InterviewArrangementServiceImpl implements InterviewArrangementServ
                     return CommonResult.fail("安排出错");
                 }
                 Message message = new Message();
-                message.setMessage(messageSendParam.getMessage());
+                message.setMessage(messageSendPo.getMessage());
                 message.setTime(LocalDateTime.now());
                 message.setIsRead((byte) 0);
                 message.setOrganizationId(organizationId);

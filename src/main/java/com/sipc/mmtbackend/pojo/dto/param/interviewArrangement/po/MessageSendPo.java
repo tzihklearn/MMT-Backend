@@ -14,5 +14,7 @@ public class MessageSendPo {
 
     private Integer userId;
 
+    private String message;
+
 
 }

@@ -7,4 +7,10 @@
         from admission_department_merge
         where admission_id = #{admissionId, jdbcType = INTEGER}
     </select>
+    <select id="selectRelationByAdmissionId" resultType="com.sipc.mmtbackend.pojo.c.result.DepartmentResult">
+        select department.id as departmentId, department.name as departmentName
+        from admission_department_merge as adm
+        left join department on adm.department_id = department.id
+        where adm.admission_id = #{admissionId,jdbcType=INTEGER};
+    </select>
 </mapper>
