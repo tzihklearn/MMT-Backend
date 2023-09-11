@@ -66,6 +66,7 @@ public class MessageConsumer {
         RegistrationFormParam registrationFormParam = registrationFormParamPo.getRegistrationFormParam();
 
         log.info("开始消费，userId:{}", userId);
+        log.info("开始消费，registrationFormParamPo:{}", registrationFormParamPo);
 
 //        rwLock.readLock().lock();
 
