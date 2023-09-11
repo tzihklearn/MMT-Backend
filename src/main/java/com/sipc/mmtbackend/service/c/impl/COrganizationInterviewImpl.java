@@ -232,7 +232,7 @@ public class COrganizationInterviewImpl implements COrganizationInterviewService
                 }
 
 //                atomicInteger.incrementAndGet();
-                redisTemplate.opsForValue().increment("message_is_send");
+//                redisTemplate.opsForValue().increment("message_is_send");
             } finally {
 //                rwLock.writeLock().unlock();
             }

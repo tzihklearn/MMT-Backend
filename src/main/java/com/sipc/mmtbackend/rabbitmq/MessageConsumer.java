@@ -66,6 +66,7 @@ public class MessageConsumer {
         RegistrationFormParam registrationFormParam = registrationFormParamPo.getRegistrationFormParam();
 
         log.info("开始消费，userId:{}", userId);
+        log.info("开始消费，registrationFormParamPo:{}", registrationFormParamPo);
 
 //        rwLock.readLock().lock();
 
@@ -148,7 +149,7 @@ public class MessageConsumer {
 
         log.info("消费成功，userId:{}", userId);
 
-        redisTemplate.opsForValue().increment("message_is_end");
+//        redisTemplate.opsForValue().increment("message_is_end");
 
     }
 
