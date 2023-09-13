@@ -30,6 +30,6 @@ public interface InterviewArrangementService {
 
     CommonResult<MessageCheckResult> messageCheck(Integer round);
 
-    CommonResult<String> messageSend(MessageSendParam messageSendParam);
+    CommonResult<String> messageSend(MessageSendParam messageSendParam) throws DateBaseException;
 
 }

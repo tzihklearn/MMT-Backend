@@ -154,7 +154,7 @@
     </select>
     <select id="selectIMByAdmissionIdAndRoundFirst"
             resultType="com.sipc.mmtbackend.pojo.domain.po.InterviewMessagePo">
-        select its.id, ui.student_id, ui.name, ui.major_class_id, its.department_id, its.state, its.start_time as next_time,
+        select its.id, ui.id as user_id, ui.student_id, ui.name, ui.major_class_id, its.department_id, its.state, its.start_time as next_time,
                its.admission_address_id as next_place_id, m.is_read as message_status
         from interview_status as its
                 left join user_info as ui on ui.id = its.user_id
@@ -165,7 +165,7 @@
     </select>
     <select id="selectIMByAdmissionIdAndRound"
             resultType="com.sipc.mmtbackend.pojo.domain.po.InterviewMessagePo">
-        select its.id, ui.student_id, ui.name, ui.major_class_id, its.department_id, its.state, its.start_time as next_time,
+        select its.id, ui.id as user_id, ui.student_id, ui.name, ui.major_class_id, its.department_id, its.state, its.start_time as next_time,
                its.admission_address_id as next_place_id, m.is_read as message_status
         from interview_status as its
                  left join user_info as ui on ui.id = its.user_id
@@ -204,7 +204,7 @@
     </select>
     <select id="selectArrangeByAdmissionIdAndSiftAndRoundFirst"
             resultType="com.sipc.mmtbackend.pojo.domain.po.InterviewMessagePo">
-        select its.id, ui.student_id, ui.name, ui.major_class_id, its.department_id, its.state, its.start_time as next_time,
+        select its.id, ui.id as user_id, ui.student_id, ui.name, ui.major_class_id, its.department_id, its.state, its.start_time as next_time,
         its.admission_address_id as next_place_id, m.is_read as message_status
         from interview_status as its
         left join user_info as ui on ui.id = its.user_id
@@ -228,23 +228,25 @@
         </if>
         <if test="siftParam.messageStatusList.size() != 0">
             <foreach collection="siftParam.messageStatusList" item="item" open="(" separator="," close=")">
+                and (
                 <choose>
                     <when test="#{item == 1}">
-                        and its.state not in (2,3)
+                        its.state not in (2,3)
                     </when>
                     <when test="#{item == 2}">
-                        and its.state = 3
+                        or its.state = 3
                     </when>
                     <when test="#{item == 3}">
-                        and its.state = 2
+                        or its.state = 2
                     </when>
                 </choose>
+                )
             </foreach>
         </if>
     </select>
     <select id="selectArrangeByAdmissionIdAndSiftAndRound"
             resultType="com.sipc.mmtbackend.pojo.domain.po.InterviewMessagePo">
-        select its.id, ui.student_id, ui.name, ui.major_class_id, its.department_id, its.state, its.start_time as next_time,
+        select its.id, ui.id as user_id, ui.student_id, ui.name, ui.major_class_id, its.department_id, its.state, its.start_time as next_time,
                its.admission_address_id as next_place_id, m.is_read as message_status
         from interview_status as its
                  left join user_info as ui on ui.id = its.user_id
@@ -268,17 +270,19 @@
           </if>
           <if test="siftParam.messageStatusList.size() != 0">
               <foreach collection="siftParam.messageStatusList" item="item" open="(" separator="," close=")">
+                  and (
                   <choose>
                       <when test="#{item == 1}">
-                            and its.state not in (2,3)
+                          its.state not in (2,3)
                       </when>
                       <when test="#{item == 2}">
-                            and its.state = 3
+                          or its.state = 3
                       </when>
                       <when test="#{item == 3}">
-                          and its.state = 2
+                          or its.state = 2
                       </when>
                   </choose>
+                  )
               </foreach>
           </if>
     </select>
