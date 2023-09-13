@@ -73,7 +73,7 @@ public class InterviewArrangementController {
     }
 
     @PostMapping("/message/send")
-    public CommonResult<String> messageSend(@RequestBody MessageSendParam messageSendParam) {
+    public CommonResult<String> messageSend(@RequestBody MessageSendParam messageSendParam) throws DateBaseException {
         return interviewArrangementService.messageSend(messageSendParam);
     }
 

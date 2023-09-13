@@ -1,6 +1,7 @@
 package com.sipc.mmtbackend.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.sipc.mmtbackend.mapper.*;
 import com.sipc.mmtbackend.mapper.customization.MyAdmissionAddressMapper;
 import com.sipc.mmtbackend.mapper.customization.MyInterviewStatusMapper;
@@ -83,6 +84,7 @@ public class InterviewArrangementServiceImpl implements InterviewArrangementServ
     private final Map<Integer, String> classMap = new HashMap<>();
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public CommonResult<String> manualSchedule(ScheduleParam scheduleParam) throws DateBaseException {
 
         /*
@@ -148,13 +150,16 @@ public class InterviewArrangementServiceImpl implements InterviewArrangementServ
                 //TODO：要使用多线程异步优化
                 int i = 0;
                 int t = interviewIdList.size() / addressIdList.size();
+
+                int size = addressIdList.size();
+
                 if (t == 0) {
                     for (Integer interviewId : interviewIdList) {
                         InterviewStatus interviewStatus = new InterviewStatus();
                         interviewStatus.setId(interviewId);
                         interviewStatus.setAdmissionAddressId(addressIdList.get(i));
                         interviewStatus.setStartTime(TimeTransUtil.transLongToTime(scheduleParam.getStartTime()));
-                        interviewStatus.setEndTime(TimeTransUtil.transLongToTime(scheduleParam.getStartTime() + scheduleParam.getTime() * 60));
+                        interviewStatus.setEndTime(TimeTransUtil.transLongToTime(scheduleParam.getStartTime() + scheduleParam.getTime() * 60 * 1000));
                         interviewStatus.setState(3);
                         int updateNum = interviewStatusMapper.updateById(interviewStatus);
                         if (updateNum != 1) {
@@ -167,9 +172,10 @@ public class InterviewArrangementServiceImpl implements InterviewArrangementServ
                     for (Integer interviewId : interviewIdList) {
                         InterviewStatus interviewStatus = new InterviewStatus();
                         interviewStatus.setId(interviewId);
-                        interviewStatus.setAdmissionAddressId(addressIdList.get(i/t));
-                        interviewStatus.setStartTime(TimeTransUtil.transLongToTime(scheduleParam.getStartTime()));
-                        interviewStatus.setEndTime(TimeTransUtil.transLongToTime(scheduleParam.getStartTime() + (long) scheduleParam.getTime() * 60 * (i + 1)));
+//                        interviewStatus.setAdmissionAddressId(addressIdList.get(i%t));
+                        interviewStatus.setAdmissionAddressId(addressIdList.get(i%size));
+                        interviewStatus.setStartTime(TimeTransUtil.transLongToTime(scheduleParam.getStartTime() + (long) scheduleParam.getTime() * 60 * (i/size) * 1000));
+                        interviewStatus.setEndTime(TimeTransUtil.transLongToTime(scheduleParam.getStartTime() + (long) scheduleParam.getTime() * 60 * ((i + size)/size) * 1000));
                         interviewStatus.setState(3);
                         int updateNum = interviewStatusMapper.updateById(interviewStatus);
                         if (updateNum != 1) {
@@ -186,6 +192,7 @@ public class InterviewArrangementServiceImpl implements InterviewArrangementServ
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public CommonResult<String> automaticSchedule(ScheduleParam scheduleParam) throws DateBaseException {
         /*
           鉴权并且获取用户所属社团组织id
@@ -252,13 +259,16 @@ public class InterviewArrangementServiceImpl implements InterviewArrangementServ
                 //TODO：要使用多线程异步优化
                 int i = 0;
                 int t = interviewIdList.size() / addressIdList.size();
+
+                int size = addressIdList.size();
+
                 if (t == 0) {
                     for (Integer interviewId : interviewIdList) {
                         InterviewStatus interviewStatus = new InterviewStatus();
                         interviewStatus.setId(interviewId);
                         interviewStatus.setAdmissionAddressId(addressIdList.get(i));
                         interviewStatus.setStartTime(TimeTransUtil.transLongToTime(scheduleParam.getStartTime()));
-                        long endTime = scheduleParam.getStartTime() + scheduleParam.getTime() * 60;
+                        long endTime = scheduleParam.getStartTime() + scheduleParam.getTime() * 60 * 1000;
                         interviewStatus.setEndTime(TimeTransUtil.transLongToTime(endTime));
                         interviewStatus.setState(3);
                         if (endTime > scheduleParam.getEndTime()) {
@@ -275,9 +285,10 @@ public class InterviewArrangementServiceImpl implements InterviewArrangementServ
                     for (Integer interviewId : interviewIdList) {
                         InterviewStatus interviewStatus = new InterviewStatus();
                         interviewStatus.setId(interviewId);
-                        interviewStatus.setAdmissionAddressId(addressIdList.get(i/t));
-                        interviewStatus.setStartTime(TimeTransUtil.transLongToTime(scheduleParam.getStartTime()));
-                        long endTime = scheduleParam.getStartTime() + (long) scheduleParam.getTime() * 60 * (i + 1);
+//                        interviewStatus.setAdmissionAddressId(addressIdList.get(i%t));
+                        interviewStatus.setAdmissionAddressId(addressIdList.get(i%size));
+                        interviewStatus.setStartTime(TimeTransUtil.transLongToTime(scheduleParam.getStartTime() + (long) scheduleParam.getTime() * 60 * (i/size) * 1000));
+                        long endTime = scheduleParam.getStartTime() + (long) scheduleParam.getTime() * 60 * ((i + size)/size) * 1000;
                         interviewStatus.setEndTime(TimeTransUtil.transLongToTime(endTime));
                         interviewStatus.setState(3);
                         if (endTime > scheduleParam.getEndTime()) {
@@ -320,7 +331,7 @@ public class InterviewArrangementServiceImpl implements InterviewArrangementServ
 
         AdmissionDepartmentMerge admissionDepartmentMerge = admissionDepartmentMergeMapper.selectOne(
                 new QueryWrapper<AdmissionDepartmentMerge>()
-                        .select("id")
+//                        .select("id")
                         .eq("admission_id", admission.getId())
                         .eq("department_id", saveAddressParam.getDepartmentId())
         );
@@ -331,10 +342,22 @@ public class InterviewArrangementServiceImpl implements InterviewArrangementServ
 
         AdmissionSchedule admissionSchedule = admissionScheduleMapper.selectOne(
                 new QueryWrapper<AdmissionSchedule>()
-                        .select("id")
+//                        .select("id")
                         .eq("admission_department_id", admissionDepartmentMerge.getId())
                         .eq("round", saveAddressParam.getRound())
         );
+
+        if (admissionSchedule == null) {
+            admissionSchedule = new AdmissionSchedule();
+            admissionSchedule.setAdmissionDepartmentId(admissionDepartmentMerge.getId());
+            admissionSchedule.setRound(saveAddressParam.getRound());
+            admissionSchedule.setIsDeleted((byte) 0);
+            int insertNum = admissionScheduleMapper.insert(admissionSchedule);
+            if (insertNum != 1) {
+                log.error("adsa");
+                throw new DateBaseException("数据库插入异常");
+            }
+        }
 
         AdmissionAddress admissionAddress = new AdmissionAddress();
         admissionAddress.setName(saveAddressParam.getName());
@@ -565,6 +588,7 @@ public class InterviewArrangementServiceImpl implements InterviewArrangementServ
             for (InterviewMessagePo interviewMessagePo : myInterviewStatusMapper.selectIMByAdmissionIdAndRoundFirst(admission.getId(), start, end)) {
                 IAInfoPo iaInfoPo = new IAInfoPo();
                 iaInfoPo.setId(interviewMessagePo.getId());
+                iaInfoPo.setUserId(interviewMessagePo.getUserId());
                 iaInfoPo.setStudentId(interviewMessagePo.getStudentId());
                 iaInfoPo.setName(interviewMessagePo.getName());
                 iaInfoPo.setClassName(classMap.get(interviewMessagePo.getMajorClassId()));
@@ -596,6 +620,7 @@ public class InterviewArrangementServiceImpl implements InterviewArrangementServ
             for (InterviewMessagePo interviewMessagePo : myInterviewStatusMapper.selectIMByAdmissionIdAndRound(admission.getId(), round, start, end)) {
                 IAInfoPo iaInfoPo = new IAInfoPo();
                 iaInfoPo.setId(interviewMessagePo.getId());
+                iaInfoPo.setUserId(interviewMessagePo.getUserId());
                 iaInfoPo.setStudentId(interviewMessagePo.getStudentId());
                 iaInfoPo.setName(interviewMessagePo.getName());
                 iaInfoPo.setClassName(classMap.get(interviewMessagePo.getMajorClassId()));
@@ -685,6 +710,7 @@ public class InterviewArrangementServiceImpl implements InterviewArrangementServ
 
                     IAInfoPo iaInfoPo = new IAInfoPo();
                     iaInfoPo.setId(interviewMessagePo.getId());
+                    iaInfoPo.setUserId(interviewMessagePo.getUserId());
                     iaInfoPo.setStudentId(interviewMessagePo.getStudentId());
                     iaInfoPo.setName(interviewMessagePo.getName());
                     iaInfoPo.setClassName(classMap.get(interviewMessagePo.getMajorClassId()));
@@ -730,6 +756,7 @@ public class InterviewArrangementServiceImpl implements InterviewArrangementServ
 
                     IAInfoPo iaInfoPo = new IAInfoPo();
                     iaInfoPo.setId(interviewMessagePo.getId());
+                    iaInfoPo.setUserId(interviewMessagePo.getUserId());
                     iaInfoPo.setStudentId(interviewMessagePo.getStudentId());
                     iaInfoPo.setName(interviewMessagePo.getName());
                     iaInfoPo.setClassName(classMap.get(interviewMessagePo.getMajorClassId()));
@@ -746,7 +773,7 @@ public class InterviewArrangementServiceImpl implements InterviewArrangementServ
                     iaInfoPo.setNextTime(TimeTransUtil.transStringToTimeDataDashboard(interviewMessagePo.getNextTime()));
                     iaInfoPo.setNextPlace(addressMap.get(interviewMessagePo.getNextPlaceId()));
 
-                    if (interviewMessagePo.getMessageStatus() != null) {
+                    if (interviewMessagePo.getMessageStatus() != null && interviewMessagePo.getState() != 3) {
                         iaInfoPo.setMessageStatus(1);
                     } else if (interviewMessagePo.getNextPlaceId() != null) {
                         iaInfoPo.setMessageStatus(2);
@@ -830,14 +857,15 @@ public class InterviewArrangementServiceImpl implements InterviewArrangementServ
             result.setMessageTemple(messageTemplate.getMessageTemplate());
         }
         result.setAllNum((int) (all - no));
-        result.setNotifiedNum((int) (all - no- un));
-        result.setNotifiedNum(Math.toIntExact(un));
+        result.setNotifiedNum((int) (all - no - un));
+        result.setNotNotifiedNum(Math.toIntExact(un));
 
         return CommonResult.success(result);
     }
 
     @Override
-    public CommonResult<String> messageSend(MessageSendParam messageSendParam) {
+    @Transactional(rollbackFor = Exception.class)
+    public CommonResult<String> messageSend(MessageSendParam messageSendParam) throws DateBaseException {
 
         /*
           鉴权并且获取用户所属社团组织id
@@ -860,11 +888,20 @@ public class InterviewArrangementServiceImpl implements InterviewArrangementServ
             for (MessageSendPo messageSendPo : messageSendParam.getMessageSendPoList()) {
 
                 InterviewStatus interviewStatus = new InterviewStatus();
-                interviewStatus.setId(messageSendPo.getInterviewId());
+//                interviewStatus.setId(messageSendPo.getInterviewId());
                 interviewStatus.setState(4);
-                int updateNum = interviewStatusMapper.updateById(interviewStatus);
+//                int updateNum = interviewStatusMapper.updateById(interviewStatus);
+                int updateNum = interviewStatusMapper.update(interviewStatus,
+                        new UpdateWrapper<InterviewStatus>()
+                                .eq("id", messageSendPo.getInterviewId())
+                                .eq("state", 3)
+                );
+                if (updateNum == 0) {
+                    break;
+                }
                 if (updateNum != 1) {
-                    return CommonResult.fail("安排出错");
+//                    return CommonResult.fail("安排出错");
+                    throw new DateBaseException("数据库更新异常");
                 }
                 Message message = new Message();
                 message.setMessage(messageSendPo.getMessage());
@@ -873,6 +910,7 @@ public class InterviewArrangementServiceImpl implements InterviewArrangementServ
                 message.setOrganizationId(organizationId);
                 message.setUserId(messageSendPo.getUserId());
                 message.setType(2);
+                message.setState(0);
                 message.setInterviewStatusId(messageSendPo.getInterviewId());
                 message.setIsDeleted((byte) 0);
                 messageMapper.insert(message);

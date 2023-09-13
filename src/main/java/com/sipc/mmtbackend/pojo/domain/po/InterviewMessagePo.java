@@ -16,6 +16,8 @@ public class InterviewMessagePo {
      */
     private Integer id;
 
+    private Integer userId;
+
     /**
      * 学号
      */
