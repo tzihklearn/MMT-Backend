@@ -739,9 +739,9 @@ public class InterviewArrangementServiceImpl implements InterviewArrangementServ
 
                 if (i >= start && i < end) {
                     iaInfoPos.add(iaInfoPo);
-                    ++i;
-                }
 
+                }
+                ++i;
 //                if (i >= end) {
 //                    break;
 //                }
@@ -788,9 +788,9 @@ public class InterviewArrangementServiceImpl implements InterviewArrangementServ
 
                 if (i >= start && i < end) {
                     iaInfoPos.add(iaInfoPo);
-                    ++i;
-                }
 
+                }
+                ++i;
 //                if (i >= end) {
 //                    break;
 //                }
