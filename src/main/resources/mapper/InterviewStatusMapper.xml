@@ -9,11 +9,10 @@
     <update id="updateByRAdmissionAddress">
         update interview_status
         set admission_address_id = null, start_time = null, end_time = null,
-            state = 2
+            state = 2, is_message = 0
         where admission_address_id = #{addressId,jdbcType=INTEGER}
             and round = #{round,jdbcType=INTEGER}
             and (state = 3 or state = 4)
-
             and is_deleted = 0
     </update>
     <delete id="deleteByUserIdAndAdmissionId">

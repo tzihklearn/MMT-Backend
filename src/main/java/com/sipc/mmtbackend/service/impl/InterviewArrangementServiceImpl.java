@@ -387,6 +387,7 @@ public class InterviewArrangementServiceImpl implements InterviewArrangementServ
         Admission admission = admissionMapper.selectOne(
                 new QueryWrapper<Admission>()
                         .select("id")
+                        .select("organization_id")
                         .eq("organization_id", organizationId)
                         .orderByDesc("id")
                         .last("limit 1")
@@ -414,14 +415,16 @@ public class InterviewArrangementServiceImpl implements InterviewArrangementServ
 
         List<InterviewStatus> interviewStatusIds = interviewStatusMapper.selectList(
                 new QueryWrapper<InterviewStatus>()
+                        .select("id")
+                        .select("user_id")
                         .eq("admission_address_id", deletedAddressParam.getAddressId())
-                        .and(i -> i.eq("state", 3).or(j -> j.eq("state", 4)))
+                        .eq("state", 4)
                         .eq("is_message", 2)
         );
 
         interviewStatusMapper.updateByRAdmissionAddress(deletedAddressParam.getAddressId(), deletedAddressParam.getRound());
 
-        messageMapper.insertRAddress(interviewStatusIds, LocalDateTime.now());
+        messageMapper.insertRAddress(interviewStatusIds, admission.getOrganizationId(), LocalDateTime.now());
 
         addressMap.remove(deletedAddressParam.getAddressId());
 
