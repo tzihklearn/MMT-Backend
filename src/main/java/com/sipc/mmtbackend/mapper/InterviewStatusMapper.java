@@ -25,4 +25,6 @@ public interface InterviewStatusMapper extends BaseMapper<InterviewStatus> {
             Integer userId, Integer round, Integer admissionId, Integer departmentId, Integer organizationOrder, Integer departmentOrder
     );
 
+    Integer updateByRAdmissionAddress(Integer addressId, Integer round);
+
 }

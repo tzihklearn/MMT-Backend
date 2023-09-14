@@ -6,6 +6,16 @@
         values (#{userId,jdbcType=INTEGER}, #{round,jdbcType=INTEGER}, #{admissionId,jdbcType=INTEGER},
                 #{departmentId,jdbcType=INTEGER}, #{organizationOrder,jdbcType=INTEGER}, #{departmentOrder,jdbcType=INTEGER})
     </insert>
+    <update id="updateByRAdmissionAddress">
+        update interview_status
+        set admission_address_id = null, start_time = null, end_time = null,
+            state = 2
+        where admission_address_id = #{addressId,jdbcType=INTEGER}
+            and round = #{round,jdbcType=INTEGER}
+            and (state = 3 or state = 4)
+
+            and is_deleted = 0
+    </update>
     <delete id="deleteByUserIdAndAdmissionId">
         delete
         from interview_status

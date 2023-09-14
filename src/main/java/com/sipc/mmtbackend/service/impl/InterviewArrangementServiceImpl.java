@@ -401,16 +401,27 @@ public class InterviewArrangementServiceImpl implements InterviewArrangementServ
             throw new DateBaseException("数据库删除数据异常");
         }
 
-        interviewStatusMapper.update(new InterviewStatus(),
-                new UpdateWrapper<InterviewStatus>()
+//        interviewStatusMapper.update(new InterviewStatus(),
+//                new UpdateWrapper<InterviewStatus>()
+//                        .eq("admission_address_id", deletedAddressParam.getAddressId())
+//                        .and(i -> i.eq("state", 3).or(j->j.eq("state", 4)))
+//                        .set("state", 2)
+//                        .set("admission_address_id", null)
+//                        .set("start_time", null)
+//                        .set("end_time", null)
+//                        .set("is_message", 0)
+//        );
+
+        List<InterviewStatus> interviewStatusIds = interviewStatusMapper.selectList(
+                new QueryWrapper<InterviewStatus>()
                         .eq("admission_address_id", deletedAddressParam.getAddressId())
-                        .and(i -> i.eq("state", 3).or(j->j.eq("state", 4)))
-                        .set("state", 2)
-                        .set("admission_address_id", null)
-                        .set("start_time", null)
-                        .set("end_time", null)
-                        .set("is_message", 0)
+                        .and(i -> i.eq("state", 3).or(j -> j.eq("state", 4)))
+                        .eq("is_message", 2)
         );
+
+        interviewStatusMapper.updateByRAdmissionAddress(deletedAddressParam.getAddressId(), deletedAddressParam.getRound());
+
+        messageMapper.insertRAddress(interviewStatusIds, LocalDateTime.now());
 
         addressMap.remove(deletedAddressParam.getAddressId());
 
