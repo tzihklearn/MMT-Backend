@@ -369,6 +369,8 @@ public class InterviewArrangementServiceImpl implements InterviewArrangementServ
             throw new DateBaseException("删除数据库数据异常");
         }
 
+        addressMap.putIfAbsent(admissionAddress.getId(), admissionAddress.getName());
+
         return addressAll(saveAddressParam.getRound());
     }
 
@@ -398,6 +400,19 @@ public class InterviewArrangementServiceImpl implements InterviewArrangementServ
             log.error("删除社团部门面试地点接口异常，admission_address表删除数据异常，影响行数：{}，删除数据id：{}", deleteNum, deletedAddressParam.getAddressId());
             throw new DateBaseException("数据库删除数据异常");
         }
+
+        interviewStatusMapper.update(new InterviewStatus(),
+                new UpdateWrapper<InterviewStatus>()
+                        .eq("admission_address_id", deletedAddressParam.getAddressId())
+                        .and(i -> i.eq("state", 3).or(j->j.eq("state", 4)))
+                        .set("state", 2)
+                        .set("admission_address_id", null)
+                        .set("start_time", null)
+                        .set("end_time", null)
+                        .set("is_message", 0)
+        );
+
+        addressMap.remove(deletedAddressParam.getAddressId());
 
         return addressAll(deletedAddressParam.getRound());
     }
@@ -432,6 +447,8 @@ public class InterviewArrangementServiceImpl implements InterviewArrangementServ
                     addressPo.setId(admissionAddress.getId());
                     addressPo.setAddressName(admissionAddress.getName());
                     addressPoList.add(addressPo);
+
+//                    addressMap.putIfAbsent(admissionAddress.getId(), admissionAddress.getName());
                 }
 
             }
