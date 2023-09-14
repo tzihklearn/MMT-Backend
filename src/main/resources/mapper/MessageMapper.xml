@@ -5,6 +5,13 @@
         insert into message(message, time, state, is_read, organization_id, user_id, type, interview_status_id)
         values (#{message}, #{time}, #{state}, #{isRead}, #{organizationId}, #{userId}, #{type}, #{interviewStatusId})
     </insert>
+    <insert id="insertRAddress">
+        insert into message (message, time, state, is_read, organization_id, user_id, type, interview_status_id, is_deleted)
+        values
+            <foreach collection="list" separator="," item="item">
+                ('您的面试地点已经变更,请等待进一步通知', #{time,jdbcType=TIMESTAMP}, 0, 0, #{organizationId,jdbcType=INTEGER}, #{item.userId}, 2, #{item.id}, 0)
+            </foreach>
+    </insert>
     <update id="updateIsRead">
         update message
         set is_read = 2

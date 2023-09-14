@@ -1,9 +1,11 @@
 package com.sipc.mmtbackend.mapper;
 
 import com.sipc.mmtbackend.pojo.c.domain.po.Message.MessagePo;
+import com.sipc.mmtbackend.pojo.domain.InterviewStatus;
 import com.sipc.mmtbackend.pojo.domain.Message;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -33,4 +35,6 @@ public interface MessageMapper extends BaseMapper<Message> {
     Message selectByPrimaryId(Integer messageId);
 
     int updateState(Integer messageId, Integer status);
+
+    int insertRAddress(@Param("list") List<InterviewStatus> list, @Param("organizationId") Integer organizationId, @Param("time") LocalDateTime time);
 }
