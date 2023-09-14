@@ -703,10 +703,7 @@ public class InterviewArrangementServiceImpl implements InterviewArrangementServ
             List<InterviewMessagePo> interviewMessagePos = myInterviewStatusMapper.selectArrangeByAdmissionIdAndSiftAndRoundFirst(siftParam, admission.getId());
             count = interviewMessagePos.size();
             for (InterviewMessagePo interviewMessagePo : interviewMessagePos) {
-                if (i >= start && i < end) {
-                    if ( siftParam.getSearch() != null && !siftParam.getSearch().isEmpty() && !interviewMessagePo.toString().contains(siftParam.getSearch())) {
-                        break;
-                    }
+
 
                     IAInfoPo iaInfoPo = new IAInfoPo();
                     iaInfoPo.setId(interviewMessagePo.getId());
@@ -735,12 +732,19 @@ public class InterviewArrangementServiceImpl implements InterviewArrangementServ
                         iaInfoPo.setMessageStatus(3);
                     }
 
+                    if ( siftParam.getSearch() != null && !siftParam.getSearch().isEmpty() && !iaInfoPo.toString().contains(siftParam.getSearch())) {
+                        --count;
+                        continue;
+                    }
+
+                if (i >= start && i < end) {
                     iaInfoPos.add(iaInfoPo);
+                    ++i;
                 }
-                ++i;
-                if (i >= end) {
-                    break;
-                }
+
+//                if (i >= end) {
+//                    break;
+//                }
 
             }
         } else {
@@ -748,11 +752,7 @@ public class InterviewArrangementServiceImpl implements InterviewArrangementServ
             List<InterviewMessagePo> interviewMessagePos = myInterviewStatusMapper.selectArrangeByAdmissionIdAndSiftAndRound(siftParam, admission.getId(), round);
             count = interviewMessagePos.size();
             for (InterviewMessagePo interviewMessagePo : interviewMessagePos) {
-                if (i >= start && i < end) {
 
-                    if ( siftParam.getSearch() != null && !interviewMessagePo.toString().contains(siftParam.getSearch())) {
-                        break;
-                    }
 
                     IAInfoPo iaInfoPo = new IAInfoPo();
                     iaInfoPo.setId(interviewMessagePo.getId());
@@ -781,12 +781,19 @@ public class InterviewArrangementServiceImpl implements InterviewArrangementServ
                         iaInfoPo.setMessageStatus(3);
                     }
 
+                    if ( siftParam.getSearch() != null && !siftParam.getSearch().isEmpty() && !iaInfoPo.toString().contains(siftParam.getSearch())) {
+                        --count;
+                        continue;
+                    }
+
+                if (i >= start && i < end) {
                     iaInfoPos.add(iaInfoPo);
+                    ++i;
                 }
-                ++i;
-                if (i >= end) {
-                    break;
-                }
+
+//                if (i >= end) {
+//                    break;
+//                }
             }
         }
 
